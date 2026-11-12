@@ -2,7 +2,7 @@
 // SAAHL — إعدادات Supabase المشتركة
 // ===================================
 const SUPABASE_URL = 'https://hkfxikmpfgixrbrboxeb.supabase.co';
-const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl0anJ0ZmxtcXlkbnBlcGR5YWZhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk1Mzk1MjksImV4cCI6MjA5NTExNTUyOX0.8ObScEKDLhsBjmfgkBqFdadx5xA99pw0CkRWCzxASpw';
+const SUPABASE_ANON = 'sb_publishable_OcWY5nY_-b2odLqQxsu2Kw_iQ4YswBz';
 
 // تهيئة Supabase
 const { createClient } = supabase;
