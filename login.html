@@ -225,16 +225,11 @@ const db = createClient(SUPABASE_URL, SUPABASE_ANON);
 let selectedRole = 'SPONSOR';
 let currentTab = 'login';
 
-// ===== CHECK IF ALREADY LOGGED IN =====
-(async () => {
-  try {
-    const { data: { user } } = await db.auth.getUser();
-    if (user) {
-      const { data: profile } = await db.from('profiles').select('role').eq('id', user.id).single();
-      if (profile) redirectByRole(profile.role);
-    }
-  } catch(e) {}
-})();
+// ===== SESSION HANDLING =====
+// Never redirect automatically from the login/registration page.
+// Visitors must be able to switch accounts and register even when an old session exists.
+// Redirect only after an explicit, successful login or registration.
+
 
 // ===== HELPERS =====
 function redirectByRole(role) {
