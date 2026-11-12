@@ -663,9 +663,9 @@ footer{
 </head>
 
 <body>
-<div id="ad-strip" style="position:fixed;top:0;left:0;right:0;z-index:501"></div>
+<div id="ad-strip" style="position:relative;z-index:5;background:#16171c;color:#fff;text-align:center;padding:10px 14px;font-family:Tajawal,sans-serif;font-size:15px;border-bottom:1px solid #c9a84c"><span>✦ مساحة إعلانية في ساهل 2 — أعلن عن خدماتك ووصل إلى المهتمين</span> <a href="advertise.html" style="color:#e7c56a;font-weight:800;margin-inline:12px">أعلن هنا — 10 دراهم لليوم ←</a></div>
 <script>
-const STRIP_SUPABASE_URL = 'https://ytjrtflmqydnpepdyafa.supabase.co';
+const STRIP_SUPABASE_URL = 'https://hkfxikmpfgixrbrboxeb.supabase.co';
 const STRIP_ANON_KEY = 'sb_publishable_OcWY5nY_-b2odLqQxsu2Kw_iQ4YswBz';
 const STRIPE_EDGE_FN_URL = `https://ytjrtflmqydnpepdyafa.supabase.co/functions/v1/stripe-ad-payment`;
 // مفتاح Stripe العام (Publishable) — وضع الاختبار — آمن يظهر بكود الموقع، عكس المفتاح السري
@@ -676,41 +676,7 @@ function escapeAdHtml(s){
   return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 }
 
-async function loadAdStrip(){
-  const stripBaseCss = 'position:fixed;top:0;left:0;right:0;z-index:501;background:#0A0A0A;color:#fff;padding:8px 0;overflow:hidden;white-space:nowrap;font-family:Tajawal,sans-serif;font-size:14px;border-bottom:1px solid rgba(201,168,76,.25);direction:ltr;text-align:left';
-  try{
-    // نستخدم expires_at بدل status لأننا غير متأكدين من صيغة قيمة status بالحروف الكبيرة/الصغيرة — التاريخ لا لبس فيه
-    const nowIso = new Date().toISOString();
-    const url = `${STRIP_SUPABASE_URL}/rest/v1/strip_ads?select=ad_topic,advertiser_name,phone,whatsapp&status=eq.active&expires_at=gt.${nowIso}&order=created_at.desc&limit=20`;
-    const r = await fetch(url, {headers:{apikey:STRIP_ANON_KEY, Authorization:'Bearer '+STRIP_ANON_KEY}});
-    if(!r.ok) throw new Error('strip fetch failed');
-    const ads = await r.json();
-    const s = document.getElementById('ad-strip');
-    s.style.cssText = stripBaseCss;
-
-    let text;
-    if(!ads || !ads.length){
-      text = '✨ اعرض بيانات عاملتك هنا لآلاف الكفلاء يومياً';
-    } else {
-      // كل إعلان يصير رابط قابل للضغط — يفتح واتساب المعلن، أو اتصال هاتفي لو ماكو واتساب
-      text = ads.map(a => {
-        const contactNum = (a.whatsapp || a.phone || '').replace(/[^\d+]/g, '');
-        const href = a.whatsapp ? `https://wa.me/${contactNum.replace('+','')}` : (a.phone ? `tel:${contactNum}` : '#');
-        const label = `📢 ${a.ad_topic} — ${a.advertiser_name}${a.phone ? ' | ' + a.phone : ''}`;
-        return `<a href="${href}" target="_blank" rel="noopener" style="color:#fff;text-decoration:none;border-bottom:1px dashed rgba(255,255,255,.4)" onmouseover="this.style.color='#C9A84C'" onmouseout="this.style.color='#fff'">${escapeAdHtml(label)}</a>`;
-      }).join('   <span style="color:#C9A84C">✦</span>   ');
-    }
-
-    s.innerHTML = `<span id="ad-strip-track" style="display:inline-block;white-space:nowrap;will-change:transform">${text}</span><button onclick="openAdvertiseModal()" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);background:#C9A84C;color:#111;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:700;border:none;cursor:pointer;font-family:inherit;z-index:2">اعلن هنا</button>`;
-
-    runMarquee();
-    adjustLayoutForStrip();
-  }catch(e){
-    console.warn('ad-strip:', e);
-    document.getElementById('ad-strip').style.display = 'none';
-    adjustLayoutForStrip();
-  }
-}
+async function loadAdStrip(){ /* الإعلان الافتراضي ظاهر دائماً؛ لا تعرض إعلاناً مدفوعاً إلا بعد التحقق من الدفع على الخادم */ }
 
 // حركة دقيقة بالبكسل: تبدأ خارج الشاشة تماماً من جهة، وتنتهي خارجها تماماً من الجهة الأخرى، بدون أي تخمين نِسَبي
 function runMarquee(){
@@ -746,8 +712,8 @@ function adjustLayoutForStrip(){
   const nav = document.getElementById('mainNav');
   const hero = document.querySelector('.hero');
   const stripH = (strip && strip.style.display !== 'none') ? strip.offsetHeight : 0;
-  if(nav) nav.style.top = stripH + 'px';
-  if(hero) hero.style.paddingTop = (120 + stripH) + 'px';
+  if(nav) nav.style.top = '0px';
+  if(hero) hero.style.paddingTop = '120px';
   positionSpotlight();
 }
 window.addEventListener('resize', adjustLayoutForStrip);
@@ -961,7 +927,7 @@ async function submitAdvertise(){
     <li><a href="#how" data-t="n1">كيف يعمل</a></li>
     <li><a href="#types" data-t="n2">ابدأ الآن</a></li>
     <li><a href="#features" data-t="n3">المميزات</a></li>
-    <li><a href="kafala.html" data-t="n4">نقل كفالة</a></li>
+    <li><a href="marketplace.html" data-t="n4">نقل كفالة</a></li>
   </ul>
   <div class="nav-actions">
     <div class="lang-wrap">
@@ -1095,7 +1061,9 @@ async function loadSpotlight(){
 
   // لا نعرض الودجت إطلاقاً إذا ما فيه اشتراك مميز فعلي ساري — بدل عرض بيانات وهمية
   if(!_spotData.length){
-    document.getElementById('spotlightWidget').style.display = 'none';
+    document.getElementById('spotSlides').innerHTML = '<div style="padding:20px 14px;text-align:center;color:#fff;font-family:Tajawal,sans-serif"><div style="font-size:24px;margin-bottom:8px">✦</div><strong style="color:#c9a84c">نافذة الأضواء</strong><p style="font-size:12px;line-height:1.9;color:#ddd">مساحة مخصصة للعاملات والإعلانات المميزة</p><a href="advertise.html" style="display:block;background:#c9a84c;color:#111;padding:10px;border-radius:8px;text-decoration:none;font-weight:800">أعلن هنا</a></div>';
+    positionSpotlight();
+    document.getElementById('spotlightWidget').style.display = 'block';
     document.getElementById('spotlightReopen').style.display = 'none';
     return;
   }

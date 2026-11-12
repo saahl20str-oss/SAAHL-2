@@ -286,7 +286,7 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);min-h
       </div>
 
       <div class="note">
-        ⚠️ سيظهر إعلانك في الشريط العلوي فور تأكيد الدفع — مرئي لجميع زوار المنصة.
+        ⚠️ سيظهر إعلانك بعد التحقق من الدفع واعتماد الإعلان — مرئي لجميع زوار المنصة.
       </div>
 
       <div class="err-msg" id="err-msg"></div>
@@ -312,12 +312,12 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);min-h
 <script>
 const SUPA_URL = 'https://hkfxikmpfgixrbrboxeb.supabase.co';
 const SUPA_KEY = 'sb_publishable_OcWY5nY_-b2odLqQxsu2Kw_iQ4YswBz';
-const STRIPE_PK = 'pk_live_51T0igO7KLniAPTryC4eJpV1YXxe20Whx5Y0Ml1sFQFj7cTrGycTcS8FcoHguV5aW75nPtT7RoOtAb10usCL19oci00eLrvkPhz';
+const STRIPE_PK = ''; // checkout must be verified server-side before activation
 const PRICE_ID  = 'price_1Tc2t57KLniAPTryulArfSyR';
 
 const { createClient } = supabase;
 const db = createClient(SUPA_URL, SUPA_KEY);
-const stripe = Stripe(STRIPE_PK);
+// Payment checkout is initiated by the server; do not instantiate Stripe until configured.
 
 let selectedDays = 3;
 
@@ -338,19 +338,7 @@ window.addEventListener('DOMContentLoaded', async ()=>{
   }
 });
 
-async function activateAd(sessionId){
-  // Mark ad as active
-  const {error} = await db.from('strip_ads')
-    .update({
-      status:'active',
-      starts_at: new Date().toISOString(),
-      expires_at: new Date(Date.now() + selectedDays*86400000).toISOString()
-    })
-    .eq('stripe_session_id', sessionId);
-
-  document.getElementById('form-screen').style.display='none';
-  document.getElementById('success-screen').style.display='block';
-}
+async function activateAd(sessionId){document.getElementById('err-msg').textContent='عاد المتصفح من صفحة الدفع. الإعلان قيد التحقق من الدفع بواسطة الخادم؛ لا يتم تفعيله من المتصفح.';}
 
 async function submitAd(){
   const name    = document.getElementById('f-name').value.trim();
@@ -399,7 +387,7 @@ async function submitAd(){
         days: selectedDays,
         price_id: PRICE_ID,
         quantity: selectedDays,
-        success_url: window.location.origin + '/advertise.html?session_id={CHECKOUT_SESSION_ID}',
+        success_url: new URL('advertise.html?session_id={CHECKOUT_SESSION_ID}',window.location.href).href,
         cancel_url: window.location.href
       })
     });
@@ -407,10 +395,10 @@ async function submitAd(){
     const {url, error:fnErr} = await res.json();
     if(fnErr) throw new Error(fnErr);
 
-    window.location.href = url;
+    if(!url || !/^https:\/\/checkout\.stripe\.com\//.test(url))throw new Error('Stripe checkout unavailable');window.location.href = url;
 
   } catch(e) {
-    errEl.textContent = 'حدث خطأ، حاول مجدداً';
+    errEl.textContent = 'الدفع غير متاح حالياً حتى يكتمل الربط الآمن مع Stripe. لم يتم تحصيل أي مبلغ من هذه الصفحة.';
     btn.classList.remove('loading');
     btn.disabled = false;
   }
