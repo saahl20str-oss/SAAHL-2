@@ -1,56 +1,1598 @@
-<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#13263f"><link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="logo.svg"><title>SAAHL | ساهل</title><style>@import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;600;700;800;900&display=swap');
-:root{--navy:#111;--gold:#c9a84c;--paper:#fff;--line:#e8e8e8}*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:white;color:#111;font-family:'Tajawal',Tahoma,Arial,sans-serif}button,input,select,textarea{font:inherit}button{cursor:pointer}header{position:sticky;top:0;z-index:6;background:#ffffffee;backdrop-filter:blur(20px);border-bottom:1px solid #f0f0f0}.wrap{max-width:1250px;margin:auto;padding:16px 24px}.nav{display:flex;align-items:center;gap:16px;min-height:68px;flex-wrap:wrap}.nav img{width:40px;height:40px;object-fit:contain}.nav>b{font-size:20px;font-weight:900}.grow{flex:1}.nav .navlinks{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.btn{background:#111;color:#fff;border:1px solid #111;border-radius:9px;padding:10px 18px;font-weight:700;transition:.2s}.btn:hover{background:#c9a84c;border-color:#c9a84c;color:#111}.btn.gold{background:#c9a84c;border-color:#c9a84c;color:#111}.btn.light{background:transparent;border-color:transparent;color:#666}.btn.light:hover{color:#111;background:#faf7ee}.btn.red{background:#963d38}.btn:disabled{opacity:.5}.nav .btn{font-size:13px}.lang-button{border:1px solid #e8e8e8;background:#fff;color:#333;border-radius:8px;padding:9px 13px;font-size:13px}.lang-options{display:none;position:absolute;top:100%;left:5%;background:white;border:1px solid #eee;border-radius:12px;box-shadow:0 12px 35px #0002;padding:6px;z-index:10}.lang-options.open{display:grid;gap:4px}.lang-options button{border:0;background:white;text-align:start;padding:9px 20px;border-radius:6px}.lang-options button:hover{background:#f8f2e5}.hero{position:relative;min-height:575px;padding:90px 20px 75px;display:flex;align-items:center;justify-content:center;text-align:center;overflow:hidden;background:#fff}.hero:before{content:'';position:absolute;width:490px;height:490px;border:1px solid #c9a84c13;border-radius:50%;left:-220px;top:-230px;pointer-events:none}.hero:after{content:'';position:absolute;width:330px;height:330px;border:1px solid #c9a84c12;border-radius:50%;right:-160px;bottom:-190px;pointer-events:none}.hero-copy{position:relative;z-index:1;max-width:1000px}.hero-eyebrow{display:inline-flex;align-items:center;gap:8px;background:#fdf8ee;border:1px solid #f2e5c9;color:#a8873a;border-radius:30px;padding:8px 18px;font-size:12px;font-weight:700;margin-bottom:25px}.hero h1{font-size:clamp(38px,5.5vw,75px);font-weight:900;line-height:1.2;margin:0 0 22px;letter-spacing:-1px}.hero h1 .accent{color:#c9a84c}.hero p{font-size:17px;color:#777;line-height:2;max-width:700px;margin:0 auto 26px}.hero img{display:none}.hero-cta{display:flex;justify-content:center;gap:12px;flex-wrap:wrap}.hero-cta .btn{padding:13px 27px}.hero-cta .outline{background:white;border-color:#e8e8e8;color:#111}.hero-trust{display:flex;justify-content:center;gap:22px;flex-wrap:wrap;margin-top:30px;color:#777;font-size:12px}.hero-trust span:before{content:'✓';color:#c9a84c;margin-inline-end:7px}.home-intro{text-align:center;padding:35px 0 25px}.home-intro .overline{color:#b18b40;letter-spacing:2px;font-weight:800;font-size:12px}.home-intro h2{font-size:32px;margin:8px 0}.home-intro p{color:#777;line-height:1.8;max-width:700px;margin:auto}.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px}.home-card{background:#fff;border:1px solid #eaeaea;border-radius:16px;padding:30px;min-height:260px;transition:.2s}.home-card:hover{border-color:#c9a84c;box-shadow:0 15px 35px #0000000b;transform:translateY(-3px)}.home-card .symbol{width:55px;height:55px;background:#fdf8ee;color:#c9a84c;border-radius:14px;display:grid;place-items:center;font-size:28px;margin-bottom:20px}.home-card h3{font-size:21px;margin:0 0 10px}.home-card p{color:#777;line-height:1.8;min-height:58px}.home-card .btn{background:white;color:#a8873a;border:0;padding:8px 0}.home-process{background:#fcfaf6;border:1px solid #f2e9d7;border-radius:18px;text-align:center;padding:30px;margin:55px 0 25px}.home-process h2{margin:0 0 20px}.process-steps{display:grid;grid-template-columns:repeat(3,1fr);gap:15px}.process-step{padding:12px}.process-step .num{display:inline-grid;place-items:center;width:40px;height:40px;border-radius:50%;background:white;color:#a8873a;border:1px solid #e9d9b9}.process-step strong{display:block;margin:10px 0}.process-step p{color:#777;font-size:13px}.home-note{text-align:center;color:#888;font-size:12px}.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:14px}.card{background:white;border:1px solid var(--line);border-radius:16px;padding:20px;box-shadow:0 4px 15px #1b2a3a08}.card h3{margin-top:0}.muted{color:#647082;font-size:13px;line-height:1.7}.tag{display:inline-block;background:#f6f0e0;border-radius:20px;padding:5px 9px;font-size:12px;margin:4px 0}.section{margin:30px 0}.section h2{font-size:23px}.fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}label{display:block;font-weight:bold;font-size:13px;margin:8px 0 4px}input,select,textarea{width:100%;border:1px solid #cbd2dc;border-radius:10px;padding:11px;background:white;color:#1b293a}textarea{min-height:80px}.view{display:none}.view.active{display:block}.actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:15px}.notice{background:#fff8e9;border:1px solid #ead5a7;padding:13px;border-radius:12px;margin:12px 0;line-height:1.7}.success{background:#e8f5ec}.spot{position:fixed;right:17px;top:100px;z-index:7;width:220px;min-height:120px;background:#fff;border:1px solid #e6d4ac;border-radius:15px;padding:14px;text-align:start;box-shadow:0 9px 30px #00000013;display:flex;flex-direction:column;justify-content:space-between;gap:8px;color:#111}.spot .spot-title{color:#a8873a;font-weight:900;font-size:17px}.spot .spot-desc{color:#666;font-size:12px;line-height:1.6}.spot .spot-link{color:#a8873a;font-size:12px;font-weight:800}.spot:hover{border-color:#c9a84c}.modal{position:fixed;inset:0;background:#081525b5;z-index:8;display:none;align-items:center;justify-content:center;padding:18px}.modal.show{display:flex}.modal .card{width:min(560px,100%);max-height:90vh;overflow:auto}.pill{background:#e7edf2;padding:4px 9px;border-radius:20px;font-size:12px}footer{margin-top:50px;background:#111;color:#fff;padding:28px;text-align:center;font-size:13px}.spotlight-price{display:inline-flex;padding:12px 20px;background:#fdf8ee;border:1px solid #eeddbb;border-radius:12px;gap:10px;align-items:center;margin:8px 0 20px}.spotlight-price strong{font-size:24px;color:#a8873a}.spotlight-form{max-width:780px}.spotlight-form .fields{margin:10px 0}.spotlight-note{font-size:13px;color:#856524;background:#fdf8ee;padding:14px;border-radius:10px}
-@media(max-width:900px){.spot{position:static;margin:12px auto;width:min(100% - 24px,450px);min-height:85px}.hero{min-height:470px}.nav{gap:7px}.nav .navlinks{order:3;width:100%;justify-content:center}.nav .btn{padding:8px;font-size:12px}.wrap{padding:12px}}
-@media(max-width:700px){.grid,.fields,.process-steps{grid-template-columns:1fr}.hero{min-height:380px;padding:55px 15px}.hero h1{font-size:clamp(34px,9vw,48px)}.hero p{font-size:14px}.nav img{width:34px;height:34px}.nav>b{font-size:16px}.nav .btn{font-size:11px}.nav .navlinks{gap:3px}.home-card{min-height:0;padding:22px}.home-card p{min-height:0}.home-intro{padding:30px 0 20px}.home-process{padding:20px 12px;margin:30px 0}.hero-trust{gap:8px 14px}}
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<script src="https://js.stripe.com/v3/"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SAAHL — منصة ساهل</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --gold:#C9A84C;
+  --gold-d:#A8873A;
+  --gold-l:#FBF3E0;
+  --gold-xl:#FDF8EE;
+  --dark:#0A0A0A;
+  --text:#111111;
+  --muted:#6B6B6B;
+  --border:#E8E8E8;
+  --white:#FFFFFF;
+}
+html{scroll-behavior:smooth}
+body{
+  font-family:'Tajawal',sans-serif;
+  background:#fff;
+  color:var(--text);
+  direction:rtl;
+  overflow-x:hidden;
+  cursor:default;
+}
 
-/* SAAHL visual refinements */
-header .wrap.nav{max-width:none;padding-inline:4.5%;gap:14px;flex-wrap:nowrap;direction:rtl}
-header .nav>img{order:0;width:46px;height:46px;flex-shrink:0}
-header .nav>b{order:1;font-family:'Tajawal',sans-serif;font-size:21px;letter-spacing:.2px}
-header .nav>.grow{order:2;flex:1}
-header .nav>.navlinks{order:3;display:flex;align-items:center;gap:7px}
-header .nav>button[data-t="account"]{order:4}
-header .nav>div:has(.lang-button){order:5}
-header .nav>button#install{order:6}
-.hero h1{font-family:'Tajawal',sans-serif;font-size:clamp(38px,5.2vw,70px);font-weight:800;letter-spacing:0;line-height:1.36;text-wrap:balance}
-.hero h1 .accent{font-weight:900}
-.spot{width:265px;min-height:148px;padding:19px 18px;border:1.5px solid #d5b368;border-radius:16px;background:linear-gradient(135deg,#fff,#fffbf1);box-shadow:0 12px 35px #00000014}
-.spot .spot-title{font-size:19px}.spot .spot-desc{font-size:13px}.spot .spot-link{font-size:13px}
-.grid{gap:22px}.home-card{border:2px solid #e3d6bd;box-shadow:0 8px 22px #14141408;border-radius:19px;min-height:285px;padding:29px;background:#fff}
-.home-card:nth-child(1){background:linear-gradient(145deg,#fffaf0 0%,#fff 75%);border-color:#d6b575}
-.home-card:nth-child(2){background:linear-gradient(145deg,#f2f8ff 0%,#fff 75%);border-color:#a8c5df}
-.home-card:nth-child(3){background:linear-gradient(145deg,#f2fbf5 0%,#fff 75%);border-color:#a7cfb5}
-.home-card:nth-child(1) .symbol{background:#f6e7c8;color:#a9802c}
-.home-card:nth-child(2) .symbol{background:#e0eefb;color:#3973a5}
-.home-card:nth-child(3) .symbol{background:#dff3e5;color:#367c53}
-.home-card .symbol{width:62px;height:62px;border-radius:16px;font-size:29px}
-.home-card h3{font-size:23px}.home-card p{font-size:15px;color:#56616b}.home-card .btn{font-size:16px}
-@media(max-width:900px){header .wrap.nav{flex-wrap:wrap;justify-content:center}header .nav>.navlinks{order:7;width:100%;justify-content:center}.spot{width:min(100% - 24px,500px);min-height:120px}}
-@media(max-width:700px){header .wrap.nav{padding-inline:12px;gap:7px}header .nav>img{width:37px;height:37px}header .nav>b{font-size:17px}.home-card{min-height:0}.hero h1{font-size:clamp(34px,9vw,49px)}}
+/* ===== CUSTOM CURSOR ===== */
+.cursor{
+  width:8px;height:8px;
+  background:var(--gold);
+  border-radius:50%;
+  position:fixed;
+  pointer-events:none;
+  z-index:9999;
+  transition:transform .15s ease;
+  mix-blend-mode:multiply;
+}
+.cursor-ring{
+  width:36px;height:36px;
+  border:1.5px solid var(--gold);
+  border-radius:50%;
+  position:fixed;
+  pointer-events:none;
+  z-index:9998;
+  transition:all .25s ease;
+  opacity:.5;
+}
 
-/* Mobile-first compact layout and section onboarding */
-.section-entry{background:#fff;border:1px solid #e8dcc5;border-radius:14px;padding:18px;margin:15px 0 20px;box-shadow:0 5px 18px #00000008}.section-entry h3{margin:0 0 8px;font-size:20px}.section-entry p{margin:0 0 14px;color:#637080;line-height:1.8}.section-entry .actions{margin:0}.section-entry .btn{font-size:14px}.auth-context{background:#fbf7ec;border:1px solid #ead7aa;border-radius:12px;padding:12px;margin:12px 0}.auth-context strong{display:block;margin-bottom:4px}.auth-context p{margin:0;color:#67717a;font-size:13px}.home-card .symbol svg{display:block}
-@media(max-width:700px){html,body{overflow-x:hidden}header .wrap.nav{min-height:62px;row-gap:6px;padding:9px 13px}header .nav>.navlinks{order:7;display:flex;flex-wrap:nowrap;overflow-x:auto;justify-content:space-between;gap:2px;scrollbar-width:none}header .nav>.navlinks::-webkit-scrollbar{display:none}header .nav .btn{white-space:nowrap;font-size:11px;padding:7px 6px}header .nav>button[data-t="account"]{font-size:12px}header .nav>img{width:34px;height:34px}header .nav>b{font-size:17px}.lang-button{font-size:12px;padding:7px 9px}.spot{position:relative;inset:auto;top:auto;right:auto;width:calc(100% - 26px);max-width:none;min-height:0;margin:10px 13px 0;padding:9px 13px;border-radius:11px;display:grid;grid-template-columns:1fr auto;gap:3px 8px;box-shadow:none;align-items:center}.spot .spot-title{font-size:14px;grid-column:1}.spot .spot-desc{font-size:11px;grid-column:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.spot .spot-link{font-size:11px;grid-column:2;grid-row:1/3;text-align:end;white-space:nowrap}.hero{min-height:0;padding:37px 14px 35px}.hero-eyebrow{font-size:10px;padding:6px 11px;margin-bottom:15px}.hero h1{font-size:clamp(28px,7.3vw,39px);line-height:1.4;margin-bottom:13px;letter-spacing:0}.hero p{font-size:13px;line-height:1.9;margin-bottom:17px}.hero-cta .btn{padding:11px 17px;font-size:13px}.hero-trust{margin-top:19px;gap:6px 10px;font-size:10px}.home-intro{padding:24px 0 17px}.home-intro h2{font-size:25px}.home-intro p{font-size:13px}.grid{grid-template-columns:1fr;gap:10px}.home-card{min-height:0;padding:15px 16px;border-radius:13px;display:grid;grid-template-columns:48px 1fr auto;grid-template-rows:auto auto;column-gap:12px;align-items:center}.home-card .symbol{grid-row:1/3;width:46px;height:46px;border-radius:11px;margin:0}.home-card .symbol svg{width:25px;height:25px}.home-card h3{font-size:17px;margin:0 0 3px;grid-column:2}.home-card p{font-size:11px;line-height:1.55;margin:0;grid-column:2;grid-row:2}.home-card .btn{grid-column:3;grid-row:1/3;align-self:center;font-size:12px;padding:8px}.home-process{margin:20px 0;padding:18px 13px}.home-process h2{font-size:21px}.process-steps{gap:2px}.process-step{padding:8px}.process-step .num{width:31px;height:31px}.process-step strong{margin:5px 0}.process-step p{margin:3px 0}.wrap{padding-inline:13px}.section{margin:18px 0}.view>h2{font-size:23px;margin-top:18px}.card{padding:15px}.section-entry{padding:15px;margin:12px 0}.section-entry h3{font-size:18px}footer{margin-top:24px;padding:19px 12px;font-size:11px}}
-</style></head><body><header><div class="wrap nav"><img src="logo.svg" alt="SAAHL"><b>SAAHL</b><div class="grow"></div><div class="navlinks"><button class="btn light" onclick="go('home')" data-t="home">الرئيسية</button><button class="btn light" onclick="go('workers')" data-t="customer">الكفيل</button><button class="btn light" onclick="go('office')" data-t="office">مكتب استقدام</button><button class="btn light" onclick="go('transfer')" data-t="transfer">نقل الكفالة</button></div><button class="btn light" onclick="go('account')" data-t="account">حسابي</button><div style="position:relative"><button class="lang-button" id="langToggle" type="button" onclick="document.getElementById('langOptions').classList.toggle('open')">◎ <span id="langName">العربية</span>⌄</button><div id="langOptions" class="lang-options"><button type="button" onclick="setLang('ar');document.getElementById('langOptions').classList.remove('open')">العربية</button><button type="button" onclick="setLang('en');document.getElementById('langOptions').classList.remove('open')">English</button><button type="button" onclick="setLang('ur');document.getElementById('langOptions').classList.remove('open')">اردو</button></div></div><select id="language" style="display:none"><option value="ar">العربية</option><option value="en">English</option><option value="ur">اردو</option></select><button id="install" class="btn gold" hidden data-t="install">تثبيت</button></div></header><button class="spot" onclick="go('spotlight')"><span class="spot-title">✦ <span data-t="spotlight">منصة الأضواء</span></span><span class="spot-desc" data-t="spotSmall">أبرز عاملة لدى مكتبك لمدة يوم كامل</span><span class="spot-link" data-t="spotAction">اعرض إعلانك · 30 درهم ←</span></button><main class="wrap">
-<section id="home" class="view active"><div class="hero"><div class="hero-copy"><div class="hero-eyebrow">✦ <span data-t="heroTag">منصة ساهل — تربط مكاتب الاستقدام بالكفلاء</span></div><h1 data-t="headline">ابحث بثقة عن <span class="accent">المساعدة المناسبة</span></h1><p data-t="intro">منصة رقمية تربط الكفلاء بمكاتب الاستقدام المرخصة في الإمارات. اختر العاملة المناسبة وأرسل حجزًا مبدئيًا لمدة 3 ساعات، وتابع الإجراءات مع المكتب.</p><div class="hero-cta"><button class="btn" onclick="go('workers')" data-t="browse">ابدأ البحث</button><button class="btn outline" onclick="go('office')" data-t="registerOffice">سجل مكتبك مجانًا</button></div><div class="hero-trust"><span data-t="trust1">مكاتب مرخصة بعد المراجعة</span><span data-t="trust2">حجز مبدئي لمدة 3 ساعات</span><span data-t="trust3">التواصل مباشرة مع المكتب</span></div></div></div><div class="home-intro"><div class="overline">SAAHL SERVICES</div><h2 data-t="sections">الأقسام الرئيسية</h2><p data-t="sectionIntro">ثلاث خدمات أساسية في منصة واحدة، بتجربة بسيطة وسريعة.</p></div><div class="grid"><div class="home-card"><div class="symbol"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="18" height="14" rx="2"/><path d="M3 11h18M7 7V3h10v4M8 15h3m2 0h3M8 18h8"/></svg></div><h3 data-t="office">مكتب استقدام</h3><p data-t="officeIntro">تسجيل المكتب، إضافة العاملات واستقبال الحجوزات.</p><button class="btn" onclick="go('office')" data-t="open">الدخول</button></div><div class="home-card"><div class="symbol"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="10" cy="8" r="4"/><path d="M3 21v-2a7 7 0 0 1 14 0v2M18 12l2 2 3-4"/></svg></div><h3 data-t="customer">الكفيل / العميل</h3><p data-t="customerIntro">البحث حسب المواصفات والحجز المبدئي السريع.</p><button class="btn" onclick="go('workers')" data-t="open">الدخول</button></div><div class="home-card"><div class="symbol"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16l-4-4m4 4-4 4M20 17H4l4-4m-4 4 4 4"/></svg></div><h3 data-t="transfer">نقل الكفالة</h3><p data-t="transferIntro">إعلانات للربط بين الأطراف، دون تنفيذ النقل داخل المنصة.</p><button class="btn" onclick="go('transfer')" data-t="open">الدخول</button></div></div><div class="home-process"><h2 data-t="howSteps">كيف تستخدم ساهل؟</h2><div class="process-steps"><div class="process-step"><span class="num">01</span><strong data-t="step1">ابحث وقارن</strong><p data-t="step1desc">تصفح العاملات من المكاتب المعتمدة.</p></div><div class="process-step"><span class="num">02</span><strong data-t="step2">احجز مبدئيًا</strong><p data-t="step2desc">أرسل طلب حجز لمدة ثلاث ساعات.</p></div><div class="process-step"><span class="num">03</span><strong data-t="step3">تابع مع المكتب</strong><p data-t="step3desc">أكمل الإجراءات الرسمية مع المكتب.</p></div></div></div><p class="home-note" data-t="homeDisclaimer">ساهل وسيط عرض وربط فقط ولا ينفذ الاستقدام أو نقل الكفالة.</p></section><section id="account" class="view"><h2 data-t="account">حسابي</h2><div id="accountBody" class="card"></div></section>
-<section id="workers" class="view"><h2 data-t="customer">الكفيل / العميل</h2><div id="entry-workers" class="section-entry"></div><p class="muted" data-t="bookNotice">الحجز مبدئي فقط، ولا يمثل عقد استقدام أو ضمان توفر العاملة.</p><div class="card fields"><div><label data-t="search">بحث</label><input id="search" placeholder="الاسم، المهارة، الجنسية"></div><div><label data-t="nationality">الجنسية</label><input id="nationalityFilter" placeholder="مثال: الفلبين"></div></div><div id="workersList" class="cards section"></div><h2 data-t="myBookings">حجوزاتي</h2><div id="myBookings" class="cards"></div></section>
-<section id="office" class="view"><h2 data-t="office">مكتب استقدام</h2><div id="entry-office" class="section-entry"></div><div id="officePanel"></div></section>
-<section id="transfer" class="view"><h2 data-t="transfer">نقل الكفالة</h2><div id="entry-transfer" class="section-entry"></div><div class="notice" data-t="transferNotice">إعلانات ربط فقط. يجب إتمام أي نقل رسمي عبر الجهات المختصة وبعد الحصول على الموافقات المطلوبة.</div><div id="transferPanel"></div><h3 data-t="listings">الإعلانات</h3><div id="transferList" class="cards"></div></section>
-<section id="spotlight" class="view"><div class="home-intro"><div class="overline">SAAHL SPOTLIGHT</div><h2 data-t="spotlight">✦ منصة الأضواء</h2><p data-t="spotIntro">نافذة إعلانية لمكاتب الاستقدام المعتمدة لعرض أفضل عاملة متاحة.</p></div><div class="spotlight-price"><strong>30 AED</strong><span data-t="spotDuration">إعلان واحد · 24 ساعة بعد الدفع والاعتماد</span></div><div id="spotlightRequest" class="card spotlight-form"></div><h3 data-t="activeAds">الإعلانات النشطة</h3><div id="adsList" class="cards"></div></section>
-<section id="admin" class="view"><h2 data-t="admin">لوحة المدير</h2><div id="adminPanel"></div></section>
-</main><footer data-t="footer">ساهل وسيط عرض وربط فقط. لا تحصيل لأموال الاستقدام ولا تنفيذ لعقود أو نقل كفالة داخل المنصة.</footer><div id="modal" class="modal"><div class="card"><div style="display:flex;justify-content:space-between;gap:10px"><h3 id="modalTitle"></h3><button class="btn light" onclick="closeModal()">✕</button></div><div id="modalBody"></div></div></div><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script><script>
-const URL='https://hkfxikmpfgixrbrboxeb.supabase.co',KEY='sb_publishable_OcWY5nY_-b2odLqQxsu2Kw_iQ4YswBz';const db=window.supabase.createClient(URL,KEY);let session=null,profile=null,office=null,workers=[],bookings=[],transfers=[],ads=[],lang='ar',deferred=null;const $=id=>document.getElementById(id),safe=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));const I={ar:{home:'الرئيسية',customer:'الكفيل / العميل',office:'مكتب استقدام',transfer:'نقل الكفالة',account:'حسابي',install:'تثبيت',spotlight:'✦ منصة الأضواء',headline:'ساهل.. طريقك الأسهل للاختيار',intro:'منصة تربط الكفلاء بمكاتب الاستقدام المرخصة. تصفح العاملات، أرسل حجزًا مبدئيًا لمدة 3 ساعات، واترك الإجراءات الرسمية للمكتب.',browse:'تصفح العاملات',sections:'الأقسام الرئيسية',officeIntro:'تسجيل المكتب، إضافة العاملات واستقبال الحجوزات.',customerIntro:'البحث حسب المواصفات والحجز المبدئي السريع.',transferIntro:'إعلانات للربط بين الأطراف، دون تنفيذ النقل داخل المنصة.',open:'الدخول',bookNotice:'الحجز مبدئي فقط، ولا يمثل عقد استقدام أو ضمان توفر العاملة.',search:'بحث',nationality:'الجنسية',myBookings:'حجوزاتي',transferNotice:'إعلانات ربط فقط. يجب إتمام أي نقل رسمي عبر الجهات المختصة وبعد الحصول على الموافقات المطلوبة.',listings:'الإعلانات',spotIntro:'مساحة إعلانية للمكاتب والعروض بعد مراجعة الإدارة.',admin:'لوحة المدير',footer:'ساهل وسيط عرض وربط فقط. لا تحصيل لأموال الاستقدام ولا تنفيذ لعقود أو نقل كفالة داخل المنصة.'},en:{home:'Home',customer:'Sponsor / customer',office:'Recruitment office',transfer:'Sponsorship transfer',account:'My account',install:'Install',spotlight:'✦ Spotlight',headline:'SAAHL — choose with confidence',intro:'Connect with approved recruitment offices, browse workers and submit a three-hour preliminary reservation. Official procedures remain with licensed offices.',browse:'Browse workers',sections:'Main sections',officeIntro:'Register an office, add workers and manage requests.',customerIntro:'Search and submit a simple preliminary reservation.',transferIntro:'Connect interested parties; official transfer occurs outside SAAHL.',open:'Open',bookNotice:'Reservations are preliminary, not a contract or guarantee of availability.',search:'Search',nationality:'Nationality',myBookings:'My reservations',transferNotice:'Listings only. Official transfer requires appropriate approvals and competent authorities.',listings:'Listings',spotIntro:'Reviewed promotions and advertisements.',admin:'Admin dashboard',footer:'SAAHL connects parties only. Recruitment payments, contracts and transfers are handled externally.'},ur:{home:'ہوم',customer:'کفیل / صارف',office:'ریکروٹمنٹ دفتر',transfer:'کفالت کی منتقلی',account:'میرا اکاؤنٹ',install:'انسٹال',spotlight:'✦ اسپاٹ لائٹ',headline:'ساهل — آسان انتخاب',intro:'دفاتر تلاش کریں، کارکن دیکھیں اور تین گھنٹے کی ابتدائی بکنگ بھیجیں۔',browse:'کارکن دیکھیں',sections:'اہم حصے',officeIntro:'دفتر رجسٹر کریں اور کارکن شامل کریں۔',customerIntro:'تلاش اور ابتدائی بکنگ۔',transferIntro:'منتقلی کے اشتہارات اور رابطہ۔',open:'کھولیں',bookNotice:'یہ ابتدائی بکنگ ہے، معاہدہ نہیں۔',search:'تلاش',nationality:'قومیت',myBookings:'میری بکنگ',transferNotice:'سرکاری منتقلی متعلقہ حکام کی منظوری سے ہوگی۔',listings:'اشتہارات',spotIntro:'تصدیق شدہ اشتہارات۔',admin:'ایڈمن',footer:'ساهل صرف رابطہ فراہم کرتا ہے؛ ادائیگی اور سرکاری کارروائی متعلقہ فریق انجام دیتے ہیں۔'}};Object.assign(I.ar,{headline:'ابحث بثقة عن <span class="accent">المساعدة المناسبة</span>',heroTag:'منصة ساهل — تربط مكاتب الاستقدام بالكفلاء',registerOffice:'سجل مكتبك مجانًا',trust1:'مكاتب مرخصة بعد المراجعة',trust2:'حجز مبدئي لمدة 3 ساعات',trust3:'التواصل مباشرة مع المكتب',sectionIntro:'ثلاث خدمات أساسية في منصة واحدة، بتجربة بسيطة وسريعة.',howSteps:'كيف تستخدم ساهل؟',step1:'ابحث وقارن',step1desc:'تصفح العاملات من المكاتب المعتمدة.',step2:'احجز مبدئيًا',step2desc:'أرسل طلب حجز لمدة ثلاث ساعات.',step3:'تابع مع المكتب',step3desc:'أكمل الإجراءات الرسمية مع المكتب.',homeDisclaimer:'ساهل وسيط عرض وربط فقط ولا ينفذ الاستقدام أو نقل الكفالة.',spotSmall:'أبرز عاملة لدى مكتبك لمدة يوم كامل',spotAction:'اعرض إعلانك · 30 درهم ←',spotDuration:'إعلان واحد · 24 ساعة بعد الدفع والاعتماد',activeAds:'الإعلانات النشطة',spotRegister:'إعلان خاص بمكاتب الاستقدام المعتمدة',spotLoginHint:'سجّل الدخول أولًا لتقديم طلب الإعلان.',spotOfficeHint:'يجب تسجيل مكتب الاستقدام واعتماده من الإدارة قبل تقديم الإعلان.',spotRequestTitle:'بيانات الإعلان',spotOfficeAuto:'بيانات المكتب مأخوذة من حساب المكتب المعتمد.',spotOfficeName:'اسم المكتب',spotLicense:'رقم الترخيص',spotPhone:'رقم التواصل',spotWorkerTitle:'اسم تعريفي للعاملة',spotNationality:'الجنسية',spotImage:'رابط صورة العاملة (اختياري)',spotDescription:'وصف الخبرة والمهارات',spotPaymentNotice:'السعر 30 درهم لمدة 24 ساعة. لا توجد بوابة دفع مفعّلة حاليًا؛ إرسال الطلب لا يعني الدفع أو نشر الإعلان. سيتم تفعيله بعد ربط بوابة الدفع والتحقق من السداد.',spotSubmit:'إرسال طلب الإعلان',spotSubmitted:'تم حفظ طلب الإعلان. لم يتم الدفع أو النشر بعد.'});Object.assign(I.en,{headline:'Find the <span class="accent">right household worker</span> with confidence',heroTag:'SAAHL — connecting recruitment offices and sponsors',registerOffice:'Register your office',trust1:'Reviewed licensed offices',trust2:'3-hour preliminary reservation',trust3:'Direct office follow-up',sectionIntro:'Three essential services, one simple platform.',howSteps:'How SAAHL works',step1:'Search and compare',step1desc:'Browse workers from approved offices.',step2:'Reserve provisionally',step2desc:'Submit a 3-hour request.',step3:'Follow up',step3desc:'Complete official procedures with the office.',homeDisclaimer:'SAAHL is a listing and connection platform only.',spotSmall:'Feature your top worker for one day',spotAction:'Advertise · AED 30',spotDuration:'One ad · 24 hours after payment and approval',activeAds:'Active ads',spotRegister:'For approved recruitment offices',spotLoginHint:'Sign in to request an ad.',spotOfficeHint:'Your office must be approved first.',spotRequestTitle:'Advertisement details',spotOfficeAuto:'Office details are taken from your approved account.',spotOfficeName:'Office',spotLicense:'License',spotPhone:'Contact',spotWorkerTitle:'Worker display name',spotNationality:'Nationality',spotImage:'Worker photo URL (optional)',spotDescription:'Experience and skills',spotPaymentNotice:'AED 30 for 24 hours. Payment is not enabled yet. Submitting does not charge you or publish an ad.',spotSubmit:'Submit ad request',spotSubmitted:'Request saved. No payment or publication yet.'});Object.assign(I.ur,{headline:'اعتماد کے ساتھ <span class="accent">مناسب گھریلو کارکن</span> تلاش کریں',heroTag:'ساهل — دفاتر اور کفیلوں کو ملانے والا پلیٹ فارم',registerOffice:'اپنا دفتر رجسٹر کریں',trust1:'منظور شدہ دفاتر',trust2:'تین گھنٹے کی ابتدائی بکنگ',trust3:'دفتر سے براہ راست رابطہ',sectionIntro:'ایک پلیٹ فارم، تین خدمات',howSteps:'ساهل کیسے کام کرتا ہے؟',step1:'تلاش اور موازنہ',step1desc:'منظور شدہ دفاتر کے کارکن دیکھیں',step2:'ابتدائی بکنگ',step2desc:'تین گھنٹے کی درخواست بھیجیں',step3:'دفتر سے رابطہ',step3desc:'سرکاری کارروائی دفتر سے مکمل کریں',homeDisclaimer:'ساهل صرف رابطہ فراہم کرتا ہے',spotSmall:'ایک دن کے لیے بہترین کارکن دکھائیں',spotAction:'اشتہار · 30 درہم',spotDuration:'ایک اشتہار · ادائیگی اور منظوری کے بعد 24 گھنٹے',activeAds:'فعال اشتہارات',spotRegister:'منظور شدہ دفاتر کے لیے',spotLoginHint:'پہلے لاگ ان کریں',spotOfficeHint:'دفتر کی منظوری ضروری ہے',spotRequestTitle:'اشتہار کی تفصیلات',spotOfficeAuto:'دفتر کی تفصیلات آپ کے اکاؤنٹ سے ہیں',spotOfficeName:'دفتر',spotLicense:'لائسنس',spotPhone:'فون',spotWorkerTitle:'کارکن کا نام',spotNationality:'قومیت',spotImage:'تصویر کا لنک (اختیاری)',spotDescription:'تجربہ اور مہارت',spotPaymentNotice:'24 گھنٹے کے لیے 30 درہم۔ ادائیگی ابھی فعال نہیں۔ درخواست سے اشتہار شائع نہیں ہوگا۔',spotSubmit:'درخواست بھیجیں',spotSubmitted:'درخواست محفوظ ہوگئی، ادائیگی نہیں ہوئی۔'});const T=k=>(I[lang]||I.ar)[k]||I.ar[k]||k;let entryContext='';function go(id){entryContext=['office','workers','transfer'].includes(id)?id:entryContext;document.querySelectorAll('.view').forEach(x=>x.classList.toggle('active',x.id===id));window.scrollTo(0,0);refresh()}function startSignup(section){entryContext=section;go('account');let el=$('accountBody');if(el&&!session){const n=el.querySelector('input[name="name"]');if(n)n.focus()}}function renderSectionEntry(){const configs={office:{title:'تسجيل مكتب استقدام',desc:'أنشئ حساب المكتب، ثم أدخل اسم المكتب ورقم الترخيص والإمارة والهاتف لإرسال طلب الاعتماد.'},workers:{title:'حساب الكفيل / العميل',desc:'أنشئ حسابًا لتتمكن من إرسال حجز مبدئي لمدة 3 ساعات ومتابعة حجوزاتك.'},transfer:{title:'حساب نقل الكفالة',desc:'أنشئ حسابًا لإضافة إعلان نقل كفالة أو إرسال اهتمام. إتمام النقل يتم عبر الجهات المختصة.'}};for(const [id,c] of Object.entries(configs)){const el=$('entry-'+id);if(!el)continue;if(session){el.innerHTML='';el.style.display='none';continue}el.style.display='block';el.innerHTML='<h3>'+c.title+'</h3><p>'+c.desc+'</p><div class="actions"><button class="btn gold" onclick="startSignup(\''+id+'\')">إنشاء حساب جديد</button><button class="btn" onclick="startSignup(\''+id+'\')">تسجيل الدخول</button></div>'}}function modal(title,html){$('modalTitle').textContent=title;$('modalBody').innerHTML=html;$('modal').classList.add('show')}function closeModal(){$('modal').classList.remove('show')}function err(e){alert(e?.message||'حدث خطأ / Error')}function mustLogin(){if(!session){go('account');alert('سجّل الدخول أولاً / Please sign in');return false}return true}function setLang(v){lang=v;document.documentElement.lang=v;document.documentElement.dir=v==='en'?'ltr':'rtl';document.querySelectorAll('[data-t]').forEach(el=>el.innerHTML=(el.dataset.t==='headline'?T('headline'):T(el.dataset.t)));$('langName').textContent=v==='ar'?'العربية':v==='en'?'English':'اردو';refresh()}
-async function init(){try{const {data}=await db.auth.getSession();session=data.session;db.auth.onAuthStateChange((_e,s)=>{session=s;setTimeout(load,0)});await load()}catch(e){err(e)}}async function load(){if(session){let p=await db.from('profiles').select('*').eq('id',session.user.id).maybeSingle();profile=p.data;if(!profile){await db.from('profiles').insert({id:session.user.id,full_name:session.user.user_metadata?.full_name||'',role:'customer'});profile=(await db.from('profiles').select('*').eq('id',session.user.id).maybeSingle()).data}let o=await db.from('offices').select('*').eq('owner_id',session.user.id).maybeSingle();office=o.data}else{profile=null;office=null}const results=await Promise.all([db.from('workers').select('*,offices(name)').order('created_at',{ascending:false}),db.from('transfer_listings').select('*').order('created_at',{ascending:false}),db.from('spotlight_ads').select('*').order('created_at',{ascending:false}),session?db.from('bookings').select('*').order('created_at',{ascending:false}):Promise.resolve({data:[]})]);workers=results[0].data||[];transfers=results[1].data||[];ads=results[2].data||[];bookings=results[3].data||[];refresh()}
-function refresh(){renderSectionEntry();renderAccount();renderWorkers();renderOffice();renderTransfers();renderAds();renderSpotlightRequest();renderAdmin()}
-function renderAccount(){let el=$('accountBody');if(!session){let origin={office:"مكتب استقدام",workers:"الكفيل / العميل",transfer:"نقل الكفالة"}[entryContext];el.innerHTML=`${origin?`<div class="auth-context"><strong>إنشاء حساب: ${origin}</strong><p>بعد التسجيل أو تسجيل الدخول، عد إلى القسم لإكمال البيانات المطلوبة.</p></div>`:""}<h3>تسجيل الدخول / Sign in</h3><p class="muted">استخدم البريد الإلكتروني وكلمة المرور. إذا كنت جديدًا اختر إنشاء حساب.</p><form id="authForm"><label>البريد الإلكتروني / Email</label><input name="email" type="email" required><label>كلمة المرور / Password</label><input name="password" type="password" minlength="6" required><label>الاسم (للحساب الجديد) / Name</label><input name="name" maxlength="80"><div class="actions"><button class="btn gold" name="mode" value="login">دخول</button><button class="btn" name="mode" value="signup">إنشاء حساب</button></div></form>`;$('authForm').onsubmit=async e=>{e.preventDefault();let f=new FormData(e.target),mode=e.submitter.value,email=f.get('email'),password=f.get('password');let r=mode==='login'?await db.auth.signInWithPassword({email,password}):await db.auth.signUp({email,password,options:{data:{full_name:f.get('name')}}});if(r.error)return err(r.error);alert(mode==='signup'?'تم التسجيل. تحقق من بريدك لتفعيل الحساب إن طُلب ذلك.':'تم تسجيل الدخول');await load();if(session&&entryContext)go(entryContext)};return}el.innerHTML=`<h3>${safe(profile?.full_name||session.user.email)}</h3><p>${safe(session.user.email)}</p><p class="muted">الدور: ${safe(profile?.role||'customer')}</p><div class="actions"><button class="btn" onclick="go('workers')">حجوزاتي</button>${profile?.role==='admin'?'<button class="btn gold" onclick="go(\'admin\')">لوحة المدير</button>':''}<button class="btn red" onclick="logout()">تسجيل الخروج</button></div>`}async function logout(){await db.auth.signOut();await load();go('home')}
-function renderWorkers(){let q=($('search').value||'').toLowerCase(),nat=($('nationalityFilter').value||'').toLowerCase();let list=workers.filter(w=>w.status==='available'&&JSON.stringify([w.display_name,w.nationality,w.skills,w.languages,w.offices?.name]).toLowerCase().includes(q)&&String(w.nationality||'').toLowerCase().includes(nat));$('workersList').innerHTML=list.map(w=>`<article class="card"><div style="font-size:44px">👩</div><h3>${safe(w.display_name)}</h3><span class="tag">${safe(w.nationality||'')}</span><p class="muted">العمر: ${safe(w.age||'-')} · الخبرة: ${safe(w.experience_years||0)} سنوات</p><p>${safe((w.skills||[]).join('، '))}</p><p><b>${safe(w.salary_aed||'-')} AED</b> / شهريًا</p><p class="muted">${safe(w.offices?.name||'')}</p><button class="btn gold" onclick="book('${w.id}')">حجز مبدئي 3 ساعات</button></article>`).join('')||'<div class="card">لا توجد عاملات متاحات حاليًا</div>';$('myBookings').innerHTML=bookings.filter(b=>b.customer_id===session?.user?.id).map(b=>`<div class="card"><b>${safe(workers.find(w=>w.id===b.worker_id)?.display_name||'عاملة')}</b><p class="muted">الحالة: ${safe(b.status)} · انتهاء المهلة: ${new Date(b.expires_at).toLocaleString()}</p>${b.status==='pending'?`<button class="btn light" onclick="cancelBooking('${b.id}')">إلغاء</button>`:''}</div>`).join('')||'<div class="card">لا توجد حجوزات</div>'}
-function book(id){if(!mustLogin())return;let w=workers.find(x=>x.id===id);modal('حجز مبدئي — '+w.display_name,`<div class="notice">الحجز لمدة 3 ساعات حتى رد المكتب. لا توجد مدفوعات داخل ساهل.</div><form id="bookForm"><label>اسم الكفيل</label><input name="name" value="${safe(profile?.full_name||'')}" required maxlength="80"><label>رقم الهاتف</label><input name="phone" type="tel" required maxlength="20"><button class="btn gold" style="margin-top:12px">إرسال الحجز</button></form>`);$('bookForm').onsubmit=async e=>{e.preventDefault();let f=new FormData(e.target);let r=await db.from('bookings').insert({worker_id:id,customer_id:session.user.id,customer_name:f.get('name'),customer_phone:f.get('phone')});if(r.error)return err(r.error);closeModal();alert('تم إرسال الطلب للمكتب');await load()}}async function cancelBooking(id){let r=await db.rpc('cancel_saahl_booking',{p_booking:id});if(r.error)return err(r.error);await load()}
-function renderOffice(){let el=$('officePanel');if(!session){el.innerHTML='<div class="notice">سجّل الدخول من صفحة حسابي لفتح لوحة المكتب.</div>';return}if(!office){el.innerHTML=`<div class="card"><h3>تسجيل مكتب استقدام</h3><p class="muted">يجب اعتماد المكتب من الإدارة قبل ظهور العاملات للعملاء.</p><form id="officeForm"><label>اسم المكتب</label><input name="name" required><label>رقم الترخيص</label><input name="license_number" required><label>الإمارة</label><input name="emirate" required><label>الهاتف</label><input name="phone" required><button class="btn gold" style="margin-top:12px">إرسال طلب اعتماد المكتب</button></form></div>`;$('officeForm').onsubmit=async e=>{e.preventDefault();let f=Object.fromEntries(new FormData(e.target));let r=await db.from('offices').insert({...f,owner_id:session.user.id});if(r.error)return err(r.error);alert('تم إرسال طلب المكتب للإدارة');await load()};return}let mine=workers.filter(w=>w.office_id===office.id);let req=bookings.filter(b=>mine.some(w=>w.id===b.worker_id));el.innerHTML=`<div class="notice">${safe(office.name)} — حالة الاعتماد: <b>${safe(office.status)}</b></div>${office.status==='approved'?`<div class="card"><h3>إضافة عاملة</h3><form id="workerForm"><div class="fields"><div><label>الاسم التعريفي</label><input name="display_name" required></div><div><label>الجنسية</label><input name="nationality" required></div><div><label>العمر</label><input name="age" type="number" min="18" max="75" required></div><div><label>الخبرة بالسنوات</label><input name="experience_years" type="number" min="0" max="60" required></div><div><label>الراتب بالدرهم</label><input name="salary_aed" type="number" min="0" required></div><div><label>المهارات (افصل بفاصلة)</label><input name="skills"></div></div><label>نبذة مختصرة</label><textarea name="description"></textarea><button class="btn gold">إضافة عاملة</button></form></div>`:''}<h3>العاملات</h3><div class="cards">${mine.map(w=>`<div class="card"><b>${safe(w.display_name)}</b><p>${safe(w.nationality)} · ${safe(w.status)}</p><div class="actions">${w.status==='draft'?`<button class="btn gold" onclick="workerStatus('${w.id}','available')">نشر</button>`:''}${w.status==='available'?`<button class="btn light" onclick="workerStatus('${w.id}','unavailable')">إخفاء</button>`:''}${w.status==='unavailable'?`<button class="btn" onclick="workerStatus('${w.id}','available')">إعادة العرض</button>`:''}</div></div>`).join('')||'<div class="card">لا توجد عاملات</div>'}</div><h3>طلبات الحجز</h3><div class="cards">${req.map(b=>`<div class="card"><b>${safe(b.customer_name)}</b><p>${safe(mine.find(w=>w.id===b.worker_id)?.display_name||'')}</p><p>${safe(b.customer_phone)}</p><p class="muted">${safe(b.status)} · ${new Date(b.expires_at).toLocaleString()}</p>${b.status==='pending'&&new Date(b.expires_at)>new Date()?`<div class="actions"><button class="btn gold" onclick="respond('${b.id}',true)">موافقة</button><button class="btn red" onclick="respond('${b.id}',false)">اعتذار</button></div>`:''}</div>`).join('')||'<div class="card">لا توجد طلبات</div>'}</div>`;if($('workerForm'))$('workerForm').onsubmit=async e=>{e.preventDefault();let f=Object.fromEntries(new FormData(e.target));f.skills=(f.skills||'').split(',').map(s=>s.trim()).filter(Boolean);let r=await db.from('workers').insert({...f,office_id:office.id});if(r.error)return err(r.error);await load()}}
-async function workerStatus(id,status){let r=await db.from('workers').update({status}).eq('id',id);if(r.error)return err(r.error);await load()}async function respond(id,yes){let r=await db.rpc('respond_saahl_booking',{p_booking:id,p_accept:yes});if(r.error)return err(r.error);await load()}
-function renderTransfers(){let el=$('transferPanel');el.innerHTML=session?`<div class="card"><h3>إضافة إعلان نقل كفالة</h3><form id="transferForm"><div class="fields"><div><label>الجنسية</label><input name="nationality" required></div><div><label>العمر</label><input name="age" type="number" min="18" max="75"></div><div><label>الراتب</label><input name="salary_aed" type="number" min="0"></div><div><label>الإمارة</label><input name="emirate" required></div></div><label>تفاصيل الإعلان دون بيانات حساسة</label><textarea name="description" required></textarea><button class="btn gold">إرسال الإعلان للمراجعة</button></form></div>`:'<div class="notice">سجّل الدخول لإضافة إعلان أو إرسال اهتمام.</div>';if($('transferForm'))$('transferForm').onsubmit=async e=>{e.preventDefault();let f=Object.fromEntries(new FormData(e.target));if(!f.age)delete f.age;if(!f.salary_aed)delete f.salary_aed;let r=await db.from('transfer_listings').insert({...f,owner_id:session.user.id});if(r.error)return err(r.error);alert('تم إرسال الإعلان للمراجعة');await load()};$('transferList').innerHTML=transfers.filter(t=>t.status==='published'||t.owner_id===session?.user?.id).map(t=>`<div class="card"><h3>${safe(t.nationality||'')} · ${safe(t.emirate||'')}</h3><p>${safe(t.description||'')}</p><p class="muted">الحالة: ${safe(t.status)}</p>${t.status==='published'?`<button class="btn gold" onclick="interest('${t.id}')">إرسال اهتمام</button>`:''}</div>`).join('')||'<div class="card">لا توجد إعلانات منشورة</div>'}
-function interest(id){if(!mustLogin())return;modal('إرسال اهتمام',`<form id="interestForm"><label>رسالة مختصرة</label><textarea name="message" required maxlength="500"></textarea><button class="btn gold">إرسال</button></form>`);$('interestForm').onsubmit=async e=>{e.preventDefault();let r=await db.from('transfer_interests').insert({listing_id:id,requester_id:session.user.id,message:new FormData(e.target).get('message')});if(r.error)return err(r.error);closeModal();alert('تم إرسال الاهتمام') }}function renderSpotlightRequest(){const el=$('spotlightRequest');if(!el)return;if(!session){el.innerHTML='<h3>'+T('spotRegister')+'</h3><p class="muted">'+T('spotLoginHint')+'</p><button class="btn" onclick="go(\'account\')">'+T('account')+'</button>';return}if(!office||office.status!=='approved'){el.innerHTML='<h3>'+T('spotRegister')+'</h3><p class="notice">'+T('spotOfficeHint')+'</p><button class="btn" onclick="go(\'office\')">'+T('office')+'</button>';return}el.innerHTML='<h3>'+T('spotRequestTitle')+'</h3><p class="muted">'+T('spotOfficeAuto')+'</p><form id="spotRequestForm"><div class="fields"><div><label>'+T('spotOfficeName')+'</label><input value="'+safe(office.name)+'" disabled></div><div><label>'+T('spotLicense')+'</label><input value="'+safe(office.license_number)+'" disabled></div><div><label>'+T('spotPhone')+'</label><input value="'+safe(office.phone)+'" disabled></div><div><label>'+T('spotWorkerTitle')+'</label><input name="worker_title" maxlength="100" required></div><div><label>'+T('spotNationality')+'</label><input name="worker_nationality" maxlength="80" required></div><div><label>'+T('spotImage')+'</label><input name="worker_image_url" type="url" placeholder="https://..."></div></div><label>'+T('spotDescription')+'</label><textarea name="worker_description" maxlength="1200" required></textarea><p class="spotlight-note">'+T('spotPaymentNotice')+'</p><button class="btn gold">'+T('spotSubmit')+'</button></form>';$('spotRequestForm').onsubmit=async e=>{e.preventDefault();let f=Object.fromEntries(new FormData(e.target));if(!f.worker_image_url)f.worker_image_url=null;const r=await db.from('spotlight_requests').insert({...f,office_owner_id:session.user.id,office_name:office.name,license_number:office.license_number,contact_phone:office.phone});if(r.error)return err(r.error);alert(T('spotSubmitted'));e.target.reset()}}
-function renderAds(){$('adsList').innerHTML=ads.filter(a=>a.status==='active').map(a=>`<div class="card"><h3>${safe(a.title)}</h3><p>${safe(a.description)}</p>${a.target_url?`<a href="${safe(a.target_url)}" target="_blank" rel="noopener noreferrer">المزيد</a>`:''}</div>`).join('')||'<div class="card">لا توجد إعلانات نشطة حاليًا</div>'}
-async function renderAdmin(){let el=$('adminPanel');if(profile?.role!=='admin'){el.innerHTML='<div class="notice">هذه الصفحة مخصصة للمدير المعتمد فقط.</div>';return}if(el.dataset.loading==='1')return;el.dataset.loading='1';let [o,t]=await Promise.all([db.from('offices').select('*').order('created_at',{ascending:false}),db.from('transfer_listings').select('*').order('created_at',{ascending:false})]);el.dataset.loading='0';el.innerHTML=`<h3>المكاتب</h3><div class="cards">${(o.data||[]).map(x=>`<div class="card"><b>${safe(x.name)}</b><p>${safe(x.license_number)} · ${safe(x.status)}</p>${x.status==='pending'?`<button class="btn gold" onclick="reviewOffice('${x.id}',true)">اعتماد</button> <button class="btn red" onclick="reviewOffice('${x.id}',false)">رفض</button>`:''}</div>`).join('')}</div><h3>إعلانات نقل الكفالة</h3><div class="cards">${(t.data||[]).map(x=>`<div class="card"><p>${safe(x.description)}</p><p>${safe(x.status)}</p>${x.status==='pending'?`<button class="btn gold" onclick="reviewTransfer('${x.id}',true)">نشر</button> <button class="btn red" onclick="reviewTransfer('${x.id}',false)">رفض</button>`:''}</div>`).join('')}</div><h3>منصة الأضواء</h3><div class="card"><form id="adForm"><label>عنوان الإعلان</label><input name="title" required><label>التفاصيل</label><textarea name="description"></textarea><label>رابط الإعلان (اختياري)</label><input name="target_url" type="url"><button class="btn gold">إضافة إعلان نشط</button></form></div>`;$('adForm').onsubmit=async e=>{e.preventDefault();let f=Object.fromEntries(new FormData(e.target));if(!f.target_url)f.target_url=null;let r=await db.from('spotlight_ads').insert({...f,status:'active'});if(r.error)return err(r.error);alert('تم النشر');await load()}}
-async function reviewOffice(id,yes){let r=await db.rpc('review_saahl_office',{p_office:id,p_approve:yes});if(r.error)return err(r.error);await load()}async function reviewTransfer(id,yes){let r=await db.rpc('review_saahl_transfer',{p_listing:id,p_approve:yes});if(r.error)return err(r.error);await load()}
-$('search').addEventListener('input',renderWorkers);$('nationalityFilter').addEventListener('input',renderWorkers);$('language').onchange=e=>setLang(e.target.value);window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferred=e;$('install').hidden=false});$('install').onclick=async()=>{if(deferred){deferred.prompt();await deferred.userChoice;deferred=null}else alert('استخدم إضافة إلى الشاشة الرئيسية من قائمة المتصفح')};if('serviceWorker'in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));init();
-</script></body></html>
+/* ===== NAV ===== */
+nav{
+  position:fixed;top:0;right:0;left:0;z-index:500;
+  background:rgba(255,255,255,.92);
+  backdrop-filter:blur(20px);
+  -webkit-backdrop-filter:blur(20px);
+  border-bottom:1px solid rgba(0,0,0,.06);
+  height:68px;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 6%;
+  transition:box-shadow .3s;
+}
+nav.scrolled{box-shadow:0 4px 32px rgba(0,0,0,.08)}
+.nav-logo{display:flex;align-items:center;gap:12px;text-decoration:none}
+.nav-logo img{height:38px;width:auto}
+.nav-logo-text{font-size:20px;font-weight:900;color:var(--dark);letter-spacing:-.5px}
+.nav-logo-sub{display:none!important}
+.nav-center{display:flex;align-items:center;gap:32px;list-style:none}
+.nav-center a{
+  font-size:14px;font-weight:500;color:var(--muted);
+  text-decoration:none;position:relative;padding-bottom:2px;
+  transition:color .2s;
+}
+.nav-center a::after{
+  content:"";position:absolute;bottom:0;right:0;
+  width:0;height:1.5px;background:var(--gold);
+  transition:width .3s ease;
+}
+.nav-center a:hover{color:var(--dark)}
+.nav-center a:hover::after{width:100%}
+.nav-actions{display:flex;align-items:center;gap:12px}
+.nav-login{
+  font-size:13px;font-weight:600;color:var(--muted);
+  text-decoration:none;padding:8px 18px;
+  border:1.5px solid var(--border);border-radius:8px;
+  transition:all .25s;
+}
+.nav-login:hover{border-color:var(--gold);color:var(--gold)}
+.nav-cta{
+  font-size:13px;font-weight:700;color:#fff;
+  background:var(--dark);text-decoration:none;
+  padding:9px 22px;border-radius:8px;
+  transition:all .25s;
+  border:1.5px solid var(--dark);
+}
+.nav-cta:hover{background:var(--gold);border-color:var(--gold)}
+.nav-burger{display:none;flex-direction:column;gap:5px;cursor:pointer;background:none;border:none;padding:4px}
+.nav-burger span{width:22px;height:2px;background:var(--dark);border-radius:1px;display:block;transition:all .3s}
+
+/* ===== HERO ===== */
+.hero{
+  min-height:100vh;
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  padding:120px 6% 80px;
+  position:relative;
+  overflow:hidden;
+  background:#fff;
+}
+
+/* Abstract geometric background */
+.hero-bg{
+  position:absolute;inset:0;
+  pointer-events:none;overflow:hidden;
+}
+.geo-line{
+  position:absolute;
+  background:linear-gradient(90deg,transparent,rgba(201,168,76,.12),transparent);
+  height:1px;
+  width:100%;
+  animation:scanLine 8s linear infinite;
+}
+.geo-line:nth-child(1){top:25%;animation-delay:0s}
+.geo-line:nth-child(2){top:50%;animation-delay:2.5s}
+.geo-line:nth-child(3){top:75%;animation-delay:5s}
+@keyframes scanLine{
+  0%{transform:translateX(100%);opacity:0}
+  10%{opacity:1}
+  90%{opacity:1}
+  100%{transform:translateX(-100%);opacity:0}
+}
+.geo-circle{
+  position:absolute;border-radius:50%;
+  border:1px solid rgba(201,168,76,.08);
+}
+.gc1{width:600px;height:600px;top:-200px;left:-200px;animation:rotateCircle 40s linear infinite}
+.gc2{width:400px;height:400px;bottom:-100px;right:-100px;animation:rotateCircle 30s linear infinite reverse}
+.gc3{width:200px;height:200px;top:30%;left:10%;animation:rotateCircle 20s linear infinite;border-color:rgba(201,168,76,.15)}
+@keyframes rotateCircle{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+
+.hero-tag{
+  display:inline-flex;align-items:center;gap:8px;
+  background:var(--gold-xl);
+  border:1px solid rgba(201,168,76,.2);
+  color:var(--gold-d);
+  padding:7px 18px;border-radius:50px;
+  font-size:12px;font-weight:700;
+  margin-bottom:28px;
+  letter-spacing:.5px;
+  animation:fadeUp .8s ease both;
+}
+.hero-tag-dot{width:6px;height:6px;background:var(--gold);border-radius:50%;animation:pulse 2s ease infinite}
+@keyframes pulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.4);opacity:.7}}
+
+.hero-title{
+  font-size:clamp(42px,6vw,80px);
+  font-weight:900;
+  color:var(--dark);
+  line-height:1.1;
+  text-align:center;
+  margin-bottom:16px;
+  animation:fadeUp .9s .1s ease both;
+  letter-spacing:-2px;
+}
+.hero-title .line-gold{
+  color:var(--gold);
+  position:relative;display:inline-block;
+}
+.hero-title .line-gold::after{
+  content:"";
+  position:absolute;bottom:-4px;right:0;left:0;
+  height:3px;
+  background:linear-gradient(90deg,transparent,var(--gold),transparent);
+  border-radius:2px;
+  animation:expandLine 1s .8s ease both;
+  transform-origin:center;
+  transform:scaleX(0);
+}
+@keyframes expandLine{to{transform:scaleX(1)}}
+
+.hero-typed-wrap{
+  font-size:clamp(28px,4vw,52px);
+  font-weight:700;color:var(--dark);
+  text-align:center;margin-bottom:24px;
+  animation:fadeUp .9s .2s ease both;
+  min-height:64px;
+  display:flex;align-items:center;justify-content:center;gap:12px;
+}
+.hero-typed{color:var(--gold)}
+.cursor-blink{
+  display:inline-block;width:3px;height:.8em;
+  background:var(--gold);border-radius:1px;
+  vertical-align:middle;margin-right:2px;
+  animation:blink 1s step-end infinite;
+}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+
+.hero-sub{
+  font-size:16px;color:var(--muted);
+  max-width:540px;text-align:center;
+  line-height:1.8;margin-bottom:44px;
+  animation:fadeUp .9s .3s ease both;
+  font-weight:400;
+}
+
+.hero-btns{
+  display:flex;gap:14px;justify-content:center;flex-wrap:wrap;
+  margin-bottom:64px;
+  animation:fadeUp .9s .4s ease both;
+}
+.btn-primary{
+  display:inline-flex;align-items:center;gap:9px;
+  padding:14px 34px;background:var(--dark);
+  color:#fff;border:none;border-radius:10px;
+  font-size:14px;font-weight:700;cursor:pointer;
+  text-decoration:none;font-family:inherit;
+  transition:all .3s;position:relative;overflow:hidden;
+}
+.btn-primary::before{
+  content:"";position:absolute;inset:0;
+  background:linear-gradient(135deg,var(--gold),var(--gold-d));
+  opacity:0;transition:opacity .3s;
+}
+.btn-primary:hover::before{opacity:1}
+.btn-primary span{position:relative;z-index:1}
+.btn-primary svg{position:relative;z-index:1;transition:transform .3s}
+.btn-primary:hover svg{transform:translateX(-4px)}
+.btn-secondary{
+  display:inline-flex;align-items:center;gap:9px;
+  padding:14px 34px;background:#fff;
+  color:var(--dark);border:1.5px solid var(--border);
+  border-radius:10px;font-size:14px;font-weight:700;
+  cursor:pointer;text-decoration:none;font-family:inherit;
+  transition:all .3s;
+}
+.btn-secondary:hover{border-color:var(--gold);color:var(--gold)}
+
+/* STATS BAR */
+.hero-stats{
+  display:flex;align-items:center;gap:0;
+  background:#fff;border:1.5px solid var(--border);
+  border-radius:16px;overflow:hidden;
+  box-shadow:0 8px 40px rgba(0,0,0,.06);
+  animation:fadeUp .9s .5s ease both;
+}
+.hstat{
+  padding:20px 36px;text-align:center;
+  position:relative;flex:1;
+  transition:background .25s;
+}
+.hstat:hover{background:var(--gold-xl)}
+.hstat::after{
+  content:"";position:absolute;
+  top:20%;bottom:20%;left:0;
+  width:1px;background:var(--border);
+}
+.hstat:first-child::after{display:none}
+.hstat-num{
+  font-size:32px;font-weight:900;
+  color:var(--gold);line-height:1;
+  margin-bottom:4px;
+}
+.hstat-lbl{font-size:12px;color:var(--muted);font-weight:500}
+
+@keyframes fadeUp{
+  from{opacity:0;transform:translateY(28px)}
+  to{opacity:1;transform:translateY(0)}
+}
+
+/* ===== HOW SECTION ===== */
+.section{padding:100px 6%}
+.section-tag{
+  display:inline-flex;align-items:center;gap:6px;
+  background:var(--gold-xl);color:var(--gold-d);
+  border:1px solid rgba(201,168,76,.15);
+  padding:6px 16px;border-radius:50px;
+  font-size:11px;font-weight:700;letter-spacing:.8px;
+  text-transform:uppercase;margin-bottom:16px;
+}
+.section-title{
+  font-size:clamp(28px,4vw,46px);
+  font-weight:900;color:var(--dark);
+  margin-bottom:12px;letter-spacing:-1px;
+  line-height:1.15;
+}
+.section-sub{
+  font-size:15px;color:var(--muted);
+  max-width:480px;line-height:1.7;
+}
+
+/* HOW STEPS — HORIZONTAL TIMELINE */
+
+.how-header{text-align:center;margin-bottom:60px}
+.how-header .section-sub{margin:0 auto}
+
+.steps-timeline{
+  display:grid;grid-template-columns:repeat(3,1fr);
+  gap:0;position:relative;
+}
+.steps-timeline::before{
+  content:"";position:absolute;
+  top:52px;right:16.6%;left:16.6%;
+  height:2px;
+  background:linear-gradient(90deg,var(--gold),var(--gold-d),var(--gold));
+  z-index:1;
+}
+.step-item{
+  display:flex;flex-direction:column;align-items:center;
+  padding:0 24px;text-align:center;
+  opacity:0;transform:translateY(32px);
+  transition:all .6s ease;
+}
+.step-item.visible{opacity:1;transform:translateY(0)}
+.step-item:nth-child(2){transition-delay:.15s}
+.step-item:nth-child(3){transition-delay:.3s}
+
+.step-num-wrap{
+  width:104px;height:104px;
+  border-radius:50%;background:#fff;
+  border:2px solid var(--border);
+  display:flex;align-items:center;justify-content:center;
+  margin-bottom:28px;position:relative;z-index:2;
+  transition:all .4s ease;
+  box-shadow:0 4px 20px rgba(0,0,0,.06);
+}
+.step-item:hover .step-num-wrap{
+  border-color:var(--gold);
+  box-shadow:0 8px 32px rgba(201,168,76,.2);
+  transform:scale(1.05);
+}
+.step-num{
+  font-size:36px;font-weight:900;color:var(--dark);
+  line-height:1;
+}
+.step-icon-bg{
+  position:absolute;inset:-2px;border-radius:50%;
+  background:linear-gradient(135deg,var(--gold-xl),transparent);
+  opacity:0;transition:opacity .4s;
+}
+.step-item:hover .step-icon-bg{opacity:1}
+.step-name{font-size:18px;font-weight:800;color:var(--dark);margin-bottom:10px}
+.step-desc{font-size:13px;color:var(--muted);line-height:1.7;max-width:220px}
+
+/* ===== TYPE CARDS ===== */
+.types-grid{
+  display:grid;grid-template-columns:repeat(3,1fr);
+  gap:20px;margin-top:56px;
+}
+.type-card{
+  border:1.5px solid var(--border);
+  border-radius:20px;overflow:hidden;
+  transition:all .35s cubic-bezier(.25,.46,.45,.94);
+  text-decoration:none;display:block;
+  background:#fff;
+  position:relative;
+}
+.type-card::before{
+  content:"";
+  position:absolute;inset:0;border-radius:20px;
+  background:linear-gradient(135deg,var(--gold-xl) 0%,transparent 60%);
+  opacity:0;transition:opacity .35s;
+  pointer-events:none;
+}
+.type-card:hover{
+  border-color:var(--gold);
+  transform:translateY(-8px);
+  box-shadow:0 24px 56px rgba(201,168,76,.15);
+}
+.type-card:hover::before{opacity:1}
+
+.type-visual{
+  height:190px;
+  position:relative;overflow:hidden;
+  display:flex;align-items:center;justify-content:center;
+}
+.type-visual-1{background:linear-gradient(135deg,#0D1B2A 0%,#1B2838 50%,#2C3E50 100%)}
+.type-visual-2{background:linear-gradient(135deg,#1a0533 0%,#2D1B45 50%,#3D2B55 100%)}
+.type-visual-3{background:linear-gradient(135deg,#0A1A0A 0%,#1B3A1B 50%,#2C4A2C 100%)}
+
+/* SVG illustrations */
+.type-svg{width:140px;height:140px;opacity:.9}
+/* PREMIUM SAAHL ICONS */
+.premium-icon-wrap{
+  width:116px;height:116px;border-radius:50%;
+  background:radial-gradient(circle at 35% 25%,#fff 0%,#FFF8E7 58%,rgba(201,168,76,.12) 100%);
+  border:1px solid rgba(201,168,76,.22);
+  display:flex;align-items:center;justify-content:center;
+  position:relative;
+  box-shadow:0 18px 45px rgba(201,168,76,.18), inset 0 0 0 8px rgba(255,255,255,.72);
+}
+.premium-icon-wrap::before,.premium-icon-wrap::after{
+  content:"";position:absolute;border-radius:50%;background:rgba(201,168,76,.18);
+}
+.premium-icon-wrap::before{width:10px;height:10px;top:14px;right:10px}
+.premium-icon-wrap::after{width:6px;height:6px;bottom:18px;left:15px}
+.premium-icon{width:78px;height:78px;filter:drop-shadow(0 8px 14px rgba(0,0,0,.10))}
+.type-card:hover .premium-icon-wrap{transform:translateY(-4px) scale(1.03);transition:all .35s ease}
+.type-ico svg,.feat-item-ico svg,.feat-card-ico svg{width:22px;height:22px;display:block}
+.type-ico,.feat-item-ico,.feat-card-ico{color:var(--gold)}
+.stat-panel{
+  grid-column:span 2;
+  display:grid;grid-template-columns:1fr 1fr;gap:18px;
+}
+.stat-wide-card{
+  background:#fff;border:1.5px solid var(--border);border-radius:20px;
+  padding:28px;display:grid;grid-template-columns:110px 1px 1fr;align-items:center;gap:28px;
+  box-shadow:0 10px 34px rgba(0,0,0,.045);
+  transition:all .3s ease;position:relative;overflow:hidden;
+}
+.stat-wide-card::before{content:"";position:absolute;inset:0;background:linear-gradient(135deg,rgba(201,168,76,.08),transparent 62%);opacity:0;transition:.3s}
+.stat-wide-card:hover{border-color:var(--gold);transform:translateY(-4px);box-shadow:0 18px 45px rgba(201,168,76,.13)}
+.stat-wide-card:hover::before{opacity:1}
+.stat-wide-icon{width:96px;height:96px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:var(--gold-xl);border:1px solid rgba(201,168,76,.22);color:var(--gold);position:relative;z-index:1}
+.stat-wide-icon svg{width:54px;height:54px;display:block}
+.stat-wide-line{height:86px;background:var(--border);position:relative;z-index:1}
+.stat-wide-num{font-size:42px;font-weight:900;color:var(--gold);line-height:1;margin-bottom:6px;position:relative;z-index:1}
+.stat-wide-lbl{font-size:15px;color:var(--dark);font-weight:800;margin-bottom:6px;position:relative;z-index:1}
+.stat-wide-desc{font-size:13px;color:var(--muted);line-height:1.6;position:relative;z-index:1}
+@media(max-width:900px){.stat-panel{grid-column:span 1;grid-template-columns:1fr}.stat-wide-card{grid-template-columns:82px 1px 1fr;padding:22px;gap:18px}.stat-wide-icon{width:76px;height:76px}.stat-wide-icon svg{width:42px;height:42px}.stat-wide-num{font-size:34px}}
+@media(max-width:480px){.stat-wide-card{grid-template-columns:1fr;text-align:center}.stat-wide-line{display:none}.stat-wide-icon{margin:auto}}
+
+
+.type-body{padding:24px}
+.type-header{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.type-ico{
+  width:44px;height:44px;border-radius:12px;
+  background:var(--gold-xl);border:1px solid rgba(201,168,76,.2);
+  display:flex;align-items:center;justify-content:center;
+  font-size:20px;
+}
+.type-name{font-size:19px;font-weight:800;color:var(--dark)}
+.type-desc{font-size:13px;color:var(--muted);margin-bottom:18px;line-height:1.7}
+.type-feats{list-style:none;margin-bottom:22px}
+.type-feat{
+  font-size:12px;color:#555;
+  padding:6px 0;border-bottom:1px solid #F5F5F5;
+  display:flex;align-items:center;gap:8px;
+}
+.type-feat:last-child{border:none}
+.feat-check{
+  width:18px;height:18px;border-radius:50%;
+  background:var(--gold);flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+}
+.feat-check svg{width:10px;height:10px}
+.type-btn{
+  display:block;text-align:center;
+  padding:12px;background:var(--dark);
+  color:#fff;border-radius:10px;
+  font-size:13px;font-weight:700;
+  transition:all .3s;
+}
+.type-card:hover .type-btn{background:var(--gold)}
+
+/* ===== FEATURES ===== */
+.features-bg{background:#FFFFFF;border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
+.features-layout{
+  display:grid;grid-template-columns:1fr 1fr;
+  gap:80px;align-items:center;
+}
+.features-left .section-sub{margin-bottom:40px}
+.feat-items{display:flex;flex-direction:column;gap:0}
+.feat-item{
+  display:flex;align-items:flex-start;gap:16px;
+  padding:20px 0;border-bottom:1px solid var(--border);
+  cursor:pointer;transition:all .25s;
+}
+.feat-item:last-child{border:none}
+.feat-item:hover{padding-right:8px}
+.feat-item-ico{
+  width:44px;height:44px;border-radius:12px;
+  background:var(--gold-xl);border:1px solid rgba(201,168,76,.15);
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;font-size:20px;
+  transition:all .25s;
+}
+.feat-item:hover .feat-item-ico{background:var(--gold);transform:scale(1.1)}
+.feat-item-title{font-size:15px;font-weight:700;color:var(--dark);margin-bottom:4px}
+.feat-item-desc{font-size:13px;color:var(--muted);line-height:1.6}
+
+.features-right{
+  display:grid;grid-template-columns:1fr 1fr;
+  gap:14px;
+}
+.feat-card{
+  background:#fff;border:1.5px solid var(--border);
+  border-radius:16px;padding:24px;
+  transition:all .3s;cursor:default;
+}
+.feat-card:hover{
+  border-color:var(--gold);
+  transform:translateY(-4px);
+  box-shadow:0 12px 32px rgba(201,168,76,.12);
+}
+.feat-card-ico{font-size:28px;margin-bottom:12px}
+.feat-card-num{
+  font-size:36px;font-weight:900;color:var(--gold);
+  line-height:1;margin-bottom:4px;
+}
+.feat-card-lbl{font-size:12px;color:var(--muted);font-weight:500}
+
+/* ===== CTA ===== */
+.cta-section{
+  background:var(--dark);padding:100px 6%;
+  position:relative;overflow:hidden;text-align:center;
+}
+.cta-bg-circle{
+  position:absolute;border-radius:50%;
+  background:radial-gradient(circle,rgba(201,168,76,.15) 0%,transparent 70%);
+}
+.cta-bg-circle-1{width:600px;height:600px;top:-200px;right:-200px}
+.cta-bg-circle-2{width:400px;height:400px;bottom:-150px;left:-150px}
+.cta-content{position:relative;z-index:1}
+.cta-label{
+  display:inline-block;font-size:11px;font-weight:700;
+  color:var(--gold);letter-spacing:2px;text-transform:uppercase;
+  margin-bottom:20px;
+}
+.cta-title{
+  font-size:clamp(32px,5vw,60px);font-weight:900;
+  color:#fff;line-height:1.1;margin-bottom:16px;
+  letter-spacing:-1.5px;
+}
+.cta-title span{color:var(--gold)}
+.cta-sub{
+  font-size:16px;color:rgba(255,255,255,.5);
+  margin-bottom:44px;max-width:480px;
+  margin-left:auto;margin-right:auto;line-height:1.7;
+}
+.cta-btns{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+.btn-cta-primary{
+  padding:15px 38px;background:var(--gold);
+  color:#fff;border:none;border-radius:10px;
+  font-size:15px;font-weight:700;cursor:pointer;
+  text-decoration:none;display:inline-flex;
+  align-items:center;gap:8px;font-family:inherit;
+  transition:all .3s;
+}
+.btn-cta-primary:hover{background:#E8C865;transform:translateY(-2px)}
+.btn-cta-secondary{
+  padding:15px 38px;background:transparent;
+  color:#fff;border:1.5px solid rgba(255,255,255,.2);
+  border-radius:10px;font-size:15px;font-weight:600;
+  cursor:pointer;text-decoration:none;
+  display:inline-flex;align-items:center;gap:8px;
+  font-family:inherit;transition:all .3s;
+}
+.btn-cta-secondary:hover{border-color:var(--gold);color:var(--gold)}
+
+/* ===== FOOTER ===== */
+footer{
+  background:#050505;
+  padding:60px 6% 28px;
+}
+.footer-grid{
+  display:grid;grid-template-columns:2fr 1fr 1fr 1fr;
+  gap:60px;margin-bottom:48px;
+}
+.footer-brand-logo{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.footer-brand-logo img{height:32px}
+.footer-brand-name{color:#fff;font-size:18px;font-weight:900;letter-spacing:-.5px}
+.footer-brand-desc{font-size:13px;color:rgba(255,255,255,.3);line-height:1.8;max-width:260px}
+.footer-col h4{color:rgba(255,255,255,.9);font-size:13px;font-weight:700;margin-bottom:18px;letter-spacing:.3px}
+.footer-col a{
+  display:block;font-size:13px;
+  color:rgba(255,255,255,.3);text-decoration:none;
+  margin-bottom:10px;transition:color .2s;
+}
+.footer-col a:hover{color:var(--gold)}
+.footer-bottom{
+  border-top:1px solid rgba(255,255,255,.06);
+  padding-top:24px;display:flex;
+  align-items:center;justify-content:space-between;
+  flex-wrap:wrap;gap:10px;
+}
+.footer-copy{font-size:12px;color:rgba(255,255,255,.2)}
+.footer-uae{font-size:12px;color:rgba(255,255,255,.2)}
+
+/* MOBILE NAV */
+.mob-nav{
+  display:none;position:fixed;
+  top:68px;right:0;left:0;bottom:0;
+  background:#fff;z-index:499;
+  flex-direction:column;padding:32px 6%;
+  gap:0;overflow-y:auto;
+}
+.mob-nav.open{display:flex}
+.mob-nav a{
+  font-size:16px;font-weight:600;color:var(--dark);
+  text-decoration:none;padding:16px 0;
+  border-bottom:1px solid var(--border);
+  display:flex;justify-content:space-between;align-items:center;
+}
+.mob-nav-btns{margin-top:24px;display:flex;flex-direction:column;gap:12px}
+
+/* LANG */
+.lang-wrap{position:relative}
+.lang-btn{
+  display:flex;align-items:center;gap:6px;
+  padding:7px 13px;border:1.5px solid var(--border);
+  border-radius:8px;background:#fff;
+  color:var(--muted);font-size:13px;cursor:pointer;
+  font-family:inherit;font-weight:600;transition:all .2s;
+}
+.lang-btn:hover{border-color:var(--gold);color:var(--gold)}
+.lang-drop{
+  position:absolute;top:calc(100% + 8px);left:0;
+  background:#fff;border:1px solid var(--border);
+  border-radius:12px;padding:6px;min-width:150px;
+  box-shadow:0 8px 32px rgba(0,0,0,.1);
+  display:none;z-index:200;
+}
+.lang-drop.open{display:block}
+.lang-opt{
+  display:flex;align-items:center;gap:8px;
+  width:100%;padding:9px 12px;border:none;
+  border-radius:8px;background:none;
+  font-size:13px;color:var(--text);
+  cursor:pointer;font-family:inherit;transition:background .15s;
+  text-align:right;
+}
+.lang-opt:hover{background:var(--gold-xl);color:var(--gold-d)}
+.lang-opt.on{color:var(--gold);font-weight:700}
+
+/* REVEAL */
+.reveal{opacity:0;transform:translateY(28px);transition:all .7s ease}
+.reveal.visible{opacity:1;transform:translateY(0)}
+.reveal-delay-1{transition-delay:.1s}
+.reveal-delay-2{transition-delay:.2s}
+.reveal-delay-3{transition-delay:.3s}
+
+/* RESPONSIVE */
+@media(max-width:1024px){
+  .features-layout{grid-template-columns:1fr;gap:48px}
+  .features-right{grid-template-columns:repeat(4,1fr)}
+}
+@media(max-width:768px){
+  nav .nav-center,.nav-actions .nav-login,.nav-actions .nav-cta{display:none}
+  nav .nav-actions .lang-wrap{display:none}
+  .nav-burger{display:flex}
+  .hero-stats{flex-direction:column;border-radius:12px}
+  .hstat::after{display:none}
+  .hstat{border-bottom:1px solid var(--border);padding:16px}
+  .hstat:last-child{border:none}
+  .steps-timeline{grid-template-columns:1fr;gap:40px}
+  .steps-timeline::before{display:none}
+  .types-grid{grid-template-columns:1fr;gap:16px}
+  .features-right{grid-template-columns:1fr 1fr}
+  .footer-grid{grid-template-columns:1fr;gap:32px}
+  .section{padding:64px 5%}
+  .hero{padding:100px 5% 64px}
+}
+@media(max-width:480px){
+  .features-right{grid-template-columns:1fr 1fr}
+  .feat-card{padding:18px}
+  .hero-title{letter-spacing:-1px}
+}
+</style>
+</head>
+
+<body>
+<div id="ad-strip" style="position:fixed;top:0;left:0;right:0;z-index:501"></div>
+<script>
+const STRIP_SUPABASE_URL = 'https://ytjrtflmqydnpepdyafa.supabase.co';
+const STRIP_ANON_KEY = 'sb_publishable_OcWY5nY_-b2odLqQxsu2Kw_iQ4YswBz';
+const STRIPE_EDGE_FN_URL = `https://ytjrtflmqydnpepdyafa.supabase.co/functions/v1/stripe-ad-payment`;
+// مفتاح Stripe العام (Publishable) — وضع الاختبار — آمن يظهر بكود الموقع، عكس المفتاح السري
+const STRIPE_PUBLISHABLE_KEY = 'pk_test_51T0igO7KLniAPTryituPffaYmZSnx5w3ZATjWUeT3ShIfc0jg37hTI5Cad4rf2jY0eK4uxoZ69euNEQBMaW6TZTL00XhKSLy1x';
+let _stripe = null, _stripeElements = null, _stripeCard = null;
+
+function escapeAdHtml(s){
+  return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+async function loadAdStrip(){
+  const stripBaseCss = 'position:fixed;top:0;left:0;right:0;z-index:501;background:#0A0A0A;color:#fff;padding:8px 0;overflow:hidden;white-space:nowrap;font-family:Tajawal,sans-serif;font-size:14px;border-bottom:1px solid rgba(201,168,76,.25);direction:ltr;text-align:left';
+  try{
+    // نستخدم expires_at بدل status لأننا غير متأكدين من صيغة قيمة status بالحروف الكبيرة/الصغيرة — التاريخ لا لبس فيه
+    const nowIso = new Date().toISOString();
+    const url = `${STRIP_SUPABASE_URL}/rest/v1/strip_ads?select=ad_topic,advertiser_name,phone,whatsapp&status=eq.active&expires_at=gt.${nowIso}&order=created_at.desc&limit=20`;
+    const r = await fetch(url, {headers:{apikey:STRIP_ANON_KEY, Authorization:'Bearer '+STRIP_ANON_KEY}});
+    if(!r.ok) throw new Error('strip fetch failed');
+    const ads = await r.json();
+    const s = document.getElementById('ad-strip');
+    s.style.cssText = stripBaseCss;
+
+    let text;
+    if(!ads || !ads.length){
+      text = '✨ اعرض بيانات عاملتك هنا لآلاف الكفلاء يومياً';
+    } else {
+      // كل إعلان يصير رابط قابل للضغط — يفتح واتساب المعلن، أو اتصال هاتفي لو ماكو واتساب
+      text = ads.map(a => {
+        const contactNum = (a.whatsapp || a.phone || '').replace(/[^\d+]/g, '');
+        const href = a.whatsapp ? `https://wa.me/${contactNum.replace('+','')}` : (a.phone ? `tel:${contactNum}` : '#');
+        const label = `📢 ${a.ad_topic} — ${a.advertiser_name}${a.phone ? ' | ' + a.phone : ''}`;
+        return `<a href="${href}" target="_blank" rel="noopener" style="color:#fff;text-decoration:none;border-bottom:1px dashed rgba(255,255,255,.4)" onmouseover="this.style.color='#C9A84C'" onmouseout="this.style.color='#fff'">${escapeAdHtml(label)}</a>`;
+      }).join('   <span style="color:#C9A84C">✦</span>   ');
+    }
+
+    s.innerHTML = `<span id="ad-strip-track" style="display:inline-block;white-space:nowrap;will-change:transform">${text}</span><button onclick="openAdvertiseModal()" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);background:#C9A84C;color:#111;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:700;border:none;cursor:pointer;font-family:inherit;z-index:2">اعلن هنا</button>`;
+
+    runMarquee();
+    adjustLayoutForStrip();
+  }catch(e){
+    console.warn('ad-strip:', e);
+    document.getElementById('ad-strip').style.display = 'none';
+    adjustLayoutForStrip();
+  }
+}
+
+// حركة دقيقة بالبكسل: تبدأ خارج الشاشة تماماً من جهة، وتنتهي خارجها تماماً من الجهة الأخرى، بدون أي تخمين نِسَبي
+function runMarquee(){
+  const container = document.getElementById('ad-strip');
+  const track = document.getElementById('ad-strip-track');
+  if(!container || !track) return;
+
+  const containerW = container.offsetWidth;
+  const textW = track.scrollWidth;
+  const distance = containerW + textW; // المسافة الكاملة من دخول النص لخروجه بالكامل
+  const speedPxPerSec = 90;
+  const duration = Math.max(6, distance / speedPxPerSec);
+
+  // إزالة أي keyframes سابقة بنفس الاسم لتفادي التراكم عند إعادة التحميل
+  const oldStyle = document.getElementById('marquee-keyframes');
+  if(oldStyle) oldStyle.remove();
+
+  const styleTag = document.createElement('style');
+  styleTag.id = 'marquee-keyframes';
+  styleTag.textContent = `
+    @keyframes adMarquee {
+      from { transform: translateX(${containerW}px); }
+      to   { transform: translateX(${-textW}px); }
+    }`;
+  document.head.appendChild(styleTag);
+  track.style.animation = `adMarquee ${duration}s linear infinite`;
+}
+window.addEventListener('resize', () => { if(document.getElementById('ad-strip-track')) runMarquee(); });
+
+// يدفع الناف بار والقسم الرئيسي لأسفل بمقدار ارتفاع الشريط الفعلي، لمنع التداخل بينهما
+function adjustLayoutForStrip(){
+  const strip = document.getElementById('ad-strip');
+  const nav = document.getElementById('mainNav');
+  const hero = document.querySelector('.hero');
+  const stripH = (strip && strip.style.display !== 'none') ? strip.offsetHeight : 0;
+  if(nav) nav.style.top = stripH + 'px';
+  if(hero) hero.style.paddingTop = (120 + stripH) + 'px';
+  positionSpotlight();
+}
+window.addEventListener('resize', adjustLayoutForStrip);
+loadAdStrip();
+
+// ===== نافذة "أعلن هنا" — نشر إعلان بالشريط العلوي (مكتب/فرد/كفالة) =====
+function openAdvertiseModal(){
+  if(document.getElementById('advertiseModalOverlay')) { document.getElementById('advertiseModalOverlay').style.display='flex'; return; }
+  const overlay = document.createElement('div');
+  overlay.id = 'advertiseModalOverlay';
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:2000;display:flex;align-items:flex-start;justify-content:center;padding:40px 16px;overflow-y:auto;font-family:Tajawal,sans-serif';
+  overlay.onclick = (e) => { if(e.target === overlay) overlay.style.display='none'; };
+  overlay.innerHTML = `
+    <div style="background:#fff;border-radius:16px;max-width:440px;width:100%;padding:24px;direction:rtl" onclick="event.stopPropagation()">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+        <h3 style="margin:0;font-size:18px;color:#111">أعلن هنا</h3>
+        <button onclick="document.getElementById('advertiseModalOverlay').style.display='none'" style="background:none;border:none;font-size:20px;cursor:pointer;color:#999">✕</button>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div><label style="font-size:12px;color:#777;display:block;margin-bottom:4px">نوع المعلن</label>
+          <select id="adv-type" style="width:100%;padding:10px;border:1.5px solid #E8E8E8;border-radius:9px;font-family:inherit">
+            <option value="مكتب استقدام">مكتب استقدام</option>
+            <option value="نقل كفالة">صاحب عمل يرغب بنقل كفالة عامل/ة</option>
+            <option value="إعلان عام">إعلان عام آخر</option>
+          </select>
+        </div>
+        <div><label style="font-size:12px;color:#777;display:block;margin-bottom:4px">اسم المعلن</label>
+          <input id="adv-name" style="width:100%;padding:10px;border:1.5px solid #E8E8E8;border-radius:9px;font-family:inherit" placeholder="اسم المكتب أو الاسم الكامل"></div>
+        <div style="display:flex;gap:10px">
+          <div style="flex:1"><label style="font-size:12px;color:#777;display:block;margin-bottom:4px">رقم الهاتف</label>
+            <input id="adv-phone" style="width:100%;padding:10px;border:1.5px solid #E8E8E8;border-radius:9px;font-family:inherit" placeholder="+971..."></div>
+          <div style="flex:1"><label style="font-size:12px;color:#777;display:block;margin-bottom:4px">واتساب</label>
+            <input id="adv-whatsapp" style="width:100%;padding:10px;border:1.5px solid #E8E8E8;border-radius:9px;font-family:inherit" placeholder="اختياري"></div>
+        </div>
+        <div><label style="font-size:12px;color:#777;display:block;margin-bottom:4px">عنوان الإعلان</label>
+          <input id="adv-topic" style="width:100%;padding:10px;border:1.5px solid #E8E8E8;border-radius:9px;font-family:inherit" placeholder="مثال: عاملات فلبينيات متوفرات الآن"></div>
+        <div><label style="font-size:12px;color:#777;display:block;margin-bottom:4px">تفاصيل الإعلان</label>
+          <textarea id="adv-details" rows="3" style="width:100%;padding:10px;border:1.5px solid #E8E8E8;border-radius:9px;font-family:inherit;resize:vertical"></textarea></div>
+        <div><label style="font-size:12px;color:#777;display:block;margin-bottom:4px">مدة العرض (أيام)</label>
+          <input id="adv-days" type="number" min="1" value="7" oninput="updateAdvertisePrice()" style="width:100%;padding:10px;border:1.5px solid #E8E8E8;border-radius:9px;font-family:inherit"></div>
+        <div style="display:flex;justify-content:space-between;align-items:center;background:#FAFAFA;border-radius:9px;padding:12px 14px">
+          <span style="font-size:12px;color:#777">المبلغ المُجمَّد الآن (<span id="adv-rate-display">30</span> د.إ/يوم)</span>
+          <span id="adv-price-display" style="font-size:16px;font-weight:900;color:#C9A84C">210 د.إ</span>
+        </div>
+        <div>
+          <label style="font-size:12px;color:#777;display:block;margin-bottom:4px">بيانات البطاقة</label>
+          <div id="adv-card-element" style="padding:12px;border:1.5px solid #E8E8E8;border-radius:9px;background:#fff"></div>
+          <div style="font-size:10px;color:#999;margin-top:4px">🔒 بيانات بطاقتك تُرسل مباشرة لـ Stripe ولا تمر عبر خوادمنا إطلاقاً</div>
+        </div>
+        <label style="display:flex;align-items:flex-start;gap:8px;font-size:11px;color:#666;line-height:1.6">
+          <input type="checkbox" id="adv-terms" style="margin-top:2px">
+          <span>أوافق أن المنصة وسيط عرض فقط ولا تتحمل مسؤولية محتوى الإعلان، وأن المبلغ أعلاه يُجمَّد من بطاقتي الآن (بدون سحب فعلي)، ويُحصَّل فقط عند موافقة الإدارة على الإعلان — وفي حال الرفض يُطلق التجميد بالكامل بدون أي خصم. الرسوم غير قابلة للاسترداد بعد التفعيل.</span>
+        </label>
+        <div id="adv-msg" style="font-size:13px"></div>
+        <button id="adv-submit-btn" onclick="submitAdvertise()" style="background:#C9A84C;color:#fff;border:none;padding:12px;border-radius:9px;font-weight:700;font-size:14px;cursor:pointer;font-family:inherit">تجميد المبلغ وإرسال الإعلان</button>
+        <div style="font-size:11px;color:#999;text-align:center">سيتم مراجعة الإعلان خلال 24 ساعة — الإعلان يظهر فقط بعد الموافقة</div>
+      </div>
+    </div>`;
+  document.body.appendChild(overlay);
+  updateAdvertisePrice();
+  initStripeCardElement();
+}
+
+const ADV_RATE_PER_DAY = 30; // د.إ/يوم — نفس سعر إعلانات نقل الكفالة، قابل للتعديل من هنا فقط
+function updateAdvertisePrice(){
+  const daysEl = document.getElementById('adv-days');
+  const priceEl = document.getElementById('adv-price-display');
+  if(!daysEl || !priceEl) return;
+  const days = Math.max(1, parseInt(daysEl.value) || 1);
+  priceEl.textContent = (days * ADV_RATE_PER_DAY).toLocaleString() + ' د.إ';
+}
+
+function initStripeCardElement(){
+  if(!_stripe){
+    _stripe = Stripe(STRIPE_PUBLISHABLE_KEY);
+  }
+  _stripeElements = _stripe.elements();
+  _stripeCard = _stripeElements.create('card', {
+    style: { base: { fontFamily: 'Tajawal, sans-serif', fontSize: '14px', color: '#111' } },
+    hidePostalCode: true
+  });
+  _stripeCard.mount('#adv-card-element');
+}
+
+async function submitAdvertise(){
+  const val = (id) => document.getElementById(id)?.value?.trim() || '';
+  const type = val('adv-type');
+  const name = val('adv-name');
+  const phone = val('adv-phone');
+  const whatsapp = val('adv-whatsapp');
+  const topic = val('adv-topic');
+  const details = val('adv-details');
+  const days = parseInt(val('adv-days')) || 7;
+  const msgEl = document.getElementById('adv-msg');
+  const btnEl = document.getElementById('adv-submit-btn');
+  const termsOk = document.getElementById('adv-terms')?.checked;
+
+  if(!name || !phone || !topic){
+    msgEl.style.color = '#E53E3E';
+    msgEl.textContent = 'يرجى تعبئة الاسم ورقم الهاتف وعنوان الإعلان';
+    return;
+  }
+  if(!termsOk){
+    msgEl.style.color = '#E53E3E';
+    msgEl.textContent = 'يرجى الموافقة على شروط الإعلان أولاً';
+    return;
+  }
+
+  const amount = days * ADV_RATE_PER_DAY; // بالدرهم
+  btnEl.disabled = true;
+  btnEl.textContent = 'جاري المعالجة...';
+  msgEl.style.color = '#777';
+  msgEl.textContent = 'جاري إنشاء طلب الإعلان...';
+
+  try{
+    // 1) إنشاء صف الإعلان أولاً (حالة pending، بدون payment_intent_id بعد) — نحتاج الـ id
+    const startsAt = new Date();
+    const expiresAt = new Date(startsAt.getTime() + days * 86400000);
+    const insertRes = await fetch(`${STRIP_SUPABASE_URL}/rest/v1/strip_ads`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        apikey: STRIP_ANON_KEY,
+        Authorization: 'Bearer ' + STRIP_ANON_KEY,
+        Prefer: 'return=representation'
+      },
+      body: JSON.stringify({
+        advertiser_name: name,
+        advertiser_type: type,
+        phone: phone,
+        whatsapp: whatsapp || null,
+        ad_topic: topic,
+        ad_details: details || null,
+        days: days,
+        amount: amount,
+        status: 'pending',
+        starts_at: startsAt.toISOString(),
+        expires_at: expiresAt.toISOString()
+      })
+    });
+    if(!insertRes.ok){
+      throw new Error('تعذّر إنشاء طلب الإعلان: ' + await insertRes.text());
+    }
+    const inserted = await insertRes.json();
+    const adId = inserted?.[0]?.id;
+    if(!adId) throw new Error('تعذّر الحصول على معرف الإعلان');
+
+    // 2) طلب تجميد المبلغ من الدالة الخادمية (Edge Function)
+    msgEl.textContent = 'جاري تجميد المبلغ من البطاقة...';
+    const authRes = await fetch(STRIPE_EDGE_FN_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        apikey: STRIP_ANON_KEY,
+        Authorization: 'Bearer ' + STRIP_ANON_KEY
+      },
+      body: JSON.stringify({ action: 'authorize', amount: amount * 100, ad_id: adId })
+    });
+    const authData = await authRes.json();
+    if(!authRes.ok || !authData.client_secret){
+      throw new Error(authData.error || 'تعذّر بدء عملية الدفع');
+    }
+
+    // 3) تأكيد التجميد فعلياً ببيانات البطاقة عبر Stripe.js (مباشرة مع Stripe، بدون مرور ببياناتنا)
+    const { error: confirmError, paymentIntent } = await _stripe.confirmCardPayment(authData.client_secret, {
+      payment_method: { card: _stripeCard, billing_details: { name: name, phone: phone } }
+    });
+    if(confirmError){
+      throw new Error(confirmError.message || 'فشل تجميد المبلغ من البطاقة');
+    }
+
+    // 4) حفظ رقم عملية الدفع بصف الإعلان عشان نقدر نحصّلها أو نلغيها لاحقاً
+    await fetch(`${STRIP_SUPABASE_URL}/rest/v1/strip_ads?id=eq.${adId}`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        apikey: STRIP_ANON_KEY,
+        Authorization: 'Bearer ' + STRIP_ANON_KEY,
+        Prefer: 'return=minimal'
+      },
+      body: JSON.stringify({ payment_intent_id: paymentIntent.id })
+    });
+
+    msgEl.style.color = '#38A169';
+    msgEl.textContent = '✓ تم تجميد المبلغ بنجاح — إعلانك الآن قيد المراجعة، وسيُخصم فقط عند الموافقة';
+    setTimeout(() => { document.getElementById('advertiseModalOverlay').style.display = 'none'; }, 2200);
+  }catch(e){
+    msgEl.style.color = '#E53E3E';
+    msgEl.textContent = e.message || 'تعذّر إتمام العملية، حاول لاحقاً';
+  }finally{
+    btnEl.disabled = false;
+    btnEl.textContent = 'تجميد المبلغ وإرسال الإعلان';
+  }
+}
+</script>
+
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<!-- NAV -->
+<nav id="mainNav">
+  <a class="nav-logo" href="#">
+    <img src="saahl-logo.png" alt="SAAHL">
+    <div>
+      <span class="nav-logo-text">SAAHL</span>
+      <span class="nav-logo-sub" data-t="logo_sub"></span>
+    </div>
+  </a>
+  <ul class="nav-center">
+    <li><a href="#how" data-t="n1">كيف يعمل</a></li>
+    <li><a href="#types" data-t="n2">ابدأ الآن</a></li>
+    <li><a href="#features" data-t="n3">المميزات</a></li>
+    <li><a href="kafala.html" data-t="n4">نقل كفالة</a></li>
+  </ul>
+  <div class="nav-actions">
+    <div class="lang-wrap">
+      <button class="lang-btn" onclick="toggleLang()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+        <span id="langLabel">عربي</span>
+      </button>
+      <div class="lang-drop" id="langDrop">
+        <button class="lang-opt on" onclick="setLang('ar',this)">🇦🇪 العربية</button>
+        <button class="lang-opt" onclick="setLang('en',this)">🇬🇧 English</button>
+        <button class="lang-opt" onclick="setLang('ur',this)">🇵🇰 اردو</button>
+      </div>
+    </div>
+    <a href="login.html" class="nav-login" data-t="n5">تسجيل الدخول</a>
+    <a href="#types" class="nav-cta" data-t="n6">ابدأ الآن</a>
+  </div>
+  <button class="nav-burger" onclick="toggleMob()" id="burger">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+
+<!-- SPOTLIGHT WIDGET — اشتراك "عاملة مميزة" المدفوع (مرتبط ببيانات المكتب الفعلية) -->
+<div id="spotlightWidget" style="
+  position:fixed;left:12px;z-index:120;
+  width:var(--spot-w,188px);
+  background:#111;
+  border-radius:16px;
+  box-shadow:0 8px 40px rgba(0,0,0,.25);
+  border:1px solid rgba(201,168,76,.2);
+  overflow:hidden;
+  transition:transform .3s ease, top .25s ease;
+  display:none;
+">
+  <!-- Header -->
+  <div style="background:linear-gradient(135deg,#111,#1a1a1a);padding:10px 14px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(201,168,76,.15)">
+    <span style="font-size:11px;font-weight:700;color:#C9A84C;letter-spacing:.5px" data-t="spot_title">عاملة مميزة</span>
+    <div style="display:flex;align-items:center;gap:8px">
+      <div style="display:flex;gap:5px;align-items:center">
+        <div style="width:6px;height:6px;border-radius:50%;background:#C9A84C;animation:spotPulse 2s ease infinite"></div>
+        <span style="font-size:9px;color:rgba(255,255,255,.3);line-height:1.6" data-t="spot_live">مباشر</span>
+      </div>
+      <button onclick="collapseSpotlight()" aria-label="تصغير" style="background:none;border:none;color:rgba(255,255,255,.4);cursor:pointer;padding:2px;display:flex;line-height:0">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Slides container -->
+  <div style="position:relative;overflow:hidden">
+    <div id="spotSlides" style="display:flex;transition:transform .5s ease"></div>
+  </div>
+
+  <!-- Arrow / Dots -->
+  <div id="spotDots" style="border-top:1px solid rgba(255,255,255,.06);padding:8px 14px;display:flex;align-items:center;justify-content:center;gap:6px"></div>
+
+  <!-- زر أعلن هنا — لصاحب مكتب يريد تمييز إحدى عاملاته -->
+  <a href="register-office.html" style="display:block;text-align:center;padding:8px;font-size:10px;font-weight:700;color:#C9A84C;background:rgba(201,168,76,.08);border-top:1px solid rgba(201,168,76,.15);text-decoration:none" data-t="spot_cta">مكتبك؟ أعلن عن عاملاتك هنا ←</a>
+</div>
+
+<!-- زر إعادة الفتح — يظهر فقط بعد تصغير البطاقة، يبقى بمكانه ويُعيد فتحها بأي وقت -->
+<button id="spotlightReopen" onclick="expandSpotlight()" aria-label="عرض العاملة المميزة" style="
+  display:none;position:fixed;left:12px;z-index:120;
+  width:44px;height:44px;border-radius:50%;
+  background:#111;border:1px solid rgba(201,168,76,.3);
+  box-shadow:0 8px 24px rgba(0,0,0,.25);
+  cursor:pointer;align-items:center;justify-content:center;
+  transition:top .25s ease;
+">
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#C9A84C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l2.9 6.3 6.9.9-5 4.9 1.2 6.9L12 17.5l-6 3.5 1.2-6.9-5-4.9 6.9-.9L12 2z"/></svg>
+</button>
+
+<style>
+@keyframes spotPulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(1.3)}}
+:root{--spot-w:188px}
+@media(max-width:480px){:root{--spot-w:148px}}
+#spotSlides>div{width:var(--spot-w,188px)!important;min-width:var(--spot-w,188px)!important}
+</style>
+
+<script>
+// ===== ودجت "عاملة مميزة" — اشتراك مدفوع يعرضه المكتب لإبراز عاملة معينة =====
+const SPOTLIGHT_SUPABASE_URL = 'https://hkfxikmpfgixrbrboxeb.supabase.co';
+const SPOTLIGHT_ANON_KEY = 'sb_publishable_OcWY5nY_-b2odLqQxsu2Kw_iQ4YswBz';
+
+let _spotData = [];
+let _spotIndex = 0;
+
+// يضع الودجت دائماً تحت الناف بار/الشريط الإعلاني مهما كان ارتفاعهم، على كل الشاشات
+function positionSpotlight(){
+  const nav = document.getElementById('mainNav');
+  const widget = document.getElementById('spotlightWidget');
+  const reopenBtn = document.getElementById('spotlightReopen');
+  if(!nav) return;
+  const bottom = nav.getBoundingClientRect().bottom;
+  const top = Math.max(8, bottom + 10) + 'px';
+  if(widget) widget.style.top = top;
+  if(reopenBtn) reopenBtn.style.top = top;
+}
+window.addEventListener('resize', positionSpotlight);
+
+async function loadSpotlight(){
+  try{
+    // end_date=gt.now() يضمن عرض الاشتراكات السارية فقط (مو المنتهية) — الأعمدة الحقيقية بجدول featured_maids
+    const nowIso = new Date().toISOString();
+    const q1 = `${SPOTLIGHT_SUPABASE_URL}/rest/v1/featured_maids`
+      + `?select=id,maid_id,office_id,end_date`
+      + `&end_date=gt.${nowIso}`
+      + `&order=end_date.desc`
+      + `&limit=8`;
+    const res1 = await fetch(q1, {headers:{apikey:SPOTLIGHT_ANON_KEY, Authorization:'Bearer '+SPOTLIGHT_ANON_KEY}});
+    if(!res1.ok) throw new Error('featured_maids fetch failed');
+    const featRows = await res1.json();
+
+    if(!featRows || !featRows.length){ _spotData = []; }
+    else{
+      const ids = [...new Set(featRows.map(r => r.maid_id).filter(Boolean))];
+      const q2 = `${SPOTLIGHT_SUPABASE_URL}/rest/v1/maids`
+        + `?select=id,full_name,nationality,age,monthly_salary,skills,office_id`
+        + `&id=in.(${ids.join(',')})`;
+      const res2 = await fetch(q2, {headers:{apikey:SPOTLIGHT_ANON_KEY, Authorization:'Bearer '+SPOTLIGHT_ANON_KEY}});
+      if(!res2.ok) throw new Error('maids fetch failed');
+      const maidsRows = await res2.json();
+      const maidsById = {};
+      (maidsRows || []).forEach(m => { maidsById[m.id] = m; });
+      _spotData = featRows.map(r => maidsById[r.maid_id]).filter(Boolean);
+    }
+  }catch(e){
+    console.warn('Spotlight: تعذّر تحميل العاملات المميزات', e);
+    _spotData = [];
+  }
+
+  // لا نعرض الودجت إطلاقاً إذا ما فيه اشتراك مميز فعلي ساري — بدل عرض بيانات وهمية
+  if(!_spotData.length){
+    document.getElementById('spotlightWidget').style.display = 'none';
+    document.getElementById('spotlightReopen').style.display = 'none';
+    return;
+  }
+
+  renderSpotSlides();
+  positionSpotlight();
+  const collapsed = localStorage.getItem('saahl_spotlight_collapsed') === '1';
+  if(collapsed){ expandSpotlight(true); collapseSpotlight(true); }
+  else{ document.getElementById('spotlightWidget').style.display = 'block'; }
+}
+
+function escapeHtml(s){
+  return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+const SPOT_T = { ar: { view: 'عرض العاملة' }, en: { view: 'View Worker' }, ur: { view: 'کارکن دیکھیں' } };
+
+function renderSpotSlides(){
+  const wrap = document.getElementById('spotSlides');
+  const dots = document.getElementById('spotDots');
+  const spotW = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--spot-w')) || 188;
+  const viewTxt = (SPOT_T[typeof lang !== 'undefined' ? lang : 'ar'] || SPOT_T.ar).view;
+  wrap.innerHTML = _spotData.map(m => {
+    const initial = escapeHtml((m.full_name || '؟').trim().charAt(0));
+    const skills = Array.isArray(m.skills) ? m.skills.slice(0,3) : String(m.skills || '').split(',').map(s=>s.trim()).filter(Boolean).slice(0,3);
+    const skillsHtml = skills.map(s => `<span style="font-size:9px;background:rgba(201,168,76,.15);color:#C9A84C;padding:2px 7px;border-radius:50px;border:1px solid rgba(201,168,76,.2)">${escapeHtml(s)}</span>`).join('');
+    // رابط ملف العاملة نفسها داخل صفحة المكتب — عدّل المسار/البارامترات ليطابق صفحة تفاصيل العاملة الفعلية عندك
+    const link = `search.html?maidId=${encodeURIComponent(m.id)}&officeId=${encodeURIComponent(m.office_id ?? '')}`;
+    return `
+      <div style="padding:13px">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+          <div style="width:48px;height:48px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#FFF8E7,#C9A84C);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:900;color:#111;box-shadow:0 4px 14px rgba(201,168,76,.4);flex-shrink:0">${initial}</div>
+          <div>
+            <div style="font-size:13px;font-weight:800;color:#fff;margin-bottom:1px">${escapeHtml(m.full_name || '')}</div>
+            <div style="font-size:10px;color:rgba(255,255,255,.4)">${escapeHtml(m.nationality || '')}${m.age ? ' — ' + escapeHtml(m.age) + ' سنة' : ''}</div>
+          </div>
+        </div>
+        <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:10px">${skillsHtml}</div>
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <div style="font-size:15px;font-weight:900;color:#C9A84C">${m.monthly_salary ? escapeHtml(m.monthly_salary) : ''} <span style="font-size:9px;font-weight:400;color:rgba(255,255,255,.4)">${m.monthly_salary ? 'د.إ' : ''}</span></div>
+          <a href="${link}" style="font-size:10px;font-weight:700;color:#111;background:#C9A84C;padding:5px 12px;border-radius:6px;text-decoration:none">${viewTxt}</a>
+        </div>
+      </div>`;
+  }).join('');
+
+  dots.innerHTML = _spotData.map((_, i) =>
+    `<div id="dot${i}" style="width:${i===0?'16px':'6px'};height:4px;border-radius:2px;background:${i===0?'#C9A84C':'rgba(255,255,255,.15)'};transition:all .3s"></div>`
+  ).join('') + (_spotData.length > 1 ? `
+    <button onclick="spotNext()" style="margin-right:auto;background:rgba(201,168,76,.15);border:1px solid rgba(201,168,76,.2);border-radius:6px;width:26px;height:26px;display:flex;align-items:center;justify-content:center;cursor:pointer" aria-label="التالي">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#C9A84C" stroke-width="2.5" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>
+    </button>` : '');
+
+  _spotIndex = 0;
+  if(_spotData.length > 1) setInterval(spotNext, 5000);
+}
+
+function spotNext(){
+  if(!_spotData.length) return;
+  _spotIndex = (_spotIndex + 1) % _spotData.length;
+  const spotW = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--spot-w')) || 188;
+  document.getElementById('spotSlides').style.transform = 'translateX(' + (_spotIndex * spotW) + 'px)';
+  _spotData.forEach((_, i) => {
+    const d = document.getElementById('dot' + i);
+    if(d){ d.style.width = i === _spotIndex ? '16px' : '6px'; d.style.background = i === _spotIndex ? '#C9A84C' : 'rgba(255,255,255,.15)'; }
+  });
+}
+
+// تصغير/تكبير: البطاقة تختفي ويظهر بدلها زر دائري صغير بنفس المكان، يعيد فتحها فوراً عند الضغط بأي وقت
+function collapseSpotlight(skipSave){
+  document.getElementById('spotlightWidget').style.display = 'none';
+  if(_spotData.length){
+    document.getElementById('spotlightReopen').style.display = 'flex';
+  }
+  if(!skipSave) localStorage.setItem('saahl_spotlight_collapsed', '1');
+}
+function expandSpotlight(skipSave){
+  document.getElementById('spotlightReopen').style.display = 'none';
+  if(!skipSave){
+    document.getElementById('spotlightWidget').style.display = 'block';
+    localStorage.removeItem('saahl_spotlight_collapsed');
+  }
+}
+
+loadSpotlight();
+</script>
+
+<!-- MOBILE NAV -->
+<div class="mob-nav" id="mobNav">
+  <a href="#how" onclick="closeMob()" data-t="n1">كيف يعمل <span>←</span></a>
+  <a href="#types" onclick="closeMob()" data-t="n2">ابدأ الآن <span>←</span></a>
+  <a href="#features" onclick="closeMob()" data-t="n3">المميزات <span>←</span></a>
+  <a href="kafala.html" data-t="n4">نقل كفالة <span>←</span></a>
+  <div class="mob-nav-btns">
+    <a href="login.html" style="border:1.5px solid #E8E8E8;border-radius:10px;padding:13px;text-align:center;font-weight:700" data-t="n5">تسجيل الدخول</a>
+    <a href="#types" onclick="closeMob()" style="background:#C9A84C;color:#fff;border-radius:10px;padding:13px;text-align:center;font-weight:700" data-t="n6">ابدأ الآن</a>
+  </div>
+</div>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg">
+    <div class="geo-line"></div>
+    <div class="geo-line"></div>
+    <div class="geo-line"></div>
+    <div class="geo-circle gc1"></div>
+    <div class="geo-circle gc2"></div>
+    <div class="geo-circle gc3"></div>
+  </div>
+
+  <div class="hero-tag">
+    <span class="hero-tag-dot"></span>
+    <span data-t="hero_badge">منصة ساهل — تربط مكاتب الاستقدام بالكفلاء</span>
+  </div>
+
+  <h1 class="hero-title">
+    <span data-t="hero_h1">ابحث بثقة عن</span><br>
+    <span class="line-gold" data-t="hero_h2">المساعدة المناسبة</span>
+  </h1>
+
+  <div class="hero-typed-wrap">
+    <span data-t="hero_via">عبر</span>
+    <span class="hero-typed" id="typedEl">مكاتب مرخصة</span><span class="cursor-blink"></span>
+  </div>
+
+  <p class="hero-sub" data-t="hero_sub">
+    منصة رقمية منظمة تربط الكفلاء بمكاتب الاستقدام المرخصة في جميع إمارات الدولة — بوضوح وشفافية وسهولة
+  </p>
+
+  <div class="hero-btns">
+    <a href="#types" class="btn-primary">
+      <span data-t="btn1">ابدأ البحث</span>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    </a>
+    <a href="register-office.html" class="btn-secondary" data-t="btn2">سجل مكتبك مجاناً</a>
+  </div>
+
+  </section>
+
+<!-- HOW IT WORKS -->
+<section class="section" id="how">
+  <div class="how-header reveal">
+    <div class="section-tag" data-t="how_tag">آلية العمل</div>
+    <h2 class="section-title" data-t="how_title">كيف تعمل المنصة</h2>
+    <p class="section-sub" data-t="how_sub">3 خطوات بسيطة تفصلك عن العاملة المناسبة لأسرتك</p>
+  </div>
+
+  <div class="steps-timeline">
+    <div class="step-item">
+      <div class="step-num-wrap">
+        <div class="step-icon-bg"></div>
+        <span class="step-num">1</span>
+      </div>
+      <div class="step-name" data-t="s1t">ابحث واختر</div>
+      <p class="step-desc" data-t="s1d">تصفح العاملات المتاحة من مكاتب معتمدة في إمارتك واختر الأنسب لاحتياج أسرتك</p>
+    </div>
+    <div class="step-item">
+      <div class="step-num-wrap">
+        <div class="step-icon-bg"></div>
+        <span class="step-num">2</span>
+      </div>
+      <div class="step-name" data-t="s2t">احجز مبدئياً</div>
+      <p class="step-desc" data-t="s2d">احجز العاملة لمدة 3 ساعات وراجع بياناتها كاملة — قابل للتمديد مرة واحدة</p>
+    </div>
+    <div class="step-item">
+      <div class="step-num-wrap">
+        <div class="step-icon-bg"></div>
+        <span class="step-num">3</span>
+      </div>
+      <div class="step-name" data-t="s3t">جرّب وأكمل</div>
+      <p class="step-desc" data-t="s3d">فترة تجربة 5 أيام مع ضمان الاستبدال — ثم أكمل العقد النهائي باطمئنان</p>
+    </div>
+  </div>
+</section>
+
+<!-- TYPES -->
+<section class="section" id="types" style="background:#FFFFFF;border-top:1px solid #EEE6D4;border-bottom:1px solid #EEE6D4">
+  <div class="how-header reveal">
+    <div class="section-tag" data-t="types_tag">انضم إلينا</div>
+    <h2 class="section-title" data-t="types_title">ابدأ رحلتك مع ساهل</h2>
+    <p class="section-sub" style="margin:0 auto" data-t="types_sub">سواء كنت كفيلاً تبحث عن عاملة، أو مكتباً يعرض خدماته، أو ترغب بنقل كفالة</p>
+  </div>
+
+  <div class="types-grid" style="max-width:1180px;margin:56px auto 0">
+    <a href="search.html" class="type-card reveal">
+      <div class="type-visual" style="background:linear-gradient(135deg,#fff,#FFF9EA);height:170px">
+        <div class="premium-icon-wrap" aria-hidden="true">
+          <svg class="premium-icon" viewBox="0 0 96 96" fill="none">
+            <rect x="18" y="24" width="56" height="46" rx="9" fill="#fff" stroke="#C9A84C" stroke-width="4"/>
+            <circle cx="39" cy="42" r="9" fill="#C9A84C"/>
+            <path d="M27 62c2.2-10 21.8-10 24 0" fill="#111"/>
+            <path d="M55 37h11M55 48h14M55 59h9" stroke="#C9A84C" stroke-width="4" stroke-linecap="round"/>
+            <circle cx="70" cy="67" r="13" fill="#C9A84C"/>
+            <path d="M63 67l5 5 10-12" stroke="#fff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+      </div>
+      <div class="type-body">
+        <div class="type-header"><div class="type-ico"><svg viewBox="0 0 24 24" fill="none"><rect x="4" y="5" width="14" height="14" rx="3" stroke="currentColor" stroke-width="2"/><circle cx="10" cy="11" r="2.5" fill="currentColor"/><path d="M7 17c.8-3 5.2-3 6 0" stroke="#111" stroke-width="2" stroke-linecap="round"/><path d="M15 18l4 4" stroke="#111" stroke-width="2" stroke-linecap="round"/></svg></div><div class="type-name" data-t="ty1">أنا كفيل</div></div>
+        <p class="type-desc" data-t="td1">ابحث عن العاملة المناسبة من مكاتب معتمدة في إمارتك بسهولة وأمان</p>
+        <ul class="type-feats">
+          <li class="type-feat"><span class="feat-check">✓</span><span data-t="tf11">مقارنة المكاتب والأسعار</span></li>
+          <li class="type-feat"><span class="feat-check">✓</span><span data-t="tf12">حجز مبدئي 3 ساعات</span></li>
+          <li class="type-feat"><span class="feat-check">✓</span><span data-t="tf13">فترة تجربة 5 أيام مضمونة</span></li>
+          <li class="type-feat"><span class="feat-check">✓</span><span data-t="tf14">عمولة المنصة 69 درهم فقط</span></li>
+        </ul>
+        <span class="type-btn" data-t="ty1b">سجل كـ كفيل</span>
+      </div>
+    </a>
+
+    <a href="register-office.html" class="type-card reveal reveal-delay-1">
+      <div class="type-visual" style="background:linear-gradient(135deg,#fff,#FFF9EA);height:170px">
+        <div class="premium-icon-wrap" aria-hidden="true">
+          <svg class="premium-icon" viewBox="0 0 96 96" fill="none">
+            <rect x="25" y="18" width="46" height="58" rx="8" fill="#fff" stroke="#111" stroke-width="4"/>
+            <path d="M38 18h20" stroke="#111" stroke-width="5" stroke-linecap="round"/>
+            <path d="M36 43h8v20h-8zM48 34h8v29h-8zM60 50h8v13h-8z" fill="#C9A84C"/>
+            <path d="M33 69h31" stroke="#C9A84C" stroke-width="4" stroke-linecap="round"/>
+            <circle cx="72" cy="68" r="13" fill="#C9A84C"/>
+            <path d="M66 68l4 4 8-10" stroke="#fff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+      </div>
+      <div class="type-body">
+        <div class="type-header"><div class="type-ico"><svg viewBox="0 0 24 24" fill="none"><path d="M4 20h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><rect x="6" y="4" width="12" height="16" rx="2" stroke="#111" stroke-width="2"/><path d="M9 8h2M13 8h2M9 12h2M13 12h2M9 16h6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></div><div class="type-name" data-t="ty2">أنا مكتب استقدام</div></div>
+        <p class="type-desc" data-t="td2">اعرض خدماتك وعاملاتك لآلاف الكفلاء في جميع أنحاء الإمارات</p>
+        <ul class="type-feats">
+          <li class="type-feat"><span class="feat-check">✓</span><span data-t="tf21">10 أيام تجربة مجانية</span></li>
+          <li class="type-feat"><span class="feat-check">✓</span><span data-t="tf22">اشتراك 70 درهم شهرياً — سعر التأسيس</span></li>
+          <li class="type-feat"><span class="feat-check">✓</span><span data-t="tf23">إدارة العاملات والحجوزات</span></li>
+          <li class="type-feat"><span class="feat-check">✓</span><span data-t="tf24">استقبال الطلبات مباشرة</span></li>
+        </ul>
+        <span class="type-btn" data-t="ty2b">سجل مكتبك</span>
+      </div>
+    </a>
+
+    <a href="kafala.html" class="type-card reveal reveal-delay-2">
+      <div class="type-visual" style="background:linear-gradient(135deg,#fff,#FFF9EA);height:170px">
+        <div class="premium-icon-wrap" aria-hidden="true">
+          <svg class="premium-icon" viewBox="0 0 96 96" fill="none">
+            <path d="M48 14l28 11v19c0 18-12 31-28 38-16-7-28-20-28-38V25l28-11z" fill="#fff" stroke="#C9A84C" stroke-width="4"/>
+            <circle cx="48" cy="42" r="9" fill="#C9A84C"/>
+            <path d="M32 65c3-14 29-14 32 0" stroke="#111" stroke-width="5" stroke-linecap="round"/>
+            <path d="M66 54c7 0 13 6 13 13m0 0h-7m7 0v-7M30 42c-7 0-13-6-13-13m0 0h7m-7 0v7" stroke="#C9A84C" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+      </div>
+      <div class="type-body">
+        <div class="type-header"><div class="type-ico"><svg viewBox="0 0 24 24" fill="none"><path d="M12 3l7 3v5c0 4.5-2.8 8-7 10-4.2-2-7-5.5-7-10V6l7-3z" stroke="currentColor" stroke-width="2"/><path d="M9 12h6M13 9l3 3-3 3" stroke="#111" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="type-name" data-t="ty3">نقل كفالة</div></div>
+        <p class="type-desc" data-t="td3">اعرض عاملك للنقل أو ابحث عن عامل جاهز لنقل الكفالة — مباشرة بدون وسيط</p>
+        <ul class="type-feats">
+          <li class="type-feat"><span class="feat-check">✓</span><span data-t="tf31">عرض العامل بـ 30 درهم / يوم</span></li>
+          <li class="type-feat"><span class="feat-check">✓</span><span data-t="tf32">تواصل مباشر بين الكفيلين</span></li>
+          <li class="type-feat"><span class="feat-check">✓</span><span data-t="tf33">فلترة بالمهنة والجنسية والوضع</span></li>
+          <li class="type-feat"><span class="feat-check">✓</span><span data-t="tf34">الإعلان يظهر فور الدفع</span></li>
+        </ul>
+        <span class="type-btn" data-t="ty3b">استعرض الإعلانات</span>
+      </div>
+    </a>
+  </div>
+</section>
+
+<section class="section" id="features">
+  <div class="features-layout">
+    <div class="features-left reveal">
+      <div class="section-tag" data-t="feat_tag">لماذا ساهل</div>
+      <h2 class="section-title" data-t="feat_title">منصة صُممت<br>لراحتك وأمانك</h2>
+      <p class="section-sub" data-t="feat_sub">كل تفصيل في المنصة مصمم لتوفير تجربة آمنة وشفافة لجميع الأطراف</p>
+      <div class="feat-items" style="margin-top:32px">
+        <div class="feat-item">
+          <div class="feat-item-ico"><svg viewBox="0 0 24 24" fill="none"><path d="M12 3l7 3v5c0 4.5-2.8 8-7 10-4.2-2-7-5.5-7-10V6l7-3z" stroke="currentColor" stroke-width="2"/><path d="M8.5 12l2.2 2.2L15.8 9" stroke="#111" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <div>
+            <div class="feat-item-title" data-t="fi1t">مكاتب مرخصة فقط</div>
+            <p class="feat-item-desc" data-t="fi1d">جميع المكاتب مرخصة ومعتمدة رسمياً — سلامتك وضمان حقوقك أولويتنا</p>
+          </div>
+        </div>
+        <div class="feat-item">
+          <div class="feat-item-ico"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="13" r="7" stroke="currentColor" stroke-width="2"/><path d="M9 3h6M12 13l3-3" stroke="#111" stroke-width="2" stroke-linecap="round"/></svg></div>
+          <div>
+            <div class="feat-item-title" data-t="fi2t">حجز مبدئي 3 ساعات</div>
+            <p class="feat-item-desc" data-t="fi2d">احجز اختيارك فوراً مع وقت كافٍ لمراجعة جميع التفاصيل قبل الالتزام</p>
+          </div>
+        </div>
+        <div class="feat-item">
+          <div class="feat-item-ico"><svg viewBox="0 0 24 24" fill="none"><path d="M7 7h8a5 5 0 0 1 4.7 3.3M17 17H9a5 5 0 0 1-4.7-3.3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M15 4l3 3-3 3M9 20l-3-3 3-3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <div>
+            <div class="feat-item-title" data-t="fi3t">سياسة استبدال واضحة</div>
+            <p class="feat-item-desc" data-t="fi3d">غير راضٍ خلال فترة التجربة؟ تواصل مع المكتب مباشرة لطلب استبدال حسب سياسته المعلنة</p>
+          </div>
+        </div>
+        <div class="feat-item">
+          <div class="feat-item-ico"><svg viewBox="0 0 24 24" fill="none"><path d="M5 6.5c0 7 5.5 12.5 12.5 12.5l2-3.5-4-2-2 2c-2.3-1-4-2.7-5-5l2-2-2-4-3.5 2z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <div>
+            <div class="feat-item-title" data-t="fi4t">تواصل مباشر</div>
+            <p class="feat-item-desc" data-t="fi4d">تواصل مع المكتب مباشرة عبر المنصة أو واتساب لأي استفسار</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="features-right reveal reveal-delay-1">
+      <div class="stat-panel">
+        <div class="stat-wide-card">
+          <div class="stat-wide-icon" aria-hidden="true">
+            <svg viewBox="0 0 64 64" fill="none"><path d="M32 8l24 10v16c0 16-10 28-24 32-14-4-24-16-24-32V18l24-10z" stroke="currentColor" stroke-width="4"/><path d="M22 32l7 7 13-15" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <div class="stat-wide-line"></div>
+          <div>
+            <div class="stat-wide-lbl" style="font-size:19px" data-t="fc1">رقم الترخيص إلزامي</div>
+            <p class="stat-wide-desc" data-t="fc1d">يُطلب من كل مكتب عند التسجيل قبل ظهوره على المنصة</p>
+          </div>
+        </div>
+        <div class="stat-wide-card">
+          <div class="stat-wide-icon" aria-hidden="true">
+            <svg viewBox="0 0 64 64" fill="none"><circle cx="32" cy="30" r="12" stroke="currentColor" stroke-width="4"/><path d="M27 30l4 4 8-8" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/><path d="M20 54c2-9 22-9 24 0" stroke="currentColor" stroke-width="4" stroke-linecap="round"/></svg>
+          </div>
+          <div class="stat-wide-line"></div>
+          <div>
+            <div class="stat-wide-lbl" style="font-size:19px" data-t="fc2">حجز بدون التزام</div>
+            <p class="stat-wide-desc" data-t="fc2d">احجز مبدئياً 3 ساعات وراجع كل التفاصيل بهدوء</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section">
+  <div class="cta-bg-circle cta-bg-circle-1"></div>
+  <div class="cta-bg-circle cta-bg-circle-2"></div>
+  <div class="cta-content reveal">
+    <div class="cta-label" data-t="cta_label">ابدأ الآن</div>
+    <h2 class="cta-title" data-t="cta_title">جاهز تبدأ مع <span>SAAHL</span>؟</h2>
+    <p class="cta-sub" data-t="cta_sub">انضم لآلاف العائلات والمكاتب التي تثق بمنصة ساهل في الإمارات</p>
+    <div class="cta-btns">
+      <a href="register-sponsor.html" class="btn-cta-primary" data-t="cta_b1">ابدأ البحث الآن</a>
+      <a href="register-office.html" class="btn-cta-secondary" data-t="cta_b2">سجل مكتبك مجاناً</a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-grid">
+    <div>
+      <div class="footer-brand-logo">
+        <img src="saahl-logo.png" alt="SAAHL">
+        <span class="footer-brand-name">SAAHL</span>
+      </div>
+      <p class="footer-brand-desc" data-t="foot_desc">منصة رقمية تنظيمية تربط الكفلاء بمكاتب الاستقدام المرخصة في دولة الإمارات العربية المتحدة</p>
+    </div>
+    <div class="footer-col">
+      <h4 data-t="fh1">الخدمات</h4>
+      <a href="search.html" data-t="fl1">بحث عن عاملة</a>
+      <a href="register-office.html" data-t="fl2">تسجيل مكتب</a>
+      <a href="kafala.html" data-t="fl3">نقل كفالة</a>
+    </div>
+    <div class="footer-col">
+      <h4 data-t="fh2">المنصة</h4>
+      <a href="#how" data-t="fl4">كيف تعمل</a>
+      <a href="login.html" data-t="fl5">تسجيل الدخول</a>
+      <a href="#" data-t="fl6">الشروط والأحكام</a>
+      <a href="#" data-t="fl7">سياسة الخصوصية</a>
+    </div>
+    <div class="footer-col">
+      <h4 data-t="fh3">تواصل</h4>
+      <a href="mailto:info@saahl.ae" data-t="fl8">info@saahl.ae</a>
+      <a href="#" data-t="fl9">واتساب الدعم</a>
+      <a href="#" data-t="fl10">تسجيل مكتب جديد</a>
+      <a href="#" data-t="fl11">الإمارات العربية المتحدة</a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span class="footer-copy" data-t="fcopy">© 2026 SAAHL — جميع الحقوق محفوظة</span>
+    <span class="footer-uae">🇦🇪 UAE</span>
+  </div>
+</footer>
+
+<script>
+// ===== TRANSLATIONS =====
+const T = {
+  ar:{logo_sub:"",spot_title:"عاملة مميزة",spot_live:"مباشر",spot_cta:"مكتبك؟ أعلن عن عاملاتك هنا ←",n1:"كيف يعمل",n2:"ابدأ الآن",n3:"المميزات",n4:"نقل كفالة",n5:"تسجيل الدخول",n6:"ابدأ الآن",hero_badge:"منصة ساهل — تربط مكاتب الاستقدام بالكفلاء",hero_h1:"ابحث بثقة عن",hero_h2:"المساعدة المناسبة",hero_via:"عبر",hero_sub:"منصة رقمية منظمة تربط الكفلاء بمكاتب الاستقدام المرخصة في جميع إمارات الدولة — بوضوح وشفافية وسهولة",btn1:"ابدأ البحث",btn2:"سجل مكتبك مجاناً",how_tag:"آلية العمل",how_title:"كيف تعمل المنصة",how_sub:"3 خطوات بسيطة تفصلك عن العاملة المناسبة لأسرتك",s1t:"ابحث واختر",s1d:"تصفح العاملات المتاحة من مكاتب معتمدة في إمارتك واختر الأنسب لاحتياج أسرتك",s2t:"احجز مبدئياً",s2d:"احجز العاملة لمدة 3 ساعات وراجع بياناتها كاملة — قابل للتمديد مرة واحدة",s3t:"جرّب وأكمل",s3d:"فترة تجربة 5 أيام مع ضمان الاستبدال — ثم أكمل العقد النهائي باطمئنان",types_tag:"انضم إلينا",types_title:"ابدأ رحلتك مع ساهل",types_sub:"سواء كنت كفيلاً تبحث عن عاملة، أو مكتباً يعرض خدماته، أو ترغب بنقل كفالة",ty1:"أنا كفيل",td1:"ابحث عن العاملة المناسبة من مكاتب معتمدة في إمارتك بسهولة وأمان",tf11:"مقارنة المكاتب والأسعار",tf12:"حجز مبدئي 3 ساعات",tf13:"فترة تجربة 5 أيام مضمونة",tf14:"عمولة المنصة 69 درهم فقط",ty1b:"سجل كـ كفيل",ty2:"أنا مكتب استقدام",td2:"اعرض خدماتك وعاملاتك لآلاف الكفلاء في جميع أنحاء الإمارات",tf21:"10 أيام تجربة مجانية",tf22:"اشتراك 70 درهم شهرياً — سعر التأسيس",tf23:"إدارة العاملات والحجوزات",tf24:"استقبال الطلبات مباشرة",ty2b:"سجل مكتبك",ty3:"نقل كفالة",td3:"اعرض عاملك للنقل أو ابحث عن عامل جاهز لنقل الكفالة — مباشرة بدون وسيط",tf31:"عرض العامل بـ 30 درهم / يوم",tf32:"تواصل مباشر بين الكفيلين",tf33:"فلترة بالمهنة والجنسية والوضع",tf34:"الإعلان يظهر فور الدفع",ty3b:"استعرض الإعلانات",feat_tag:"لماذا ساهل",feat_title:"منصة صُممت لراحتك وأمانك",feat_sub:"كل تفصيل في المنصة مصمم لتوفير تجربة آمنة وشفافة لجميع الأطراف",fi1t:"مكاتب مرخصة فقط",fi1d:"جميع المكاتب مرخصة ومعتمدة رسمياً — سلامتك وضمان حقوقك أولويتنا",fi2t:"حجز مبدئي 3 ساعات",fi2d:"احجز اختيارك فوراً مع وقت كافٍ لمراجعة جميع التفاصيل قبل الالتزام",fi3t:"سياسة استبدال واضحة",fi3d:"غير راضٍ خلال فترة التجربة؟ تواصل مع المكتب مباشرة لطلب استبدال حسب سياسته المعلنة",fi4t:"تواصل مباشر",fi4d:"تواصل مع المكتب مباشرة عبر المنصة أو واتساب لأي استفسار",fc1:"رقم الترخيص إلزامي",fc1d:"يُطلب من كل مكتب عند التسجيل قبل ظهوره على المنصة",fc2:"حجز بدون التزام",fc2d:"احجز مبدئياً 3 ساعات وراجع كل التفاصيل بهدوء",cta_label:"ابدأ الآن",cta_title:"جاهز تبدأ مع SAAHL؟",cta_sub:"انضم لآلاف العائلات والمكاتب التي تثق بمنصة ساهل في الإمارات",cta_b1:"ابدأ البحث الآن",cta_b2:"سجل مكتبك مجاناً",foot_desc:"منصة رقمية تنظيمية تربط الكفلاء بمكاتب الاستقدام المرخصة في دولة الإمارات العربية المتحدة",fh1:"الخدمات",fl1:"بحث عن عاملة",fl2:"تسجيل مكتب",fl3:"نقل كفالة",fh2:"المنصة",fl4:"كيف تعمل",fl5:"تسجيل الدخول",fl6:"الشروط والأحكام",fl7:"سياسة الخصوصية",fh3:"تواصل",fl8:"info@saahl.ae",fl9:"واتساب الدعم",fl10:"تسجيل مكتب جديد",fl11:"الإمارات العربية المتحدة",fcopy:"© 2026 SAAHL — جميع الحقوق محفوظة"},
+  en:{logo_sub:"Recruitment Platform",spot_title:"Featured Worker",spot_live:"Live",spot_cta:"Own an office? Advertise your workers here →",n1:"How It Works",n2:"Get Started",n3:"Features",n4:"Kafala Transfer",n5:"Login",n6:"Get Started",hero_badge:"Digital Recruitment Platform — United Arab Emirates",hero_h1:"Search confidently for",hero_h2:"The Right Help",hero_via:"through",hero_sub:"A digital platform connecting sponsors with licensed recruitment offices across all UAE emirates — with clarity, transparency and ease.",btn1:"Start Search",btn2:"Register Office Free",how_tag:"How It Works",how_title:"How The Platform Works",how_sub:"3 simple steps to find the right helper for your family",s1t:"Search & Choose",s1d:"Browse available workers from certified offices in your emirate",s2t:"Book Provisionally",s2d:"Book for 3 hours and review all details before committing",s3t:"Try & Complete",s3d:"5-day trial with replacement guarantee — then complete with confidence",types_tag:"Join Us",types_title:"Start Your Journey with SAAHL",types_sub:"Whether you are searching, offering services, or transferring sponsorship",ty1:"I am a Sponsor",td1:"Find the right helper from certified offices in your emirate with ease",tf11:"Compare offices & prices",tf12:"3-hour provisional booking",tf13:"5-day guaranteed trial",tf14:"Platform fee only AED 69",ty1b:"Register as Sponsor",ty2:"I am a Recruitment Office",td2:"Showcase your services to thousands of sponsors across the UAE",tf21:"10-day free trial",tf22:"Subscription AED 70/month — Founding price",tf23:"Manage helpers & bookings",tf24:"Receive requests directly",ty2b:"Register Your Office",ty3:"Kafala Transfer",td3:"List your worker for transfer or find a worker ready for sponsorship transfer",tf31:"List worker for AED 30/day",tf32:"Direct contact between sponsors",tf33:"Filter by profession, nationality & status",tf34:"Ad appears immediately after payment",ty3b:"Browse Listings",feat_tag:"Why SAAHL",feat_title:"Built for your comfort and safety",feat_sub:"Every detail designed for a safe, transparent experience",fi1t:"Licensed Offices Only",fi1d:"All offices are officially licensed and certified",fi2t:"3-Hour Provisional Booking",fi2d:"Book instantly with time to review all details",fi3t:"Clear Replacement Policy",fi3d:"Not satisfied during trial? Contact the office directly per their stated policy",fi4t:"Direct Communication",fi4d:"Contact offices directly via platform or WhatsApp",fc1:"License Required",fc1d:"Every office must provide a license number before listing",fc2:"Book Without Commitment",fc2d:"Book for 3 hours and review all details calmly",cta_label:"Get Started",cta_title:"Ready to start with SAAHL?",cta_sub:"Join thousands of families and offices that trust SAAHL in the UAE",cta_b1:"Start Searching Now",cta_b2:"Register Your Office Free",foot_desc:"A digital platform connecting sponsors with licensed recruitment offices in the UAE",fh1:"Services",fl1:"Find a Helper",fl2:"Register Office",fl3:"Kafala Transfer",fh2:"Platform",fl4:"How It Works",fl5:"Login",fl6:"Terms & Conditions",fl7:"Privacy Policy",fcopy:"© 2026 SAAHL — All Rights Reserved"},
+  ur:{logo_sub:"بھرتی پلیٹ فارم",spot_title:"نمایاں کارکن",spot_live:"لائیو",spot_cta:"آپ کا دفتر؟ یہاں اپنے کارکنوں کا اشتہار دیں ←",n1:"یہ کیسے کام کرتا ہے",n2:"ابھی شروع کریں",n3:"خصوصیات",n4:"کفالہ منتقلی",n5:"لاگ ان",n6:"ابھی شروع کریں",hero_badge:"ڈیجیٹل بھرتی پلیٹ فارم — متحدہ عرب امارات",hero_h1:"اعتماد کے ساتھ تلاش کریں",hero_h2:"مناسب مدد",hero_via:"کے ذریعے",hero_sub:"ایک ڈیجیٹل پلیٹ فارم جو کفیلوں کو تمام امارات میں لائسنس یافتہ دفاتر سے جوڑتا ہے",btn1:"تلاش شروع کریں",btn2:"دفتر رجسٹر کریں",how_tag:"یہ کیسے کام کرتا ہے",how_title:"پلیٹ فارم کیسے کام کرتا ہے",how_sub:"مناسب ملازم تلاش کرنے کے لیے 3 آسان اقدامات",s1t:"تلاش کریں",s1d:"اپنے امارت میں سرٹیفائیڈ دفاتر سے دستیاب کارکنوں کو براؤز کریں",s2t:"عارضی بکنگ کریں",s2d:"3 گھنٹے کے لیے بک کریں اور تمام تفصیلات کا جائزہ لیں",s3t:"آزمائیں اور مکمل کریں",s3d:"5 دن کی آزمائشی مدت کے ساتھ متبادل کی ضمانت",types_tag:"ہمارے ساتھ شامل ہوں",types_title:"ساہل کے ساتھ شروع کریں",types_sub:"چاہے آپ تلاش کر رہے ہوں یا خدمات پیش کر رہے ہوں",ty1:"میں کفیل ہوں",td1:"اپنے امارت میں سرٹیفائیڈ دفاتر سے مناسب ملازم تلاش کریں",tf11:"دفاتر کا موازنہ",tf12:"3 گھنٹے کی عارضی بکنگ",tf13:"5 دن کی ضمانت یافتہ آزمائش",tf14:"صرف 69 درہم فیس",ty1b:"کفیل کے طور پر رجسٹر",ty2:"میں بھرتی دفتر ہوں",td2:"ہزاروں کفیلوں کو اپنی خدمات دکھائیں",tf21:"10 دن مفت آزمائش",tf22:"70 درہم ماہانہ — بانی قیمت",tf23:"کارکنوں کا انتظام",tf24:"براہ راست درخواستیں",ty2b:"دفتر رجسٹر کریں",ty3:"کفالہ منتقلی",td3:"اپنے کارکن کو منتقلی کے لیے پیش کریں",tf31:"30 درہم فی دن",tf32:"کفیلوں کے درمیان براہ راست رابطہ",tf33:"فلٹر کریں",tf34:"ادائیگی کے فوراً بعد اشتہار ظاہر ہوتا ہے",ty3b:"فہرست دیکھیں",feat_tag:"ساہل کیوں",feat_title:"آپ کی سہولت کے لیے بنایا گیا",feat_sub:"ہر تفصیل محفوظ اور شفاف تجربے کے لیے",fi1t:"صرف لائسنس یافتہ دفاتر",fi1d:"تمام دفاتر سرکاری طور پر تصدیق شدہ",fi2t:"3 گھنٹے کی بکنگ",fi2d:"فوری بک کریں",fi3t:"واضح متبادل پالیسی",fi3d:"مطمئن نہیں؟ دفتر سے براہ راست رابطہ کریں",fi4t:"براہ راست رابطہ",fi4d:"پلیٹ فارم یا واٹس ایپ کے ذریعے",fc1:"لائسنس نمبر لازمی",fc1d:"ہر دفتر سے رجسٹریشن پر مانگا جاتا ہے",fc2:"بغیر عزم کے بکنگ",fc2d:"3 گھنٹے کے لیے بک کریں اور تفصیلات دیکھیں",cta_label:"ابھی شروع کریں",cta_title:"SAAHL کے ساتھ شروع کرنے کے لیے تیار؟",cta_sub:"ہزاروں خاندانوں سے جڑیں",cta_b1:"ابھی تلاش شروع کریں",cta_b2:"مفت دفتر رجسٹر کریں",foot_desc:"UAE میں کفیلوں کو لائسنس یافتہ دفاتر سے جوڑنے والا پلیٹ فارم",fh1:"خدمات",fl1:"ملازم تلاش کریں",fl2:"دفتر رجسٹر کریں",fl3:"کفالہ منتقلی",fh2:"پلیٹ فارم",fl4:"یہ کیسے کام کرتا ہے",fl5:"لاگ ان",fl6:"شرائط",fl7:"رازداری",fcopy:"© 2026 SAAHL — تمام حقوق محفوظ"}
+};
+
+let lang = 'ar';
+function applyLang(l) {
+  lang = l;
+  const t = T[l];
+  const rtl = l !== 'en';
+  document.documentElement.lang = l;
+  document.documentElement.dir = rtl ? 'rtl' : 'ltr';
+  document.querySelectorAll('[data-t]').forEach(el => {
+    const k = el.getAttribute('data-t');
+    if (t[k] !== undefined) el.textContent = t[k];
+  });
+  if (typeof _spotData !== 'undefined' && _spotData.length) renderSpotSlides();
+  document.getElementById('langLabel').textContent = l === 'ar' ? 'عربي' : l === 'en' ? 'EN' : 'اردو';
+  document.querySelectorAll('.lang-opt').forEach(b => b.classList.remove('on'));
+  // Update cta-title span
+  const ctaTitle = document.querySelector('.cta-title');
+  if (ctaTitle) {
+    if (l === 'ar') ctaTitle.innerHTML = 'جاهز تبدأ مع <span>SAAHL</span>؟';
+    else if (l === 'en') ctaTitle.innerHTML = 'Ready to start with <span>SAAHL</span>?';
+    else ctaTitle.innerHTML = '<span>SAAHL</span> کے ساتھ شروع کرنے کے لیے تیار؟';
+  }
+}
+function setLang(l, btn) {
+  applyLang(l);
+  document.querySelectorAll('.lang-opt').forEach(b => b.classList.remove('on'));
+  btn.classList.add('on');
+  document.getElementById('langDrop').classList.remove('open');
+}
+function toggleLang() { document.getElementById('langDrop').classList.toggle('open'); }
+document.addEventListener('click', e => {
+  if (!e.target.closest('.lang-wrap')) document.getElementById('langDrop').classList.remove('open');
+});
+
+// NAV
+window.addEventListener('scroll', () => {
+  document.getElementById('mainNav').classList.toggle('scrolled', window.scrollY > 20);
+});
+
+// Mobile nav
+function toggleMob() { document.getElementById('mobNav').classList.toggle('open'); }
+function closeMob() { document.getElementById('mobNav').classList.remove('open'); }
+
+// Smooth scroll
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+  a.addEventListener('click', e => {
+    const id = a.getAttribute('href');
+    if (id === '#') return;
+    const el = document.querySelector(id);
+    if (el) { e.preventDefault(); el.scrollIntoView({behavior:'smooth'}); closeMob(); }
+  });
+});
+
+// CUSTOM CURSOR
+const cursor = document.getElementById('cursor');
+const ring = document.getElementById('cursorRing');
+let mx = 0, my = 0, rx = 0, ry = 0;
+document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
+function animCursor() {
+  cursor.style.left = mx - 4 + 'px';
+  cursor.style.top = my - 4 + 'px';
+  rx += (mx - rx) * .12;
+  ry += (my - ry) * .12;
+  ring.style.left = rx - 18 + 'px';
+  ring.style.top = ry - 18 + 'px';
+  requestAnimationFrame(animCursor);
+}
+animCursor();
+document.querySelectorAll('a,button,.type-card,.feat-item,.feat-card').forEach(el => {
+  el.addEventListener('mouseenter', () => { cursor.style.transform = 'scale(2)'; ring.style.transform = 'scale(1.4)'; ring.style.opacity = '.8'; });
+  el.addEventListener('mouseleave', () => { cursor.style.transform = 'scale(1)'; ring.style.transform = 'scale(1)'; ring.style.opacity = '.5'; });
+});
+
+// TYPED TEXT
+const phrases = {ar:['مكاتب مرخصة','مكاتب معتمدة','مكاتب موثوقة','خيارات آمنة'],en:['Licensed Offices','Certified Agencies','Trusted Partners','Safe Options'],ur:['لائسنس یافتہ دفاتر','سرٹیفائیڈ ایجنسیاں','قابل اعتماد شراکت دار']};
+let pi = 0, ci = 0, del = false;
+const tel = document.getElementById('typedEl');
+function type() {
+  const ph = phrases[lang] || phrases.ar;
+  const c = ph[pi % ph.length];
+  if (del) {
+    tel.textContent = c.substring(0, ci - 1); ci--;
+    if (ci === 0) { del = false; pi++; setTimeout(type, 400); return; }
+    setTimeout(type, 50);
+  } else {
+    tel.textContent = c.substring(0, ci + 1); ci++;
+    if (ci === c.length) { del = true; setTimeout(type, 2200); return; }
+    setTimeout(type, 80);
+  }
+}
+setTimeout(type, 1200);
+
+// INTERSECTION OBSERVER
+const obs = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.classList.add('visible');
+      obs.unobserve(e.target);
+    }
+  });
+}, {threshold: 0.15});
+
+document.querySelectorAll('.reveal, .step-item').forEach(el => obs.observe(el));
+
+// إحصائية "عدد الإمارات" فقط رقم حقيقي (7 حسب فلاتر البحث الفعلية) — بقية البطاقات
+// استُبدلت بنقاط ثقة نوعية بدل أرقام غير موثقة، فلا حاجة لعدّاد متحرك عليها.
+const SAAHL_STATS = { emirates: 7 };
+
+function applySaahlStats(){
+  const el = document.getElementById('fcStat3');
+  if (el) el.textContent = SAAHL_STATS.emirates;
+}
+applySaahlStats();
+</script>
+</body>
+</html>

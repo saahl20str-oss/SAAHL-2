@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ساهل — لوحة الأدمن</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--teal:#0f766e;--teal-light:#ccfbf1;--teal-dark:#0d5f58;--bg:#f8fafc;--white:#fff;--border:#e2e8f0;--bl:#f1f5f9;--text:#1e293b;--muted:#64748b;--light:#94a3b8;--red:#dc2626;--rl:#fee2e2;--blue:#2563eb;--bluel:#dbeafe;--amber:#d97706;--al:#fef3c7;--green:#16a34a;--gl:#dcfce7;--purple:#7c3aed;--pl:#ede9fe;}
+body.dark{--bg:#0f172a;--white:#1e293b;--border:#334155;--bl:#1e293b;--text:#f1f5f9;--muted:#94a3b8;--light:#475569;--teal-light:#134e4a;--gl:#14532d;--bluel:#1e3a5f;--al:#451a03;--rl:#450a0a;--pl:#2e1065;}
+body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;transition:background .2s,color .2s}
+.tb{position:fixed;top:0;right:0;left:0;z-index:100;background:var(--white);border-bottom:1px solid var(--border);height:60px;display:flex;align-items:center;justify-content:space-between;padding:0 24px}
+.tb-brand{display:flex;align-items:center;gap:12px}
+.lw{width:40px;height:40px;border-radius:10px;background:transparent;display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0}
+.lw img{width:36px;height:36px;object-fit:contain}
+.bn{font-size:16px;font-weight:700;color:var(--text)}
+.bs{font-size:11px;color:var(--muted)}
+.tb-r{display:flex;align-items:center;gap:8px}
+.abg{background:var(--gl);color:#166534;font-size:11px;padding:4px 12px;border-radius:20px;font-weight:600}
+.tbtn{background:none;border:1px solid var(--border);border-radius:8px;padding:6px 14px;font-size:13px;cursor:pointer;color:var(--muted);font-family:'Cairo',sans-serif;transition:all .15s}
+.tbtn:hover{background:var(--bg)}
+#lob{color:var(--red);border-color:var(--rl)}.#lob:hover{background:var(--rl)}
+.dtg{cursor:pointer;font-size:18px;background:none;border:1px solid var(--border);border-radius:8px;padding:5px 10px}
+.main{display:flex;margin-top:60px;min-height:calc(100vh - 60px)}
+.sb{width:210px;flex-shrink:0;background:var(--white);border-left:1px solid var(--border);padding:20px 0;position:fixed;top:60px;right:0;bottom:0;overflow-y:auto}
+.ns{font-size:10px;color:var(--light);padding:14px 20px 4px;letter-spacing:.08em;font-weight:700}
+.ni{display:flex;align-items:center;gap:10px;padding:10px 20px;font-size:13px;cursor:pointer;color:var(--muted);border-right:3px solid transparent;transition:all .15s}
+.ni:hover{background:var(--bg);color:var(--text)}
+.ni.active{color:var(--teal);background:var(--teal-light);border-right-color:var(--teal);font-weight:600}
+.ni svg{width:17px;height:17px;flex-shrink:0}
+.ct{flex:1;margin-right:210px;padding:28px}
+.pg{display:none}.pg.active{display:block}
+.pt{font-size:20px;font-weight:700;margin-bottom:24px}
+.sg{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px}
+.sc{background:var(--white);border:1px solid var(--border);border-radius:14px;padding:18px 20px}
+.si{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:19px;margin-bottom:12px}
+.si.teal{background:var(--teal-light);color:var(--teal)}.si.blue{background:var(--bluel);color:var(--blue)}.si.amber{background:var(--al);color:var(--amber)}.si.green{background:var(--gl);color:var(--green)}
+.sl{font-size:12px;color:var(--muted);margin-bottom:4px}
+.sv{font-size:26px;font-weight:700;line-height:1}
+.ss{font-size:11px;color:var(--light);margin-top:6px}
+.cd{background:var(--white);border:1px solid var(--border);border-radius:14px;padding:22px;margin-bottom:18px}
+.ch{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+.ct2{font-size:14px;font-weight:600}
+.cr{display:grid;grid-template-columns:1.6fr 1fr;gap:16px;margin-bottom:18px}
+.cb{background:var(--white);border:1px solid var(--border);border-radius:14px;padding:22px}
+.tw{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:right;font-weight:600;font-size:11px;color:var(--muted);padding:10px 14px;border-bottom:1px solid var(--border);background:var(--bl);white-space:nowrap}
+td{padding:11px 14px;border-bottom:1px solid var(--bl);color:var(--text);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:var(--bl)}
+.bge{display:inline-flex;align-items:center;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;white-space:nowrap}
+.bge.active{background:var(--gl);color:#166534}.bge.expired{background:var(--rl);color:#991b1b}.bge.pending{background:var(--al);color:#92400e}.bge.booked{background:var(--bluel);color:#1e40af}.bge.kafala{background:var(--pl);color:#5b21b6}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:7px 16px;border-radius:8px;font-size:13px;cursor:pointer;font-family:'Cairo',sans-serif;transition:all .15s;border:none;font-weight:500}
+.btn-p{background:var(--teal);color:#fff}.btn-p:hover{background:var(--teal-dark)}
+.btn-o{background:none;border:1px solid var(--border);color:var(--muted)}.btn-o:hover{background:var(--bg)}
+.btn-d{background:none;border:1px solid var(--rl);color:var(--red)}.btn-d:hover{background:var(--rl)}
+.btn-s{padding:4px 10px;font-size:12px}
+.fb{display:flex;gap:10px;margin-bottom:14px;align-items:center;flex-wrap:wrap}
+.fb input,.fb select{font-family:'Cairo',sans-serif;font-size:13px;padding:7px 12px;border:1px solid var(--border);border-radius:8px;background:var(--white);color:var(--text);outline:none}
+.fb input:focus,.fb select:focus{border-color:var(--teal)}
+.fb input{flex:1;min-width:180px}
+.av{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;flex-shrink:0}
+.rf{display:flex;align-items:center;gap:9px}
+.es{text-align:center;padding:56px 24px;color:var(--light)}
+.es .ei{font-size:44px;margin-bottom:14px;opacity:.35}
+.es p{font-size:13px;line-height:1.7;color:var(--muted)}
+.ld{text-align:center;padding:40px;color:var(--muted);font-size:13px}
+.sp{width:24px;height:24px;border:2px solid var(--border);border-top-color:var(--teal);border-radius:50%;animation:spin .7s linear infinite;margin:0 auto 10px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.sti{display:flex;align-items:center;justify-content:space-between;padding:16px 0;border-bottom:1px solid var(--border)}
+.sti:last-child{border-bottom:none}
+.stl{font-size:14px;font-weight:500}
+.std{font-size:12px;color:var(--muted);margin-top:3px}
+.tgl{position:relative;width:44px;height:24px;flex-shrink:0}
+.tgl input{opacity:0;width:0;height:0}
+.tsl{position:absolute;inset:0;background:var(--border);border-radius:24px;cursor:pointer;transition:.2s}
+.tsl:before{content:'';position:absolute;width:18px;height:18px;right:3px;top:3px;background:#fff;border-radius:50%;transition:.2s}
+.tgl input:checked+.tsl{background:var(--teal)}
+.tgl input:checked+.tsl:before{right:calc(100% - 21px)}
+.si2{width:100%;padding:9px 13px;border:1px solid var(--border);border-radius:9px;font-family:'Cairo',sans-serif;font-size:13px;color:var(--text);background:var(--white);outline:none;margin-bottom:10px;display:block}
+.si2:focus{border-color:var(--teal)}
+.svb{background:var(--teal);color:#fff;border:none;border-radius:9px;padding:10px 24px;font-family:'Cairo',sans-serif;font-size:14px;font-weight:600;cursor:pointer}
+.svb:hover{background:var(--teal-dark)}
+.ac{background:var(--white);border:1px solid var(--border);border-radius:10px;padding:14px 16px;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.ai strong{display:block;font-size:13px;font-weight:600;margin-bottom:4px}
+.ai span{color:var(--muted);font-size:12px}
+.lg{font-size:12px;color:var(--light);margin-top:3px}
+.ps{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:18px}
+.lgd{display:flex;flex-direction:column;gap:7px;margin-top:14px;font-size:12px;color:var(--muted)}
+.lgi{display:flex;align-items:center;gap:8px}
+.lgd2{width:10px;height:10px;border-radius:2px;flex-shrink:0}
+#ls{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:999}
+.lc{background:var(--white);border:1px solid var(--border);border-radius:20px;padding:40px;width:360px;text-align:center}
+.ll{width:64px;height:64px;border-radius:16px;background:transparent;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;overflow:hidden}
+.ll img{width:56px;height:56px;object-fit:contain}
+.lc h2{font-size:20px;font-weight:700;margin-bottom:4px}
+.lc p{font-size:13px;color:var(--muted);margin-bottom:28px}
+.fg{margin-bottom:14px;text-align:right}
+.fg label{display:block;font-size:12px;font-weight:600;color:var(--muted);margin-bottom:6px}
+.fg input{width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:10px;font-family:'Cairo',sans-serif;font-size:14px;outline:none;color:var(--text);background:var(--white)}
+.fg input:focus{border-color:var(--teal)}
+.lb{width:100%;padding:11px;background:var(--teal);color:#fff;border:none;border-radius:10px;font-family:'Cairo',sans-serif;font-size:14px;font-weight:600;cursor:pointer;margin-top:6px}
+.lb:hover{background:var(--teal-dark)}
+.le{font-size:12px;color:var(--red);margin-top:10px;min-height:18px}
+#toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1e293b;color:#fff;padding:10px 22px;border-radius:10px;font-size:13px;opacity:0;transition:opacity .3s;pointer-events:none;z-index:9999}
+#toast.show{opacity:1}
+@media(max-width:900px){.sb{display:none}.ct{margin-right:0}.sg{grid-template-columns:repeat(2,1fr)}.cr{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<div id="ls">
+  <div class="lc" id="ls-form">
+    <div class="ll"><img src="saahl-logo.png" alt="ساهل" onerror="this.parentElement.innerHTML='<span style=font-size:22px;color:#c9a227;font-weight:700>س</span>'"></div>
+    <h2>ساهل</h2><p>لوحة الأدمن — تسجيل الدخول</p>
+    <div class="fg"><label>البريد الإلكتروني</label><input type="email" id="le-email" placeholder="admin@example.com"></div>
+    <div class="fg"><label>كلمة المرور</label><input type="password" id="le-pass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()"></div>
+    <button class="lb" id="le-btn" onclick="doLogin()">دخول</button>
+    <div class="le" id="le-err"></div>
+  </div>
+  <div class="lc" id="ls-loading" style="text-align:center;display:none">
+    <div class="ll"><img src="saahl-logo.png" alt="ساهل" onerror="this.parentElement.innerHTML='<span style=font-size:22px;color:#c9a227;font-weight:700>س</span>'"></div>
+    <p style="margin-top:12px;color:var(--muted)">جاري التحقق من الجلسة...</p>
+  </div>
+</div>
+
+<div class="tb" id="topbar" style="display:none">
+  <div class="tb-brand">
+    <div class="lw"><img src="saahl-logo.png" alt="ساهل" onerror="this.parentElement.innerHTML='<span style=font-size:18px;color:#c9a227;font-weight:700>س</span>'"></div>
+    <div><div class="bn">ساهل</div><div class="bs">لوحة الأدمن</div></div>
+  </div>
+  <div class="tb-r">
+    <span class="abg">أدمن</span>
+    <button class="dtg" id="dkb" onclick="toggleDark()">🌙</button>
+    <button class="tbtn" onclick="navTo('settings')">⚙️ إعدادات</button>
+    <button class="tbtn" id="lob" onclick="doLogout()" style="color:var(--red);border-color:var(--rl)">خروج</button>
+  </div>
+</div>
+
+<div class="main" id="mw" style="display:none">
+  <div class="sb">
+    <div class="ns">الرئيسية</div>
+    <div class="ni active" data-p="overview" onclick="navTo('overview')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>نظرة عامة</div>
+    <div class="ns">الإدارة</div>
+    <div class="ni" data-p="offices" onclick="navTo('offices')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 21h18M5 21V7l7-4 7 4v14M9 21v-4h6v4"/></svg>المكاتب</div>
+    <div class="ni" data-p="sponsors" onclick="navTo('sponsors')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>الكفلاء</div>
+    <div class="ni" data-p="bookings" onclick="navTo('bookings')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/><path d="M9 16l2 2 4-4"/></svg>الحجوزات</div>
+    <div class="ns">المالية</div>
+    <div class="ni" data-p="payments" onclick="navTo('payments')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="1" y="4" width="22" height="16" rx="2"/><path d="M1 10h22"/></svg>المدفوعات</div>
+    <div class="ni" data-p="kafala" onclick="navTo('kafala')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M7 16V4m0 0L3 8m4-4 4 4M17 8v12m0 0 4-4m-4 4-4-4"/></svg>نقل الكفالة</div>
+    <div class="ns">أدوات</div>
+    <div class="ni" data-p="ads" onclick="navTo('ads')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>الإعلانات<span id="ads-badge" style="margin-right:auto;background:#ef4444;color:#fff;font-size:11px;font-weight:700;min-width:18px;height:18px;border-radius:9px;display:none;align-items:center;justify-content:center;padding:0 5px">0</span></div>
+    <div class="ni" data-p="notifications" onclick="navTo('notifications')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>الإشعارات</div>
+    <div class="ni" data-p="settings" onclick="navTo('settings')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>الإعدادات</div>
+  </div>
+
+  <div class="ct">
+    <div id="pg-overview" class="pg active">
+      <div class="pt">نظرة عامة</div>
+      <div class="sg">
+        <div class="sc"><div class="si teal">🏢</div><div class="sl">المكاتب المسجلة</div><div class="sv" id="s-off">—</div><div class="ss" id="ss-off">جارٍ التحميل...</div></div>
+        <div class="sc"><div class="si blue">👥</div><div class="sl">الكفلاء المسجلون</div><div class="sv" id="s-spo">—</div><div class="ss" id="ss-spo">جارٍ التحميل...</div></div>
+        <div class="sc"><div class="si amber">💰</div><div class="sl">إيرادات هذا الشهر</div><div class="sv" id="s-rev">—</div><div class="ss" id="ss-rev">جارٍ التحميل...</div></div>
+        <div class="sc"><div class="si green">📋</div><div class="sl">الحجوزات النشطة</div><div class="sv" id="s-bk">—</div><div class="ss" id="ss-bk">جارٍ التحميل...</div></div>
+      </div>
+      <div class="cr">
+        <div class="cb"><div class="ch"><span class="ct2">الإيرادات — آخر 6 أشهر (AED)</span></div><div style="position:relative;height:200px"><canvas id="revChart"></canvas></div></div>
+        <div class="cb"><div class="ch"><span class="ct2">توزيع الإيرادات</span></div><div style="position:relative;height:160px"><canvas id="pieChart"></canvas></div><div class="lgd"><div class="lgi"><span class="lgd2" style="background:#0f766e"></span>اشتراك مكاتب</div><div class="lgi"><span class="lgd2" style="background:#3b82f6"></span>عمولة حجز</div><div class="lgi"><span class="lgd2" style="background:#f59e0b"></span>إعلان كفالة</div><div class="lgi"><span class="lgd2" style="background:#7c3aed"></span>إعلان شريط</div></div></div>
+      </div>
+      <div class="cd"><div class="ch"><span class="ct2">آخر الحجوزات</span><button class="btn btn-o btn-s" onclick="navTo('bookings')">عرض الكل</button></div><div id="rb-wrap"><div class="ld"><div class="sp"></div>جارٍ التحميل...</div></div></div>
+    </div>
+
+    <div id="pg-offices" class="pg">
+      <div class="pt">إدارة المكاتب</div>
+      <div class="fb"><input type="text" id="off-s" placeholder="🔍 بحث..." oninput="filterOffices()"><select id="off-st" onchange="filterOffices()"><option value="">الكل</option><option value="active">نشط</option><option value="expired">منتهي</option></select></div>
+      <div class="cd" style="padding:0;overflow:hidden"><div id="off-wrap"><div class="ld"><div class="sp"></div>جارٍ التحميل...</div></div></div>
+    </div>
+
+    <div id="pg-sponsors" class="pg">
+      <div class="pt">إدارة الكفلاء</div>
+      <div class="fb"><input type="text" id="spo-s" placeholder="🔍 بحث..." oninput="filterSponsors()"></div>
+      <div class="cd" style="padding:0;overflow:hidden"><div id="spo-wrap"><div class="ld"><div class="sp"></div>جارٍ التحميل...</div></div></div>
+    </div>
+
+    <div id="pg-bookings" class="pg">
+      <div class="pt">إدارة الحجوزات</div>
+      <div class="cd" style="padding:0;overflow:hidden"><div id="bk-wrap"><div class="ld"><div class="sp"></div>جارٍ التحميل...</div></div></div>
+    </div>
+
+    <div id="pg-payments" class="pg">
+      <div class="pt">المدفوعات</div>
+      <div class="ps">
+        <div class="sc"><div class="sl">اشتراكات المكاتب</div><div class="sv" style="font-size:22px" id="py-off">0 AED</div><div class="ss">70 AED × المكاتب</div></div>
+        <div class="sc"><div class="sl">عمولات الحجز</div><div class="sv" style="font-size:22px" id="py-bk">0 AED</div><div class="ss">69 AED × الحجوزات</div></div>
+        <div class="sc"><div class="sl">إعلانات الكفالة</div><div class="sv" style="font-size:22px" id="py-kf">0 AED</div><div class="ss">30 AED × الأيام</div></div>
+      </div>
+      <div class="cd" style="padding:0;overflow:hidden"><div id="py-wrap"><div class="ld"><div class="sp"></div>جارٍ التحميل...</div></div></div>
+    </div>
+
+    <div id="pg-kafala" class="pg">
+      <div class="pt">إعلانات نقل الكفالة</div>
+      <div class="cd" style="padding:0;overflow:hidden"><div id="kf-wrap"><div class="ld"><div class="sp"></div>جارٍ التحميل...</div></div></div>
+    </div>
+
+    <div id="pg-ads" class="pg">
+      <div class="pt">إعلانات الشريط العلوي</div>
+      <div class="cd">
+        <div class="ch"><span class="ct2">الإعلانات</span><span id="ads-cnt" class="bge pending">0 إعلان</span></div>
+        <div id="ads-wrap"><div class="ld"><div class="sp"></div>جارٍ التحميل...</div></div>
+      </div>
+      <div class="cd"><div class="ch"><span class="ct2">إجمالي إيرادات الإعلانات</span></div><div style="font-size:28px;font-weight:700;color:var(--teal)" id="ads-rev">0 AED</div><div style="font-size:12px;color:var(--muted);margin-top:6px">10 AED × إجمالي الأيام المباعة</div></div>
+    </div>
+
+    <div id="pg-notifications" class="pg">
+      <div class="pt">إرسال إشعارات</div>
+      <div class="cd">
+        <div class="ct2" style="margin-bottom:18px">📢 إشعار جديد</div>
+        <label style="font-size:12px;font-weight:600;color:var(--muted);display:block;margin-bottom:6px">إرسال إلى</label>
+        <select class="si2" id="nt-to"><option value="all">الجميع</option><option value="offices">المكاتب فقط</option><option value="sponsors">الكفلاء فقط</option></select>
+        <label style="font-size:12px;font-weight:600;color:var(--muted);display:block;margin-bottom:6px">عنوان الإشعار</label>
+        <input type="text" class="si2" id="nt-ti" placeholder="مثال: تحديث جديد في المنصة">
+        <label style="font-size:12px;font-weight:600;color:var(--muted);display:block;margin-bottom:6px">نص الإشعار</label>
+        <textarea class="si2" id="nt-bo" placeholder="اكتب نص الإشعار هنا..." style="min-height:80px;resize:vertical"></textarea>
+        <button class="svb" onclick="sendNotif()">📤 إرسال الإشعار</button>
+      </div>
+      <div class="cd"><div class="ch"><span class="ct2">الإشعارات المرسلة</span></div><div id="nt-wrap"><div class="es"><div class="ei">🔔</div><p>لا توجد إشعارات مرسلة بعد</p></div></div></div>
+    </div>
+
+    <div id="pg-settings" class="pg">
+      <div class="pt">الإعدادات</div>
+      <div class="cd">
+        <div class="ct2" style="margin-bottom:18px">🎨 المظهر</div>
+        <div class="sti">
+          <div><div class="stl">الوضع الليلي</div><div class="std">تبديل بين الوضع الفاتح والداكن</div></div>
+          <label class="tgl"><input type="checkbox" id="dk-cb" onchange="toggleDark()"><span class="tsl"></span></label>
+        </div>
+      </div>
+      <div class="cd">
+        <div class="ct2" style="margin-bottom:18px">🔒 تغيير كلمة المرور</div>
+        <label style="font-size:12px;font-weight:600;color:var(--muted);display:block;margin-bottom:6px">كلمة المرور الجديدة</label>
+        <input type="password" class="si2" id="np1" placeholder="أدخل كلمة المرور الجديدة">
+        <label style="font-size:12px;font-weight:600;color:var(--muted);display:block;margin-bottom:6px">تأكيد كلمة المرور</label>
+        <input type="password" class="si2" id="np2" placeholder="أعد إدخال كلمة المرور">
+        <div style="font-size:12px;color:var(--red);margin-bottom:10px;min-height:16px" id="pw-err"></div>
+        <button class="svb" onclick="changePw()">💾 حفظ كلمة المرور</button>
+      </div>
+      <div class="cd">
+        <div class="ct2" style="margin-bottom:14px">🖼️ الشعار</div>
+        <div style="font-size:13px;color:var(--muted);background:var(--bl);border-radius:10px;padding:12px">لرفع الشعار: ارفع ملف باسم <strong>logo.png</strong> في GitHub مع باقي الملفات. يُفضَّل PNG بخلفية شفافة.</div>
+      </div>
+      <div class="cd">
+        <div class="ct2" style="margin-bottom:18px">💲 إدارة الأسعار</div>
+        <label style="font-size:12px;font-weight:600;color:var(--muted);display:block;margin-bottom:6px">اشتراك المكتب (AED/شهر)</label>
+        <input type="number" class="si2" id="pr-off" value="70">
+        <label style="font-size:12px;font-weight:600;color:var(--muted);display:block;margin-bottom:6px">عمولة الحجز (AED)</label>
+        <input type="number" class="si2" id="pr-bk" value="69">
+        <label style="font-size:12px;font-weight:600;color:var(--muted);display:block;margin-bottom:6px">إعلان الشريط (AED/يوم)</label>
+        <input type="number" class="si2" id="pr-ad" value="10">
+        <button class="svb" onclick="toast('تم حفظ الأسعار ✓')">💾 حفظ الأسعار</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+const SU='https://hkfxikmpfgixrbrboxeb.supabase.co';
+const SK='sb_publishable_OcWY5nY_-b2odLqQxsu2Kw_iQ4YswBz';
+// AE/AP (بيانات الدخول الوهمية) أُزيلت — الدخول الآن عبر Supabase Auth حقيقي + تحقق من role='ADMIN'
+const {createClient}=supabase;
+const db=createClient(SU,SK);
+let aOff=[],aSpo=[],aBk=[],aPy=[],aKf=[],aAds=[];
+let rC,pC,isDark=localStorage.getItem('saahl_dark')==='1';
+const clrs=['#0f766e','#2563eb','#7c3aed','#d97706','#059669','#dc2626','#0891b2'];
+const ac=s=>clrs[(s||'').charCodeAt(0)%clrs.length];
+const ini=s=>(s||'?')[0];
+const fd=d=>{if(!d)return'—';return new Date(d).toLocaleDateString('ar-AE',{year:'numeric',month:'short',day:'numeric'});};
+const eh=m=>`<div class="es"><div class="ei">📭</div><p>${m}<br><small>ستظهر هنا عند أول تسجيل</small></p></div>`;
+function toast(m,d=2500){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),d);}
+function navTo(id){document.querySelectorAll('.pg').forEach(p=>p.classList.remove('active'));document.querySelectorAll('.ni').forEach(n=>n.classList.remove('active'));document.getElementById('pg-'+id).classList.add('active');document.querySelector('[data-p='+id+']')?.classList.add('active');}
+function toggleDark(){isDark=!isDark;document.body.classList.toggle('dark',isDark);localStorage.setItem('saahl_dark',isDark?'1':'0');const cb=document.getElementById('dk-cb');if(cb)cb.checked=isDark;document.getElementById('dkb').textContent=isDark?'☀️':'🌙';}
+async function doLogin(){
+  const e=document.getElementById('le-email').value.trim();
+  const p=document.getElementById('le-pass').value;
+  const er=document.getElementById('le-err');
+  const btn=document.getElementById('le-btn');
+  er.textContent='';
+  if(!e||!p){er.textContent='أدخل الإيميل وكلمة المرور';return;}
+  btn.disabled=true;btn.textContent='جاري التحقق...';
+  try{
+    const {data,error}=await db.auth.signInWithPassword({email:e,password:p});
+    if(error){er.textContent='بيانات الدخول غير صحيحة';return;}
+    // تحقق إضافي: هل هذا المستخدم فعلاً أدمن؟ (مو مجرد حساب مسجّل عادي)
+    const {data:prof}=await db.from('profiles').select('role').eq('id',data.user.id).single();
+    if(!prof||prof.role!=='ADMIN'){
+      er.textContent='هذا الحساب ليس لديه صلاحيات إدارية';
+      await db.auth.signOut();
+      return;
+    }
+    showApp();
+  }catch(e){
+    er.textContent='تعذّر الاتصال، حاول لاحقاً';
+  }finally{
+    btn.disabled=false;btn.textContent='دخول';
+  }
+}
+async function doLogout(){
+  await db.auth.signOut();
+  document.getElementById('ls').style.display='flex';
+  document.getElementById('topbar').style.display='none';
+  document.getElementById('mw').style.display='none';
+}
+function showApp(){document.getElementById('ls').style.display='none';document.getElementById('topbar').style.display='flex';document.getElementById('mw').style.display='flex';if(isDark){document.body.classList.add('dark');document.getElementById('dkb').textContent='☀️';const cb=document.getElementById('dk-cb');if(cb)cb.checked=true;}loadAll();}
+window.addEventListener('DOMContentLoaded',async ()=>{
+  if(isDark)document.body.classList.add('dark');
+  document.getElementById('ls-form').style.display='none';
+  document.getElementById('ls-loading').style.display='block';
+  const {data:{session}}=await db.auth.getSession();
+  if(session){
+    const {data:prof}=await db.from('profiles').select('role').eq('id',session.user.id).single();
+    if(prof&&prof.role==='ADMIN'){showApp();return;}
+    await db.auth.signOut();
+  }
+  document.getElementById('ls-loading').style.display='none';
+  document.getElementById('ls-form').style.display='block';
+});
+async function loadAll(){await Promise.all([loadStats(),loadOff(),loadSpo(),loadBk(),loadPy(),loadKf(),loadAds()]);buildCharts();}
+async function loadStats(){
+  const {count:oc}=await db.from('office_profiles').select('*',{count:'exact',head:true});
+  document.getElementById('s-off').textContent=oc??0;document.getElementById('ss-off').textContent=oc?oc+' مكتب مسجل':'لا يوجد مكاتب بعد';
+  const {count:sc}=await db.from('sponsor_profiles').select('*',{count:'exact',head:true});
+  document.getElementById('s-spo').textContent=sc??0;document.getElementById('ss-spo').textContent=sc?sc+' كفيل مسجل':'لا يوجد كفلاء بعد';
+  const now=new Date();const sm=new Date(now.getFullYear(),now.getMonth(),1).toISOString();
+  const {data:pays}=await db.from('payments').select('amount').gte('created_at',sm);
+  const rev=pays?pays.reduce((s,p)=>s+(p.amount||0),0):0;
+  document.getElementById('s-rev').textContent=rev.toLocaleString();document.getElementById('ss-rev').textContent=rev?'AED — هذا الشهر':'AED — لا توجد مدفوعات';
+  const {count:bc}=await db.from('bookings').select('*',{count:'exact',head:true}).eq('status','booked');
+  document.getElementById('s-bk').textContent=bc??0;document.getElementById('ss-bk').textContent=bc?bc+' حجز نشط':'لا توجد حجوزات';
+  const {data:rb}=await db.from('bookings').select('*').order('created_at',{ascending:false}).limit(5);
+  aBk=rb||[];
+  const w=document.getElementById('rb-wrap');
+  if(!aBk.length){w.innerHTML=eh('لا توجد حجوزات حتى الآن');return;}
+  w.innerHTML=`<div class="tw"><table><thead><tr><th>الكفيل</th><th>العاملة</th><th>المكتب</th><th>التاريخ</th><th>الحالة</th><th>العمولة</th></tr></thead><tbody>${aBk.map(b=>`<tr><td>${b.sponsor_name||'—'}</td><td>${b.maid_name||'—'}</td><td>${b.office_name||'—'}</td><td>${fd(b.created_at)}</td><td><span class="bge ${b.status==='booked'?'booked':b.status==='completed'?'active':'pending'}">${b.status==='booked'?'محجوزة':b.status==='completed'?'مكتملة':'معلقة'}</span></td><td style="font-weight:600;color:var(--teal)">69 AED</td></tr>`).join('')}</tbody></table></div>`;
+}
+async function loadOff(){const {data}=await db.from('office_profiles').select('*').order('created_at',{ascending:false});aOff=data||[];renderOff(aOff);}
+function renderOff(data){const w=document.getElementById('off-wrap');if(!data.length){w.innerHTML=eh('لا توجد مكاتب مسجلة');return;}w.innerHTML=`<div class="tw"><table><thead><tr><th>المكتب</th><th>الإمارة</th><th>البريد</th><th>تاريخ التسجيل</th><th>الحالة</th><th>إجراء</th></tr></thead><tbody>${data.map(o=>{const a=(o.subscription_status||'').toUpperCase()==='ACTIVE'||(o.subscription_status||'').toUpperCase()==='TRIAL';return`<tr><td><div class="rf"><div class="av" style="background:${ac(o.office_name)}">${ini(o.office_name)}</div>${o.office_name||'—'}</div></td><td>${o.emirate||'—'}</td><td>${o.email||'—'}</td><td>${fd(o.created_at)}</td><td><span class="bge ${a?'active':'expired'}">${(o.subscription_status||'').toUpperCase()==='TRIAL'?'تجريبي':a?'نشط':'منتهي'}</span></td><td><button class="btn ${a?'btn-d':'btn-o'} btn-s" onclick="togOff('${o.id}','${o.subscription_status}')">${a?'تعليق':'تفعيل'}</button></td></tr>`;}).join('')}</tbody></table></div>`;}
+function filterOffices(){const q=document.getElementById('off-s').value.toLowerCase();const s=document.getElementById('off-st').value;renderOff(aOff.filter(o=>(!q||(o.office_name||'').toLowerCase().includes(q))&&(!s||o.subscription_status===s)));}
+async function togOff(id,st){const isActive=(st||'').toUpperCase()==='ACTIVE'||(st||'').toUpperCase()==='TRIAL';const n=isActive?'EXPIRED':'ACTIVE';await db.from('office_profiles').update({subscription_status:n}).eq('id',id);toast(n==='ACTIVE'?'تم تفعيل المكتب ✓':'تم تعليق المكتب');loadOff();}
+async function loadSpo(){const {data}=await db.from('sponsor_profiles').select('*').order('created_at',{ascending:false});aSpo=data||[];renderSpo(aSpo);}
+function renderSpo(data){const w=document.getElementById('spo-wrap');if(!data.length){w.innerHTML=eh('لا يوجد كفلاء مسجلون');return;}w.innerHTML=`<div class="tw"><table><thead><tr><th>الكفيل</th><th>الإمارة</th><th>البريد</th><th>تاريخ التسجيل</th><th>إجراء</th></tr></thead><tbody>${data.map(s=>`<tr><td><div class="rf"><div class="av" style="background:${ac(s.full_name)}">${ini(s.full_name)}</div>${s.full_name||'—'}</div></td><td>${s.emirate||'—'}</td><td>${s.email||'—'}</td><td>${fd(s.created_at)}</td><td><button class="btn btn-d btn-s" onclick="delSpo('${s.id}')">حذف</button></td></tr>`).join('')}</tbody></table></div>`;}
+function filterSponsors(){const q=document.getElementById('spo-s').value.toLowerCase();renderSpo(aSpo.filter(s=>!q||(s.full_name||'').toLowerCase().includes(q)));}
+async function delSpo(id){if(!confirm('حذف الكفيل؟'))return;await db.from('sponsor_profiles').delete().eq('id',id);toast('تم حذف الكفيل ✓');loadSpo();}
+async function loadBk(){const {data}=await db.from('bookings').select('*').order('created_at',{ascending:false});aBk=data||[];const w=document.getElementById('bk-wrap');if(!aBk.length){w.innerHTML=eh('لا توجد حجوزات');return;}w.innerHTML=`<div class="tw"><table><thead><tr><th>الكفيل</th><th>العاملة</th><th>المكتب</th><th>التاريخ</th><th>الحالة</th><th>العمولة</th></tr></thead><tbody>${aBk.map(b=>`<tr><td>${b.sponsor_name||'—'}</td><td>${b.maid_name||'—'}</td><td>${b.office_name||'—'}</td><td>${fd(b.created_at)}</td><td><span class="bge ${b.status==='booked'?'booked':b.status==='completed'?'active':'pending'}">${b.status==='booked'?'محجوزة':b.status==='completed'?'مكتملة':'معلقة'}</span></td><td style="font-weight:600;color:var(--teal)">69 AED</td></tr>`).join('')}</tbody></table></div>`;}
+async function loadPy(){const {data}=await db.from('payments').select('*').order('created_at',{ascending:false});aPy=data||[];let o=0,b=0,k=0;aPy.forEach(p=>{if(p.type==='subscription')o+=p.amount||0;else if(p.type==='booking')b+=p.amount||0;else if(p.type==='kafala_ad')k+=p.amount||0;});document.getElementById('py-off').textContent=o.toLocaleString()+' AED';document.getElementById('py-bk').textContent=b.toLocaleString()+' AED';document.getElementById('py-kf').textContent=k.toLocaleString()+' AED';const w=document.getElementById('py-wrap');if(!aPy.length){w.innerHTML=eh('لا توجد مدفوعات');return;}const tl={subscription:'اشتراك شهري',booking:'عمولة حجز',kafala_ad:'إعلان كفالة',strip_ad:'إعلان شريط'};w.innerHTML=`<div class="tw"><table><thead><tr><th>المستخدم</th><th>النوع</th><th>المبلغ</th><th>التاريخ</th><th>الحالة</th></tr></thead><tbody>${aPy.map(p=>`<tr><td>${p.user_name||'—'}</td><td>${tl[p.type]||p.type||'—'}</td><td style="font-weight:600;color:var(--teal)">${(p.amount||0).toLocaleString()} AED</td><td>${fd(p.created_at)}</td><td><span class="bge ${p.status==='paid'?'active':'expired'}">${p.status==='paid'?'مكتمل':'فشل'}</span></td></tr>`).join('')}</tbody></table></div>`;}
+async function loadKf(){const {data}=await db.from('kafala_ads').select('*').order('created_at',{ascending:false});aKf=data||[];const w=document.getElementById('kf-wrap');if(!aKf.length){w.innerHTML=eh('لا توجد إعلانات نقل كفالة');return;}w.innerHTML=`<div class="tw"><table><thead><tr><th>العاملة</th><th>الإمارة</th><th>الجنسية</th><th>الأيام</th><th>ينتهي</th><th>المبلغ</th><th>الحالة</th><th>إجراء</th></tr></thead><tbody>${aKf.map(k=>{const d=k.ad_days||1;const a=!!k.is_active;return`<tr><td>${k.worker_name||'—'}</td><td>${k.emirate||'—'}</td><td>${k.nationality||'—'}</td><td>${d} يوم</td><td>${fd(k.ends_at)}</td><td style="font-weight:600;color:var(--teal)">${k.ad_price||d*30} AED</td><td><span class="bge ${a?'active':'expired'}">${a?'نشط':'منتهي'}</span></td><td><button class="btn ${a?'btn-d':'btn-o'} btn-s" onclick="togKf('${k.id}',${a})">${a?'إيقاف':'تجديد'}</button></td></tr>`;}).join('')}</tbody></table></div>`;}
+async function togKf(id,isActive){await db.from('kafala_ads').update({is_active:!isActive}).eq('id',id);toast(!isActive?'تم تفعيل الإعلان ✓':'تم إيقاف الإعلان');loadKf();}
+async function loadAds(){const {data}=await db.from('strip_ads').select('*').order('created_at',{ascending:false});aAds=data||[];const act=aAds.filter(a=>a.status==='active');const pend=aAds.filter(a=>a.status==='pending');const rev=aAds.reduce((s,a)=>s+(a.amount||0),0);document.getElementById('ads-cnt').textContent=act.length+' إعلان نشط';document.getElementById('ads-rev').textContent=rev.toLocaleString()+' AED';updateAdsBadge(pend.length);const w=document.getElementById('ads-wrap');if(!aAds.length){w.innerHTML=eh('لا توجد إعلانات بعد');return;}w.innerHTML=aAds.map(a=>`<div class="ac"><div class="ai"><strong>${a.ad_topic||'—'}</strong><span>${a.advertiser_name||'—'} • ${a.days||1} يوم • ${a.amount||0} AED</span><span style="display:block;margin-top:3px">📞 ${a.phone||'—'}${a.whatsapp?' • واتساب: '+a.whatsapp:''}</span><span style="display:block;margin-top:3px" class="lg">ينتهي: ${fd(a.expires_at)}</span></div><div style="display:flex;gap:6px;flex-shrink:0"><span class="bge ${a.status==='active'?'active':a.status==='pending'?'pending':'expired'}">${a.status==='active'?'نشط':a.status==='pending'?'انتظار':'منتهي'}</span>${a.status==='pending'?`<button class="btn btn-p btn-s" onclick="appAd('${a.id}')">موافقة</button>`:''}<button class="btn btn-d btn-s" onclick="delAd('${a.id}')">حذف</button></div></div>`).join('');}
+function updateAdsBadge(n){const b=document.getElementById('ads-badge');if(!b)return;if(n>0){b.textContent=n>99?'99+':n;b.style.display='flex';}else{b.style.display='none';}}
+async function appAd(id){
+  const a=aAds.find(x=>x.id===id);
+  if(!a)return;
+  // لو فيه مبلغ مجمّد (payment_intent_id)، لازم نحصّله فعلياً قبل التفعيل
+  if(a.payment_intent_id){
+    toast('جاري تحصيل المبلغ من Stripe...');
+    try{
+      const {data:{session}}=await db.auth.getSession();
+      const r=await fetch(`${SU}/functions/v1/stripe-ad-payment`,{method:'POST',headers:{'Content-Type':'application/json',apikey:SK,Authorization:'Bearer '+(session?.access_token||SK)},body:JSON.stringify({action:'capture',payment_intent_id:a.payment_intent_id})});
+      const d=await r.json();
+      if(!r.ok||d.error){toast('فشل التحصيل: '+(d.error||'خطأ غير معروف'));return;}
+    }catch(e){toast('تعذّر الاتصال بخدمة الدفع');return;}
+  }
+  await db.from('strip_ads').update({status:'active',starts_at:new Date().toISOString(),expires_at:new Date(Date.now()+(a.days||1)*86400000).toISOString()}).eq('id',id);
+  toast('تم تحصيل المبلغ وتفعيل الإعلان ✓');
+  loadAds();
+}
+async function delAd(id){
+  if(!confirm('حذف الإعلان؟'))return;
+  const a=aAds.find(x=>x.id===id);
+  // لو الإعلان لسا معلّق وفيه مبلغ مجمّد لكن ما تحصّل بعد، نطلق التجميد بدل ما نتركه معلّقاً بحساب المعلن
+  if(a && a.payment_intent_id && a.status==='pending'){
+    try{
+      const {data:{session}}=await db.auth.getSession();
+      await fetch(`${SU}/functions/v1/stripe-ad-payment`,{method:'POST',headers:{'Content-Type':'application/json',apikey:SK,Authorization:'Bearer '+(session?.access_token||SK)},body:JSON.stringify({action:'cancel',payment_intent_id:a.payment_intent_id})});
+    }catch(e){/* حتى لو فشل الإلغاء بـ Stripe، نكمل حذف الصف — التجميد ينتهي تلقائياً خلال أيام من طرف البنك */}
+  }
+  await db.from('strip_ads').delete().eq('id',id);
+  toast('تم الحذف وإلغاء أي مبلغ مجمّد');
+  loadAds();
+}
+async function sendNotif(){const to=document.getElementById('nt-to').value;const ti=document.getElementById('nt-ti').value.trim();const bo=document.getElementById('nt-bo').value.trim();if(!ti||!bo){toast('أدخل العنوان والنص');return;}try{await db.from('notifications').insert({target:to,title:ti,body:bo,sent_at:new Date().toISOString()});}catch(e){}toast('تم إرسال الإشعار ✓ 📤');document.getElementById('nt-ti').value='';document.getElementById('nt-bo').value='';}
+async function changePw(){
+  const p1=document.getElementById('np1').value;
+  const p2=document.getElementById('np2').value;
+  const e=document.getElementById('pw-err');
+  e.textContent='';
+  if(!p1){e.textContent='أدخل كلمة المرور';return;}
+  if(p1!==p2){e.textContent='كلمتا المرور غير متطابقتين';return;}
+  if(p1.length<6){e.textContent='6 أحرف على الأقل';return;}
+  const {error}=await db.auth.updateUser({password:p1});
+  if(error){e.textContent='تعذّر تغيير كلمة المرور: '+error.message;return;}
+  toast('تم تغيير كلمة المرور ✓');
+  document.getElementById('np1').value='';
+  document.getElementById('np2').value='';
+}
+function buildCharts(){buildR();buildP();}
+function buildR(){const ctx=document.getElementById('revChart');if(!ctx)return;if(rC)rC.destroy();const mn=['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];const now=new Date();const ms=[],lb=[];for(let i=5;i>=0;i--){const d=new Date(now.getFullYear(),now.getMonth()-i,1);ms.push({y:d.getFullYear(),m:d.getMonth()});lb.push(mn[d.getMonth()]);}const dt=ms.map(m=>aPy.filter(p=>{const d=new Date(p.created_at);return d.getFullYear()===m.y&&d.getMonth()===m.m;}).reduce((s,p)=>s+(p.amount||0),0));rC=new Chart(ctx,{type:'bar',data:{labels:lb,datasets:[{label:'AED',data:dt,backgroundColor:'#0f766e',borderRadius:6,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,ticks:{callback:v=>v.toLocaleString()+' د',font:{family:'Cairo',size:11},color:'#94a3b8'},grid:{color:'rgba(0,0,0,0.04)'}},x:{ticks:{font:{family:'Cairo',size:11},color:'#94a3b8'},grid:{display:false}}}}});}
+function buildP(){const ctx=document.getElementById('pieChart');if(!ctx)return;if(pC)pC.destroy();let s=0,b=0,k=0,a=0;aPy.forEach(p=>{if(p.type==='subscription')s+=p.amount||0;else if(p.type==='booking')b+=p.amount||0;else if(p.type==='kafala_ad')k+=p.amount||0;else if(p.type==='strip_ad')a+=p.amount||0;});const tot=s+b+k+a;const dt=tot===0?[1,1,1,1]:[s,b,k,a];pC=new Chart(ctx,{type:'doughnut',data:{labels:['اشتراك مكاتب','عمولة حجز','إعلان كفالة','إعلان شريط'],datasets:[{data:dt,backgroundColor:['#0f766e','#3b82f6','#f59e0b','#7c3aed'],borderWidth:0,hoverOffset:4}]},options:{responsive:true,maintainAspectRatio:false,cutout:'72%',plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>tot===0?' لا توجد بيانات':` ${c.label}: ${c.raw.toLocaleString()} AED`}}}}});}
+</script>
+</body>
+</html>

@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SAAHL — البحث بالذكاء الاصطناعي</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{
+  --gold:#C9A84C;--gold-d:#A8873A;--gold-l:#FBF3E0;
+  --dark:#111;--text:#1A1A1A;--muted:#777;
+  --border:#E8E8E8;--bg:#F4F4F2;--white:#fff;--radius:14px;
+}
+body{font-family:'Segoe UI',Tahoma,Arial,sans-serif;background:var(--bg);color:var(--text);direction:rtl;min-height:100vh}
+
+nav{background:#fff;border-bottom:2px solid var(--border);padding:0 5%;display:flex;align-items:center;justify-content:space-between;height:60px}
+.logo{display:flex;align-items:center;gap:8px;text-decoration:none}
+.logo-mark{width:32px;height:32px;border-radius:8px;background:var(--dark);color:var(--gold);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px}
+.logo-name{font-size:16px;font-weight:800;color:var(--dark)}
+.logo-sub{font-size:9px;color:var(--muted);display:block;margin-top:-2px}
+.back-link{color:var(--muted);font-size:12.5px;text-decoration:none;font-weight:600}
+.back-link:hover{color:var(--gold-d)}
+
+.wrap{max-width:640px;margin:0 auto;padding:36px 20px}
+.head{text-align:center;margin-bottom:22px}
+.head-badge{display:inline-block;background:var(--dark);color:var(--gold);font-size:10px;font-weight:800;padding:4px 12px;border-radius:50px;margin-bottom:10px}
+.head h1{font-size:clamp(18px,3.2vw,24px);font-weight:800;color:var(--dark)}
+.head p{color:var(--muted);font-size:12.5px;margin-top:6px}
+
+.panel{background:#fff;border-radius:var(--radius);border:1.5px solid var(--border);padding:22px 20px}
+
+.field{margin-bottom:18px}
+.field-label{font-size:12.5px;font-weight:800;color:var(--dark);margin-bottom:8px;display:block}
+.opt-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.opt-grid.two{grid-template-columns:repeat(2,1fr)}
+.opt{padding:10px 8px;border:1.5px solid var(--border);border-radius:9px;text-align:center;cursor:pointer;font-size:12px;font-weight:700;color:var(--dark);transition:all .15s}
+.opt:hover{border-color:var(--gold)}
+.opt.sel{background:var(--gold-l);border-color:var(--gold);color:var(--gold-d)}
+
+.submit-btn{width:100%;padding:13px;background:var(--dark);color:var(--gold);border:none;border-radius:10px;font-size:14px;font-weight:800;cursor:pointer;font-family:inherit;margin-top:6px}
+.submit-btn:hover{opacity:.92}
+</style>
+</head>
+<body>
+<nav>
+  <a href="sponsor-dashboard.html" class="logo">
+    <div class="logo-mark">S</div>
+    <div><div class="logo-name">SAAHL</div><span class="logo-sub">منصة الاستقدام</span></div>
+  </a>
+  <a href="search-choice.html" class="back-link">→ رجوع لاختيار طريقة البحث</a>
+</nav>
+
+<div class="wrap">
+  <div class="head">
+    <span class="head-badge">✦ البحث بالذكاء الاصطناعي</span>
+    <h1>حدّد احتياجك ونرشّح لك الأنسب</h1>
+    <p>اختر ما ينطبق عليك، وبعدها بنعرض لك العاملات والمكاتب المطابقة مباشرة</p>
+  </div>
+
+  <div class="panel">
+    <div class="field">
+      <span class="field-label">في أي إمارة تسكن؟</span>
+      <div class="opt-grid" id="fEmirate">
+        <div class="opt" data-v="أبوظبي">أبوظبي</div>
+        <div class="opt" data-v="دبي">دبي</div>
+        <div class="opt" data-v="الشارقة">الشارقة</div>
+        <div class="opt" data-v="عجمان">عجمان</div>
+        <div class="opt" data-v="أم القيوين">أم القيوين</div>
+        <div class="opt" data-v="رأس الخيمة">رأس الخيمة</div>
+      </div>
+    </div>
+
+    <div class="field">
+      <span class="field-label">نوع السكن</span>
+      <div class="opt-grid two" id="fHousing">
+        <div class="opt" data-v="شقة">شقة</div>
+        <div class="opt" data-v="فيلا">فيلا</div>
+      </div>
+    </div>
+
+    <div class="field">
+      <span class="field-label">عدد أفراد الأسرة تقريباً</span>
+      <div class="opt-grid" id="fFamily">
+        <div class="opt" data-v="1-2">1 – 2</div>
+        <div class="opt" data-v="3-4">3 – 4</div>
+        <div class="opt" data-v="5-6">5 – 6</div>
+      </div>
+    </div>
+
+    <div class="field">
+      <span class="field-label">هل يوجد كبار سن أو أصحاب همم يحتاجون رعاية؟</span>
+      <div class="opt-grid two" id="fElderly">
+        <div class="opt" data-v="yes">نعم</div>
+        <div class="opt" data-v="no">لا</div>
+      </div>
+    </div>
+
+    <button class="submit-btn" onclick="showResults()">عرض الترشيحات المطابقة</button>
+  </div>
+</div>
+
+<script>
+document.querySelectorAll('.opt-grid').forEach(grid => {
+  grid.addEventListener('click', e => {
+    const opt = e.target.closest('.opt');
+    if (!opt) return;
+    grid.querySelectorAll('.opt').forEach(o => o.classList.remove('sel'));
+    opt.classList.add('sel');
+  });
+});
+
+function getSelected(gridId) {
+  const el = document.querySelector('#' + gridId + ' .opt.sel');
+  return el ? el.dataset.v : '';
+}
+
+function showResults() {
+  // الترشيح الحالي: نطبّق فلتر الإمارة + مهارة "رعاية مسنين" لو محتاجين رعاية كبار سن
+  // TODO (مرحلة لاحقة): ترشيح أذكى فعلياً (مطابقة نوع السكن وعدد الأسرة بمهارات
+  // العاملة وخبرتها) يحتاج حقول إضافية غير موجودة حالياً بجدول maids
+  const emirate = getSelected('fEmirate');
+  const elderly = getSelected('fElderly');
+
+  const params = new URLSearchParams();
+  if (emirate) params.set('emirate', emirate);
+  if (elderly === 'yes') params.set('skill', 'رعاية مسنين');
+  window.location.href = 'search.html?' + params.toString();
+}
+</script>
+</body>
+</html>

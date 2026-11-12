@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>SAAHL — تسجيل مكتب استقدام</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{font-family:'Segoe UI',Tahoma,Arial,sans-serif;background:#F5F5F3;color:#111;direction:rtl;min-height:100vh}
+nav{background:#fff;border-bottom:2px solid #EBEBEB;padding:0 4%;display:flex;align-items:center;justify-content:space-between;height:62px;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.05)}
+.logo-name{font-size:17px;font-weight:800;color:#111;text-decoration:none}
+.back-btn{display:flex;align-items:center;gap:6px;color:#666;text-decoration:none;font-size:13px;font-weight:600;padding:8px 14px;border:1.5px solid #EBEBEB;border-radius:8px;transition:all .2s}
+.back-btn:hover{border-color:#C9A84C;color:#C9A84C}
+.page{display:grid;grid-template-columns:280px 1fr;min-height:calc(100vh - 62px);max-width:1100px;margin:0 auto;padding:28px 20px;gap:24px}
+.sidebar{background:#111;border-radius:18px;padding:28px 20px;position:sticky;top:90px;height:fit-content}
+.sidebar-title{color:#fff;font-size:15px;font-weight:800;margin-bottom:6px}
+.sidebar-sub{color:rgba(255,255,255,.4);font-size:12px;margin-bottom:28px;line-height:1.6}
+.steps{display:flex;flex-direction:column;gap:2px}
+.si{display:flex;align-items:center;gap:12px;padding:11px 12px;border-radius:10px;transition:all .2s}
+.si.done{background:rgba(201,168,76,.1)}
+.si.active{background:rgba(201,168,76,.15);border:1px solid rgba(201,168,76,.3)}
+.si.upcoming{opacity:.35}
+.sc{width:2px;height:16px;background:rgba(255,255,255,.08);margin-right:28px}
+.sc.dl{background:rgba(201,168,76,.35)}
+.snum{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;flex-shrink:0}
+.si.done .snum,.si.active .snum{background:#C9A84C;color:#fff}
+.si.upcoming .snum{background:rgba(255,255,255,.08);color:rgba(255,255,255,.4)}
+.slbl{color:#fff;font-size:12px;font-weight:700}
+.sdsc{color:rgba(255,255,255,.35);font-size:11px;margin-top:1px}
+.trial-tag{margin-top:24px;background:rgba(201,168,76,.1);border:1px solid rgba(201,168,76,.2);border-radius:10px;padding:14px;font-size:12px;color:rgba(255,255,255,.5);line-height:1.7}
+.trial-tag strong{color:#C9A84C}
+.card{background:#fff;border-radius:18px;padding:32px 28px;border:1.5px solid #EBEBEB;box-shadow:0 2px 12px rgba(0,0,0,.04)}
+.prog-wrap{margin-bottom:28px}
+.prog-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.prog-label{font-size:12px;color:#999;font-weight:600}
+.prog-bar{height:5px;background:#F0F0F0;border-radius:3px;overflow:hidden}
+.prog-fill{height:100%;background:linear-gradient(90deg,#C9A84C,#E8C86A);border-radius:3px;transition:width .4s ease}
+.step-hd{margin-bottom:28px}
+.step-tag{display:inline-flex;align-items:center;background:#FBF3E0;color:#A8873A;padding:5px 12px;border-radius:50px;font-size:11px;font-weight:700;margin-bottom:12px;border:1px solid rgba(201,168,76,.2)}
+.step-title{font-size:22px;font-weight:800;color:#111;margin-bottom:5px}
+.step-sub{font-size:13px;color:#777;line-height:1.6}
+.row{display:grid;gap:16px;margin-bottom:16px}
+.row.r2{grid-template-columns:1fr 1fr}
+.row.r1{grid-template-columns:1fr}
+.field{display:flex;flex-direction:column;gap:6px}
+.field label{font-size:12px;font-weight:700;color:#333;text-transform:uppercase;letter-spacing:.3px}
+.req{color:#C9A84C;margin-right:2px}
+.inp{padding:11px 13px;border:1.5px solid #EBEBEB;border-radius:10px;font-size:14px;color:#111;font-family:inherit;background:#fff;transition:border-color .2s;outline:none;width:100%;-webkit-appearance:none}
+.inp:focus{border-color:#C9A84C;box-shadow:0 0 0 3px rgba(201,168,76,.08)}
+.inp::placeholder{color:#C5C5C5}
+textarea.inp{resize:none;min-height:90px;line-height:1.6}
+select.inp{cursor:pointer}
+.hint{font-size:11px;color:#AAA;margin-top:2px;line-height:1.5}
+.err-msg{font-size:11px;color:#E53E3E;margin-top:2px;display:none;font-weight:600}
+.field.bad .inp{border-color:#E53E3E!important}
+.field.bad .err-msg{display:block}
+.founding-box{background:linear-gradient(135deg,#111,#1a1a2e);border-radius:16px;padding:24px;text-align:center;margin-bottom:8px}
+.founding-badge{display:inline-flex;background:rgba(201,168,76,.15);border:1px solid rgba(201,168,76,.3);color:#C9A84C;padding:5px 14px;border-radius:50px;font-size:11px;font-weight:700;margin-bottom:14px}
+.founding-price{font-size:52px;font-weight:800;color:#C9A84C;line-height:1;margin-bottom:4px}
+.founding-price span{font-size:18px;font-weight:500;color:rgba(201,168,76,.7)}
+.founding-period{font-size:13px;color:rgba(255,255,255,.5);margin-bottom:16px}
+.founding-feats{display:flex;flex-direction:column;gap:8px;text-align:right}
+.founding-feat{display:flex;align-items:center;gap:8px;font-size:13px;color:rgba(255,255,255,.7)}
+.founding-feat::before{content:"✓";color:#C9A84C;font-weight:800;flex-shrink:0}
+.founding-note{margin-top:16px;padding:12px 16px;background:rgba(201,168,76,.1);border-radius:10px;font-size:12px;color:rgba(255,255,255,.5);line-height:1.6}
+.founding-note strong{color:#C9A84C}
+.sum-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px}
+.sum-item{background:#F8F8F8;border-radius:12px;padding:14px}
+.sum-lbl{font-size:10px;color:#999;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px}
+.sum-val{font-size:14px;font-weight:700;color:#111}
+.sum-val.gold{color:#C9A84C}
+.terms-box{background:#F8F8F8;border-radius:12px;padding:18px;margin-bottom:18px}
+.terms-box h4{font-size:13px;font-weight:700;color:#111;margin-bottom:12px}
+.terms-list{list-style:none;display:flex;flex-direction:column;gap:8px}
+.terms-list li{font-size:13px;color:#555;display:flex;align-items:flex-start;gap:8px;line-height:1.5}
+.terms-list li::before{content:"✓";color:#C9A84C;font-weight:800;flex-shrink:0;margin-top:1px}
+.agree-row{display:flex;align-items:center;gap:10px;margin-bottom:20px;cursor:pointer}
+.agree-row input{width:18px;height:18px;accent-color:#C9A84C;flex-shrink:0}
+.agree-row label{font-size:13px;color:#444;cursor:pointer;line-height:1.5}
+.agree-row a{color:#C9A84C;text-decoration:none;font-weight:600}
+.btn-row{display:flex;align-items:center;justify-content:space-between;margin-top:28px;padding-top:22px;border-top:1.5px solid #F0F0F0;gap:12px}
+.btn-prev{display:flex;align-items:center;gap:6px;color:#666;font-size:14px;font-weight:600;cursor:pointer;background:none;border:1.5px solid #EBEBEB;border-radius:10px;font-family:inherit;padding:11px 20px;transition:all .2s}
+.btn-prev:hover{border-color:#C9A84C;color:#C9A84C}
+.btn-next{display:flex;align-items:center;gap:8px;background:#C9A84C;color:#fff;font-size:14px;font-weight:700;cursor:pointer;border:none;font-family:inherit;padding:12px 32px;border-radius:10px;transition:all .2s;margin-right:auto}
+.btn-next:hover{background:#A8873A}
+.btn-submit{display:flex;align-items:center;gap:8px;background:#111;color:#fff;font-size:14px;font-weight:700;cursor:pointer;border:none;font-family:inherit;padding:12px 32px;border-radius:10px;transition:all .2s;margin-right:auto}
+.btn-submit:hover{background:#333}
+.btn-submit:disabled{opacity:.6;cursor:not-allowed}
+.fs{display:none}
+.fs.active{display:block}
+.global-err{display:none;background:#FFF5F5;border:1px solid #FED7D7;color:#C53030;padding:14px 16px;border-radius:10px;font-size:13px;margin-bottom:16px;line-height:1.7;font-weight:600}
+.global-err.show{display:block}
+.success{display:none;text-align:center;padding:48px 24px}
+.success.show{display:block}
+.success-ico{width:80px;height:80px;background:#FBF3E0;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:36px;margin:0 auto 20px;color:#C9A84C;font-weight:800}
+.success-title{font-size:26px;font-weight:800;color:#111;margin-bottom:10px}
+.success-sub{font-size:14px;color:#777;line-height:1.8;max-width:420px;margin:0 auto 28px}
+.success-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.mob-steps{display:none;background:#fff;border-bottom:1px solid #EBEBEB;padding:12px 4%;overflow-x:auto;white-space:nowrap;position:sticky;top:62px;z-index:99}
+@media(max-width:768px){
+  .page{grid-template-columns:1fr;padding:16px;gap:16px}
+  .sidebar{display:none}
+  .card{padding:22px 18px}
+  .row.r2{grid-template-columns:1fr}
+  .sum-grid{grid-template-columns:1fr}
+  .btn-row{flex-wrap:wrap}
+  .btn-next,.btn-submit,.btn-prev{width:100%;justify-content:center}
+  .mob-steps{display:block}
+  .founding-price{font-size:40px}
+}
+.mob-step{display:inline-flex;align-items:center;gap:6px;margin-left:16px;font-size:12px;color:#999;font-weight:600}
+.mob-step.active,.mob-step.done{color:#C9A84C}
+.mob-num{width:22px;height:22px;border-radius:50%;background:#F0F0F0;color:#999;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center}
+.mob-step.active .mob-num,.mob-step.done .mob-num{background:#C9A84C;color:#fff}
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="logo-name" href="index.html">SAAHL</a>
+  <a href="index.html" class="back-btn">← الرئيسية</a>
+</nav>
+
+<div class="mob-steps">
+  <div class="mob-step active" id="ms1"><div class="mob-num">1</div>المكتب</div>
+  <div class="mob-step upcoming" id="ms2"><div class="mob-num">2</div>التواصل</div>
+  <div class="mob-step upcoming" id="ms3"><div class="mob-num">3</div>الوصف</div>
+  <div class="mob-step upcoming" id="ms4"><div class="mob-num">4</div>الاشتراك</div>
+  <div class="mob-step upcoming" id="ms5"><div class="mob-num">5</div>الحساب</div>
+</div>
+
+<div class="page">
+  <div class="sidebar">
+    <div class="sidebar-title">تسجيل مكتب استقدام</div>
+    <div class="sidebar-sub">أكمل الخطوات لتفعيل حسابك</div>
+    <div class="steps">
+      <div class="si active" id="si1"><div class="snum">1</div><div><div class="slbl">معلومات المكتب</div><div class="sdsc">البيانات الأساسية</div></div></div>
+      <div class="sc" id="sc1"></div>
+      <div class="si upcoming" id="si2"><div class="snum">2</div><div><div class="slbl">معلومات التواصل</div><div class="sdsc">الهاتف والعنوان</div></div></div>
+      <div class="sc" id="sc2"></div>
+      <div class="si upcoming" id="si3"><div class="snum">3</div><div><div class="slbl">عن المكتب</div><div class="sdsc">الوصف والخدمات</div></div></div>
+      <div class="sc" id="sc3"></div>
+      <div class="si upcoming" id="si4"><div class="snum">4</div><div><div class="slbl">الاشتراك</div><div class="sdsc">سعر التأسيس</div></div></div>
+      <div class="sc" id="sc4"></div>
+      <div class="si upcoming" id="si5"><div class="snum">5</div><div><div class="slbl">بيانات الحساب</div><div class="sdsc">الإيميل وكلمة المرور</div></div></div>
+    </div>
+    <div class="trial-tag"><strong>10 أيام مجانية</strong> عند التسجيل<br>بدون بطاقة ائتمان</div>
+  </div>
+
+  <div>
+    <div class="card">
+      <div class="prog-wrap">
+        <div class="prog-top">
+          <span class="prog-label" id="progLabel">الخطوة 1 من 5</span>
+          <span class="prog-label" id="progPct">20%</span>
+        </div>
+        <div class="prog-bar"><div class="prog-fill" id="progFill" style="width:20%"></div></div>
+      </div>
+
+      <!-- STEP 1 -->
+      <div class="fs active" id="step1">
+        <div class="step-hd">
+          <div class="step-tag">الخطوة 1 من 5</div>
+          <div class="step-title">معلومات المكتب</div>
+          <div class="step-sub">ابدأ بالبيانات الأساسية لمكتبك</div>
+        </div>
+        <div class="row r2">
+          <div class="field" id="f1">
+            <label><span class="req">*</span>اسم المكتب</label>
+            <input class="inp" type="text" id="officeName" placeholder="مكتب الأمانة للاستقدام">
+            <div class="err-msg">يرجى إدخال اسم المكتب</div>
+          </div>
+          <div class="field" id="f2">
+            <label><span class="req">*</span>رقم الترخيص</label>
+            <input class="inp" type="text" id="licenseNum" placeholder="UAE-2024-XXXXX">
+            <div class="err-msg">يرجى إدخال رقم الترخيص</div>
+          </div>
+        </div>
+        <div class="row r2">
+          <div class="field" id="f3">
+            <label><span class="req">*</span>الإمارة</label>
+            <select class="inp" id="emirate">
+              <option value="">اختر الإمارة</option>
+              <option>أبوظبي</option><option>دبي</option><option>الشارقة</option>
+              <option>عجمان</option><option>أم القيوين</option><option>رأس الخيمة</option><option>الفجيرة</option>
+            </select>
+            <div class="err-msg">يرجى اختيار الإمارة</div>
+          </div>
+          <div class="field">
+            <label>المنطقة / الحي</label>
+            <input class="inp" type="text" id="area" placeholder="مثال: الخالدية، الروضة">
+          </div>
+        </div>
+        <div class="btn-row">
+          <div></div>
+          <button class="btn-next" onclick="next(1)">التالي ←</button>
+        </div>
+      </div>
+
+      <!-- STEP 2 -->
+      <div class="fs" id="step2">
+        <div class="step-hd">
+          <div class="step-tag">الخطوة 2 من 5</div>
+          <div class="step-title">معلومات التواصل</div>
+          <div class="step-sub">كيف يتواصل معك الكفلاء</div>
+        </div>
+        <div class="row r2">
+          <div class="field" id="f4">
+            <label><span class="req">*</span>رقم الجوال</label>
+            <input class="inp" type="tel" id="mobile" placeholder="+971 50 XXX XXXX">
+            <div class="err-msg">يرجى إدخال رقم الجوال</div>
+          </div>
+          <div class="field">
+            <label>رقم الهاتف الأرضي</label>
+            <input class="inp" type="tel" id="landline" placeholder="+971 2 XXX XXXX">
+          </div>
+        </div>
+        <div class="row r2">
+          <div class="field" id="f5">
+            <label><span class="req">*</span>رقم واتساب</label>
+            <input class="inp" type="tel" id="whatsapp" placeholder="+971 50 XXX XXXX">
+            <div class="hint">للتواصل المباشر مع الكفلاء</div>
+            <div class="err-msg">يرجى إدخال رقم واتساب</div>
+          </div>
+          <div class="field">
+            <label>الشارع والعنوان</label>
+            <input class="inp" type="text" id="street" placeholder="اسم الشارع، المبنى، الطابق">
+          </div>
+        </div>
+        <div class="row r1">
+          <div class="field">
+            <label>رابط خرائط جوجل</label>
+            <input class="inp" type="url" id="maps" placeholder="https://maps.google.com/...">
+            <div class="hint">اختياري — يساعد الكفلاء في إيجادك</div>
+          </div>
+        </div>
+        <div class="btn-row">
+          <button class="btn-prev" onclick="prev(2)">→ السابق</button>
+          <button class="btn-next" onclick="next(2)">التالي ←</button>
+        </div>
+      </div>
+
+      <!-- STEP 3 -->
+      <div class="fs" id="step3">
+        <div class="step-hd">
+          <div class="step-tag">الخطوة 3 من 5</div>
+          <div class="step-title">عن مكتبك</div>
+          <div class="step-sub">اشرح ما يميزك — الكفلاء يقرأون هذا قبل الاختيار</div>
+        </div>
+        <div class="row r1">
+          <div class="field" id="f6">
+            <label><span class="req">*</span>مميزات المكتب</label>
+            <textarea class="inp" id="features" placeholder="نوفر عاملات مدربات من الفلبين وإندونيسيا مع ضمان الاستبدال..."></textarea>
+            <div class="hint">اكتب ما يميزك عن المنافسين بوضوح</div>
+            <div class="err-msg">يرجى إدخال مميزات المكتب</div>
+          </div>
+        </div>
+        <div class="row r1">
+          <div class="field">
+            <label>سياسة الاستبدال والإرجاع</label>
+            <textarea class="inp" id="policy" placeholder="اشرح شروط الاستبدال والإرجاع لديكم..."></textarea>
+          </div>
+        </div>
+        <div class="row r2">
+          <div class="field">
+            <label>اسم البنك</label>
+            <input class="inp" type="text" id="bank" placeholder="بنك أبوظبي الأول">
+          </div>
+          <div class="field">
+            <label>رقم الحساب IBAN</label>
+            <input class="inp" type="text" id="iban" placeholder="AE07 0331 2345 6789...">
+            <div class="hint">لاستقبال المدفوعات من المنصة</div>
+          </div>
+        </div>
+        <div class="btn-row">
+          <button class="btn-prev" onclick="prev(3)">→ السابق</button>
+          <button class="btn-next" onclick="next(3)">التالي ←</button>
+        </div>
+      </div>
+
+      <!-- STEP 4 -->
+      <div class="fs" id="step4">
+        <div class="step-hd">
+          <div class="step-tag">الخطوة 4 من 5</div>
+          <div class="step-title">سعر التأسيس</div>
+          <div class="step-sub">عرض خاص للمكاتب الأولى</div>
+        </div>
+        <div class="founding-box">
+          <div class="founding-badge">سعر التأسيس — عرض محدود</div>
+          <div class="founding-price">70 <span>د.إ</span></div>
+          <div class="founding-period">شهرياً — بدون عقد طويل</div>
+          <div class="founding-feats">
+            <div class="founding-feat">حتى 7 عاملات نشطة في نفس الوقت</div>
+            <div class="founding-feat">10 أيام تجربة مجانية بدون دفع</div>
+            <div class="founding-feat">استقبال طلبات الكفلاء مباشرة</div>
+            <div class="founding-feat">لوحة تحكم كاملة لإدارة الحجوزات</div>
+          </div>
+          <div class="founding-note">هذا السعر <strong>حصري للمكاتب الأولى</strong> — سترتفع الأسعار لاحقاً</div>
+        </div>
+        <div class="btn-row">
+          <button class="btn-prev" onclick="prev(4)">→ السابق</button>
+          <button class="btn-next" onclick="next(4)">أوافق وأكمل ←</button>
+        </div>
+      </div>
+
+      <!-- STEP 5 -->
+      <div class="fs" id="step5">
+        <div class="step-hd">
+          <div class="step-tag">الخطوة 5 من 5</div>
+          <div class="step-title">بيانات الحساب</div>
+          <div class="step-sub">الخطوة الأخيرة — أنشئ حسابك</div>
+        </div>
+        <div class="global-err" id="globalErr"></div>
+        <div class="sum-grid">
+          <div class="sum-item"><div class="sum-lbl">اسم المكتب</div><div class="sum-val" id="sumName">—</div></div>
+          <div class="sum-item"><div class="sum-lbl">الإمارة</div><div class="sum-val" id="sumEmirate">—</div></div>
+          <div class="sum-item"><div class="sum-lbl">الاشتراك</div><div class="sum-val gold">70 د.إ / شهر</div></div>
+          <div class="sum-item"><div class="sum-lbl">التجربة المجانية</div><div class="sum-val gold">10 أيام ✓</div></div>
+        </div>
+        <div class="row r1">
+          <div class="field" id="f7">
+            <label><span class="req">*</span>البريد الإلكتروني</label>
+            <input class="inp" type="email" id="email" placeholder="office@example.com">
+            <div class="err-msg">يرجى إدخال بريد إلكتروني صحيح</div>
+          </div>
+        </div>
+        <div class="row r2">
+          <div class="field" id="f8">
+            <label><span class="req">*</span>كلمة المرور</label>
+            <input class="inp" type="password" id="pass1" placeholder="8 أحرف على الأقل">
+            <div class="err-msg">كلمة المرور يجب أن تكون 8 أحرف على الأقل</div>
+          </div>
+          <div class="field" id="f9">
+            <label><span class="req">*</span>تأكيد كلمة المرور</label>
+            <input class="inp" type="password" id="pass2" placeholder="أعد الإدخال">
+            <div class="err-msg">كلمات المرور غير متطابقة</div>
+          </div>
+        </div>
+        <div class="terms-box">
+          <h4>ما تحصل عليه فور التسجيل</h4>
+          <ul class="terms-list">
+            <li>10 أيام مجانية — لا يُطلب منك الدفع الآن</li>
+            <li>إضافة حتى 7 عاملات فور تفعيل حسابك</li>
+            <li>استقبال طلبات الكفلاء على الموقع والإيميل</li>
+            <li>لوحة تحكم كاملة بالإحصائيات والحجوزات</li>
+          </ul>
+        </div>
+        <div class="agree-row">
+          <input type="checkbox" id="agree">
+          <label for="agree">أوافق على <a href="#">الشروط والأحكام</a> وسياسة <a href="#">الخصوصية</a></label>
+        </div>
+        <div class="btn-row">
+          <button class="btn-prev" onclick="prev(5)">→ السابق</button>
+          <button class="btn-submit" id="submitBtn" onclick="doSubmit()">إنشاء الحساب مجاناً</button>
+        </div>
+      </div>
+
+      <!-- SUCCESS -->
+      <div class="success" id="successScreen">
+        <div class="success-ico">✓</div>
+        <div class="success-title">تم تسجيل مكتبك!</div>
+        <div class="success-sub" id="successMsg">تم إنشاء حسابك بنجاح. تحقق من بريدك الإلكتروني لتأكيد الحساب ثم سجّل الدخول.</div>
+        <div class="success-btns">
+          <a href="login.html" class="btn-next" style="text-decoration:none">تسجيل الدخول ←</a>
+          <a href="index.html" class="btn-prev" style="text-decoration:none">الرئيسية</a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- Supabase CDN — يُحمَّل آخر شيء قبل السكربت الرئيسي -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script>
+// ============================================================
+// 1) تهيئة Supabase — بعد تحميل المكتبة مباشرة
+// ============================================================
+var db;
+try {
+  var _supa = window.supabase || window.Supabase;
+  if (!_supa || !_supa.createClient) throw new Error('مكتبة Supabase لم تُحمَّل');
+  db = _supa.createClient(
+    'https://hkfxikmpfgixrbrboxeb.supabase.co',
+    'sb_publishable_OcWY5nY_-b2odLqQxsu2Kw_iQ4YswBz'
+  );
+  console.log('✅ Supabase initialized');
+} catch(initErr) {
+  console.error('❌ Supabase init error:', initErr);
+}
+
+// ============================================================
+// 2) التنقل بين الخطوات
+// ============================================================
+function updateUI(step) {
+  for (var i = 1; i <= 5; i++) {
+    var si = document.getElementById('si' + i);
+    var sc = document.getElementById('sc' + i);
+    var ms = document.getElementById('ms' + i);
+    if (i < step) {
+      si.className = 'si done';
+      if (sc) sc.className = 'sc dl';
+      if (ms) ms.className = 'mob-step done';
+    } else if (i === step) {
+      si.className = 'si active';
+      if (sc) sc.className = 'sc';
+      if (ms) ms.className = 'mob-step active';
+    } else {
+      si.className = 'si upcoming';
+      if (sc) sc.className = 'sc';
+      if (ms) ms.className = 'mob-step upcoming';
+    }
+  }
+  var pct = Math.round((step / 5) * 100);
+  document.getElementById('progFill').style.width = pct + '%';
+  document.getElementById('progLabel').textContent = 'الخطوة ' + step + ' من 5';
+  document.getElementById('progPct').textContent = pct + '%';
+}
+
+function showStep(n) {
+  document.querySelectorAll('.fs').forEach(function(s){ s.classList.remove('active'); });
+  var el = document.getElementById('step' + n);
+  if (el) el.classList.add('active');
+  updateUI(n);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function validate(step) {
+  var ok = true;
+  function chk(fid, condition) {
+    var f = document.getElementById(fid);
+    if (f) {
+      if (!condition) { f.classList.add('bad'); ok = false; }
+      else f.classList.remove('bad');
+    }
+  }
+  if (step === 1) {
+    chk('f1', document.getElementById('officeName').value.trim());
+    chk('f2', document.getElementById('licenseNum').value.trim());
+    chk('f3', document.getElementById('emirate').value);
+  }
+  if (step === 2) {
+    chk('f4', document.getElementById('mobile').value.trim());
+    chk('f5', document.getElementById('whatsapp').value.trim());
+  }
+  if (step === 3) {
+    chk('f6', document.getElementById('features').value.trim());
+  }
+  if (step === 5) {
+    var em = document.getElementById('email').value.trim();
+    var p1 = document.getElementById('pass1').value;
+    var p2 = document.getElementById('pass2').value;
+    chk('f7', em && em.includes('@') && em.includes('.'));
+    chk('f8', p1.length >= 8);
+    chk('f9', p1 === p2 && p2.length > 0);
+    if (!document.getElementById('agree').checked) {
+      alert('يرجى الموافقة على الشروط والأحكام');
+      ok = false;
+    }
+  }
+  return ok;
+}
+
+function next(from) {
+  if (!validate(from)) return;
+  if (from === 4) {
+    document.getElementById('sumName').textContent = document.getElementById('officeName').value || '—';
+    document.getElementById('sumEmirate').textContent = document.getElementById('emirate').value || '—';
+  }
+  showStep(from + 1);
+}
+
+function prev(from) { showStep(from - 1); }
+
+function showErr(msg) {
+  var el = document.getElementById('globalErr');
+  el.textContent = msg;
+  el.classList.add('show');
+  el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+function hideErr() {
+  document.getElementById('globalErr').classList.remove('show');
+}
+
+// ============================================================
+// 3) التسجيل الفعلي
+// ============================================================
+async function doSubmit() {
+  hideErr();
+  if (!validate(5)) return;
+
+  // تحقق من تهيئة Supabase
+  if (!db) {
+    showErr('خطأ في تحميل الصفحة — يرجى تحديث المتصفح والمحاولة مرة أخرى');
+    return;
+  }
+
+  var btn = document.getElementById('submitBtn');
+  btn.disabled = true;
+  btn.textContent = 'جارٍ إنشاء الحساب...';
+
+  var email      = document.getElementById('email').value.trim();
+  var pass       = document.getElementById('pass1').value;
+  var officeName = document.getElementById('officeName').value.trim();
+
+  try {
+    // --- الخطوة أ: إنشاء حساب Auth ---
+    console.log('▶ signUp start', email);
+    var signUpRes = await db.auth.signUp({
+      email: email,
+      password: pass,
+      options: {
+        data: { full_name: officeName, role: 'OFFICE' }
+      }
+    });
+
+    console.log('signUp result:', signUpRes);
+
+    if (signUpRes.error) throw signUpRes.error;
+
+    var userId = signUpRes.data.user && signUpRes.data.user.id;
+    if (!userId) throw new Error('لم يتم إنشاء المستخدم — يرجى المحاولة مرة أخرى');
+
+    // --- الخطوة ب: profiles (الـ Trigger يفعل هذا تلقائياً، upsert للأمان) ---
+    var profRes = await db.from('profiles').upsert({
+      id: userId,
+      full_name: officeName,
+      role: 'OFFICE',
+      email: email
+    });
+    if (profRes.error) console.warn('profiles upsert:', profRes.error.message);
+
+    // --- الخطوة ج: office_profiles ---
+    var officeRes = await db.from('office_profiles').upsert({
+      id: userId,
+      office_name: officeName,
+      license_number: document.getElementById('licenseNum').value.trim(),
+      emirate:        document.getElementById('emirate').value,
+      area:           document.getElementById('area').value.trim(),
+      mobile:         document.getElementById('mobile').value.trim(),
+      landline:       document.getElementById('landline').value.trim(),
+      whatsapp:       document.getElementById('whatsapp').value.trim(),
+      street:         document.getElementById('street').value.trim(),
+      google_map_link:document.getElementById('maps').value.trim(),
+      office_features:document.getElementById('features').value.trim(),
+      return_policy:  document.getElementById('policy').value.trim(),
+      bank_name:      document.getElementById('bank').value.trim(),
+      bank_account:   document.getElementById('iban').value.trim(),
+      subscription_status: 'TRIAL'
+    });
+
+    console.log('office_profiles result:', officeRes);
+    if (officeRes.error) throw officeRes.error;
+
+    // --- نجاح ---
+    document.querySelectorAll('.fs').forEach(function(s){ s.classList.remove('active'); });
+    document.getElementById('successScreen').classList.add('show');
+    document.getElementById('progFill').style.width = '100%';
+    document.getElementById('progLabel').textContent = 'مكتمل ✓';
+    document.getElementById('progPct').textContent = '100%';
+    for (var i = 1; i <= 5; i++) {
+      var si = document.getElementById('si' + i);
+      if (si) si.className = 'si done';
+    }
+
+    if (signUpRes.data.session) {
+      document.getElementById('successMsg').textContent = 'تم إنشاء حسابك بنجاح! يمكنك الدخول الآن للوحة التحكم.';
+      document.querySelector('.success-btns a').href = 'office-dashboard.html';
+    }
+
+  } catch (e) {
+    console.error('❌ Registration error:', e);
+
+    var arabicMsgs = {
+      'User already registered': 'هذا البريد الإلكتروني مسجل بالفعل — جرّب تسجيل الدخول',
+      'Email rate limit exceeded': 'تم تجاوز الحد المسموح — انتظر قليلاً ثم حاول مرة أخرى',
+      'Password should be at least 6 characters': 'كلمة المرور قصيرة جداً — يجب 8 أحرف على الأقل',
+      'Unable to validate email address: invalid format': 'صيغة البريد الإلكتروني غير صحيحة',
+      'signup is disabled': 'التسجيل موقوف مؤقتاً — تواصل مع الدعم',
+    };
+
+    var errMsg = e.message || e.msg || e.error_description || '';
+    var displayMsg = arabicMsgs[errMsg] || (errMsg ? 'خطأ: ' + errMsg : 'حدث خطأ غير متوقع — يرجى المحاولة مرة أخرى');
+
+    showErr(displayMsg);
+    btn.disabled = false;
+    btn.textContent = 'إنشاء الحساب مجاناً';
+  }
+}
+</script>
+</body>
+</html>
