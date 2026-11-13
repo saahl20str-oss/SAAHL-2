@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>اعلن في ساهل</title>
-<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://js.stripe.com/v3/"></script>
 <style>
@@ -155,6 +155,40 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);min-h
   .form-row{grid-template-columns:1fr}
   .days-grid{grid-template-columns:repeat(2,1fr)}
 }
+/* SAAHL 2 unified visual identity */
+:root{--teal:#c9a84c;--teal-dark:#ad8934;--teal-light:#faf5e7;--bg:#f7f5f0;--white:#fff;--border:#e5dfd2;--text:#191a20;--text-muted:#6c6a68;--text-light:#9b9486;--gold:#c9a84c}
+body{font-family:'Tajawal',Arial,sans-serif;background:var(--bg);color:var(--text)}
+.topbar{height:76px;background:#111218;border-bottom:1px solid rgba(201,168,76,.3);padding:0 clamp(18px,5vw,72px)}
+.brand-name{color:#e4c36e;font-size:22px;font-weight:800;letter-spacing:.3px}
+.logo{background:#111218;border:1px solid #8e7538;border-radius:12px}
+.back-btn{color:#e5d6b4;border-color:#77653d;font-family:inherit;font-weight:700;padding:10px 18px}
+.back-btn:hover{background:#24232a;color:white}
+.hero{background:linear-gradient(120deg,#161820 0%,#24201d 65%,#352a1c 100%);padding:52px 20px 72px;border-bottom:3px solid #c9a84c}
+.hero h1{font-size:clamp(27px,4vw,39px);font-weight:900;letter-spacing:0}
+.hero p{max-width:650px;font-size:16px;line-height:1.9;color:#e4dccd;opacity:1}
+.hero-badge{background:rgba(201,168,76,.1);border:1px solid rgba(201,168,76,.45);color:#f0d78e;font-weight:700}
+.main{max-width:800px;margin:-26px auto 70px}
+.steps{background:#fff;border:1px solid var(--border);border-radius:16px;padding:19px 12px;box-shadow:0 8px 28px rgba(22,22,22,.04);margin-bottom:22px}
+.step.active,.step.done{color:#99772d}
+.step.done .step-num{background:#c9a84c;color:#171717}
+.step-line.done{background:#c9a84c}
+.card{border-radius:18px;padding:clamp(20px,3vw,32px);border:1px solid #e8e2d7;box-shadow:0 8px 28px rgba(24,23,20,.035);margin-bottom:18px}
+.card-title{font-size:20px;font-weight:800;color:#1c1c22;padding-bottom:16px;border-bottom:1px solid #eee8dd;margin-bottom:24px}
+.form-group label{font-size:14px;font-weight:700;color:#464441;margin-bottom:9px}
+.form-group input,.form-group select,.form-group textarea{font-family:inherit;font-size:15px;padding:14px 16px;border-radius:11px;border-color:#ded9cf;background:#fff}
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:#c9a84c;box-shadow:0 0 0 3px rgba(201,168,76,.12)}
+.day-btn{font-family:inherit;border-radius:12px;padding:13px 8px}
+.day-btn:hover,.day-btn.selected{background:#faf3df;border-color:#c9a84c}
+.day-btn .day-num,.day-btn .day-price{color:#8d6b20}
+.summary-box{background:#faf6ec;border:1px solid #e6d6ae}
+.summary-row:last-child{border-top-color:#e6d6ae}
+.summary-total{color:#8d6b20}
+.pay-btn{background:#c9a84c;color:#171717;font-family:inherit;font-weight:800;font-size:17px;padding:16px}
+.pay-btn:hover{background:#b89640}
+.note{background:#fbf6e8;border-color:#e9d9ac;color:#79602d}
+#success-screen h2{color:#8d6b20}
+.home-btn{background:#c9a84c;color:#171717;font-family:inherit;font-weight:800}
+@media(max-width:600px){.topbar{height:66px;padding:0 14px}.brand-name{font-size:19px}.hero{padding:36px 16px 55px}.hero p{font-size:14px}.hero-badge{font-size:11px;padding:6px 10px}.main{padding:0 12px}.steps{gap:3px}.step{font-size:11px}.step-line{width:17px}.card{padding:19px}.card-title{font-size:18px}}
 </style>
 </head>
 <body>
@@ -162,20 +196,20 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);min-h
 <div class="topbar">
   <div class="brand">
     <div class="logo">
-      <img src="logo.png" alt="ساهل" onerror="this.parentElement.innerHTML='<span style=font-size:16px;color:#c9a227;font-weight:700>س</span>'">
+      <img src="saahl-logo.png" alt="ساهل" onerror="this.parentElement.innerHTML='<span style=font-size:16px;color:#c9a227;font-weight:700>س</span>'">
     </div>
-    <div class="brand-name">ساهل</div>
+    <div class="brand-name">SAAHL 2 | ساهل</div>
   </div>
   <a href="index.html" class="back-btn">← العودة للرئيسية</a>
 </div>
 
 <div class="hero">
-  <h1>🎯 اعلن في ساهل</h1>
-  <p>أوصل إعلانك لآلاف الكفلاء والمكاتب في الإمارات — بسهولة وسرعة</p>
+  <h1>أعلن في ساهل 2</h1>
+  <p>اعرض خدماتك وإعلاناتك في مساحة مميزة تصل إلى زوار ساهل 2</p>
   <div class="hero-badges">
-    <div class="hero-badge">⚡ يظهر فوراً بعد الدفع</div>
+    <div class="hero-badge">✦ يظهر بعد تأكيد الدفع</div>
     <div class="hero-badge">👁️ شريط علوي بارز</div>
-    <div class="hero-badge">💰 10 درهم فقط / يوم</div>
+    <div class="hero-badge">💰 10 دراهم / يوم</div>
   </div>
 </div>
 
@@ -303,7 +337,7 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);min-h
   <div id="success-screen">
     <div class="success-icon">🎉</div>
     <h2>تم استلام إعلانك!</h2>
-    <p>سيظهر إعلانك في الشريط العلوي فور تأكيد الدفع من Stripe.<br>شكراً لثقتك في ساهل.</p>
+    <p>سيظهر إعلانك في الشريط العلوي فور تأكيد الدفع من Stripe.<br>شكراً لثقتك في ساهل 2.</p>
     <a href="index.html" class="home-btn">العودة للرئيسية</a>
   </div>
 
