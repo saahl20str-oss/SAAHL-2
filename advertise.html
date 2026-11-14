@@ -408,7 +408,11 @@ async function submitAd(){
       ad_details: selectedWorker ? details+' | رابط العاملة: '+new URL('search.html?worker='+encodeURIComponent(selectedWorker.id),location.href).href+' | صورة العاملة: '+(selectedWorker.photo_url||'غير متوفرة') : details,
       days: selectedDays,
       amount: selectedDays * 10,
-      status: 'pending'
+      status: 'pending',
+      placement: selectedWorker ? 'spotlight' : 'strip',
+      worker_id: selectedWorker?.id || null,
+      office_id: selectedOffice?.id || null,
+      worker_photo_url: selectedWorker?.photo_url || null
     });
 
     if(insertErr) throw insertErr;
