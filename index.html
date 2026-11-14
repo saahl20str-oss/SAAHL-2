@@ -706,7 +706,9 @@ function stripUnit(ad){
  const description=(ad.ad_details||'').replace(/https?:\/\/\S+/g,'').trim();
  if(description){const desc=document.createElement('span');desc.textContent='— '+description.slice(0,240);span.appendChild(desc)}
  const number=saahlWhatsAppNumber(ad.whatsapp)||saahlWhatsAppNumber(ad.phone);
- if(number){const contact=document.createElement('a');contact.href='https://wa.me/'+number+'?text='+encodeURIComponent('مرحباً، أتواصل بخصوص إعلانكم في ساهل 2: '+(ad.ad_topic||'الإعلان'));contact.target='_blank';contact.rel='noopener noreferrer';contact.textContent='تواصل مع المعلن: '+(ad.phone||ad.whatsapp);span.appendChild(contact)}
+ if(number){const contact=document.createElement('a');const ref='S2-'+String(ad.id||'').replace(/-/g,'').slice(0,8).toUpperCase();
+ const message=['السلام عليكم،','أرغب في الاستفسار عن الإعلان التالي المنشور في منصة ساهل 2:','','📌 عنوان الإعلان: '+(ad.ad_topic||'إعلان في ساهل 2'),'🏢 المعلن: '+(ad.advertiser_name||'غير محدد'),'🆔 رقم الإعلان: '+ref,'','📋 تفاصيل الإعلان:',ad.ad_details||'لم تُضف تفاصيل أخرى','','هل الإعلان ما زال متاحاً؟ أرجو تزويدي بالمزيد من المعلومات.'].join('\\n');
+ contact.href='https://wa.me/'+number+'?text='+encodeURIComponent(message);contact.target='_blank';contact.rel='noopener noreferrer';contact.textContent='تواصل مع المعلن: '+(ad.phone||ad.whatsapp);span.appendChild(contact)}
  return span;
 }
 function startStripMotion(){
@@ -732,7 +734,7 @@ async function loadAdStrip(){
  try{
   if(window.supabase){
    const client=window.supabase.createClient(STRIP_SUPABASE_URL,STRIP_ANON_KEY);
-   const {data,error}=await client.from('strip_ads').select('ad_topic,ad_details,advertiser_name,phone,whatsapp,placement,status,starts_at,expires_at,created_at').in('status',['approved','active']).order('created_at',{ascending:false}).limit(50);
+   const {data,error}=await client.from('strip_ads').select('id,ad_topic,ad_details,advertiser_name,phone,whatsapp,placement,status,starts_at,expires_at,created_at').in('status',['approved','active']).order('created_at',{ascending:false}).limit(50);
    if(error)throw error;
    const now=Date.now();
    ads=(data||[]).filter(ad=>ad.placement==='strip'&&Date.parse(ad.starts_at||ad.created_at)<=now&&Date.parse(ad.expires_at)>now);
