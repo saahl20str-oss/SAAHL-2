@@ -1,0 +1,17 @@
+<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>تفاصيل العاملة | ساهل 2</title><style>body{margin:0;background:#f8f6f1;font-family:Tahoma,Arial,sans-serif;color:#171717}header{background:white;padding:17px 24px;border-bottom:1px solid #ddd;display:flex;justify-content:space-between;align-items:center}a{color:inherit}main{max-width:720px;margin:35px auto;padding:0 16px}.card{background:white;border:1px solid #e7dfcd;border-radius:18px;padding:24px;box-shadow:0 8px 35px #00000008}h1{margin:10px 0;color:#9b792b}.photo{width:150px;height:190px;object-fit:contain;background:#151515;border-radius:12px}.row{display:flex;gap:12px;align-items:center;flex-wrap:wrap}.details{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin:20px 0}.details div{background:#f8f6f1;padding:12px;border-radius:10px}.details b{display:block;font-size:12px;color:#786b50;margin-bottom:6px}.btn{display:inline-block;background:#c9a84c;color:#111;text-decoration:none;padding:12px 20px;border-radius:9px;font-weight:bold}.muted{color:#666}</style></head><body><header><strong>ساهل 2 | تفاصيل العاملة</strong><a href="index.html">العودة للرئيسية</a></header><main><div class="card" id="view"><p>جاري تحميل بيانات العاملة...</p></div></main><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script><script>
+const esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+(async()=>{
+ const box=document.getElementById('view'),id=new URLSearchParams(location.search).get('ad');
+ if(!/^[0-9a-f-]{36}$/i.test(id||'')){box.textContent='رابط الإعلان غير صالح';return;}
+ try{
+ const db=supabase.createClient('https://hkfxikmpfgixrbrboxeb.supabase.co','sb_publishable_OcWY5nY_-b2odLqQxsu2Kw_iQ4YswBz');
+ const {data:a,error}=await db.from('strip_ads').select('*').eq('id',id).eq('placement','spotlight').in('status',['approved','active']).single();
+ if(error||!a||Date.parse(a.starts_at)>Date.now()||Date.parse(a.expires_at)<=Date.now()){box.textContent='الإعلان غير متاح أو انتهت مدته';return;}
+ const d=a.ad_details||'',field=n=>{const m=d.match(new RegExp('(?:^|\\|)\\s*'+n+':\\s*([^|]+)'));return m?m[1].trim():''};
+ const name=field('العاملة')||a.ad_topic.replace(/^عاملة متاحة:\s*/,'');
+ const photo=a.worker_photo_url||field('صورة العاملة'),phone=(a.phone||'').replace(/[^0-9+]/g,''),wa=(a.whatsapp||a.phone||'').replace(/[^0-9]/g,'');
+ const items=[['الاسم',name],['الرقم الوظيفي',field('الرقم')],['الجنسية',field('الجنسية')],['العمر',field('العمر')],['الخبرة',field('الخبرة')],['المكتب',field('المكتب')||a.advertiser_name],['الإمارة',field('الإمارة')]];
+ box.innerHTML='<div class="row">'+(/^https:\/\//.test(photo)?'<img class="photo" alt="صورة العاملة" src="'+esc(photo)+'">':'')+'<div><h1>'+esc(name)+'</h1><p class="muted">عاملة معلن عنها بواسطة مكتب استقدام في ساهل 2</p></div></div><div class="details">'+items.filter(x=>x[1]).map(x=>'<div><b>'+esc(x[0])+'</b>'+esc(x[1])+'</div>').join('')+'</div><h3>التواصل مع المكتب</h3><p>'+esc(a.advertiser_name||field('المكتب'))+'</p><div class="row">'+(phone?'<a class="btn" href="tel:'+encodeURIComponent(phone)+'">اتصال بالمكتب</a>':'')+(wa?'<a class="btn" target="_blank" rel="noopener noreferrer" href="https://wa.me/'+wa+'">واتساب المكتب</a>':'')+'</div>';
+ }catch(e){box.textContent='تعذر تحميل الإعلان، يرجى المحاولة لاحقاً';console.error(e)}
+})();
+</script></body></html>
