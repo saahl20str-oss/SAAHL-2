@@ -664,7 +664,8 @@ footer{
 </head>
 
 <body>
-<div id="ad-strip" style="position:relative;z-index:5;background:#16171c;color:#fff;text-align:center;padding:10px 14px;font-family:Tajawal,sans-serif;font-size:15px;border-bottom:1px solid #c9a84c"><span>✦ مساحة إعلانية في ساهل 2 — أعلن عن خدماتك ووصل إلى المهتمين</span> <a href="advertise.html" style="color:#e7c56a;font-weight:800;margin-inline:12px">أعلن هنا — 10 دراهم لليوم ←</a></div>
+<style>@keyframes saahlAdMove{from{transform:translateX(100vw)}to{transform:translateX(-110%)}}#ad-strip{overflow:hidden;white-space:nowrap}#ad-strip .saahl-ad-track{display:inline-block;animation:saahlAdMove 22s linear infinite;will-change:transform}#ad-strip:hover .saahl-ad-track{animation-play-state:paused}</style>
+<div id="ad-strip" style="position:relative;z-index:5;background:#16171c;color:#fff;text-align:center;padding:10px 14px;font-family:Tajawal,sans-serif;font-size:15px;border-bottom:1px solid #c9a84c"><span class="saahl-ad-track">✦ أعلن عن خدمات مكتبك وعاملاتك في ساهل 2 ✦ عرض عاملة أو نقل كفالة أو إعلان ترويجي ✦ <a href="advertise.html" style="color:#e7c56a;font-weight:800;margin-inline:12px">أعلن هنا — 10 دراهم لليوم ←</a></span></div>
 <script>
 const STRIP_SUPABASE_URL = 'https://hkfxikmpfgixrbrboxeb.supabase.co';
 const STRIP_ANON_KEY = 'sb_publishable_OcWY5nY_-b2odLqQxsu2Kw_iQ4YswBz';
@@ -693,7 +694,7 @@ async function loadAdStrip(){
   const ad=active[0],label=document.createElement('span'),link=document.createElement('a');
   label.textContent='✦ '+(ad.ad_topic||'إعلان مميز')+' — '+(ad.ad_details||'').slice(0,135)+' ';
   link.href='advertise.html';link.textContent='أعلن هنا — 10 دراهم لليوم';link.style.cssText='color:#e7c56a;font-weight:800;margin-inline:12px';
-  bar.replaceChildren(label,link);
+  const track=document.createElement('span');track.className='saahl-ad-track';track.append(label,link);bar.replaceChildren(track);
  }catch(e){console.warn('Ad strip unavailable:',e.message);}
 }
 // حركة دقيقة بالبكسل: تبدأ خارج الشاشة تماماً من جهة، وتنتهي خارجها تماماً من الجهة الأخرى، بدون أي تخمين نِسَبي
