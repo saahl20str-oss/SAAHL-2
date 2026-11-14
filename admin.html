@@ -359,24 +359,42 @@ async function loadBk(){const {data}=await db.from('bookings').select('*').order
 async function loadPy(){const {data}=await db.from('payments').select('*').order('created_at',{ascending:false});aPy=data||[];let o=0,b=0,k=0;aPy.forEach(p=>{if(p.type==='subscription')o+=p.amount||0;else if(p.type==='booking')b+=p.amount||0;else if(p.type==='kafala_ad')k+=p.amount||0;});document.getElementById('py-off').textContent=o.toLocaleString()+' AED';document.getElementById('py-bk').textContent=b.toLocaleString()+' AED';document.getElementById('py-kf').textContent=k.toLocaleString()+' AED';const w=document.getElementById('py-wrap');if(!aPy.length){w.innerHTML=eh('لا توجد مدفوعات');return;}const tl={subscription:'اشتراك شهري',booking:'عمولة حجز',kafala_ad:'إعلان كفالة',strip_ad:'إعلان شريط'};w.innerHTML=`<div class="tw"><table><thead><tr><th>المستخدم</th><th>النوع</th><th>المبلغ</th><th>التاريخ</th><th>الحالة</th></tr></thead><tbody>${aPy.map(p=>`<tr><td>${p.user_name||'—'}</td><td>${tl[p.type]||p.type||'—'}</td><td style="font-weight:600;color:var(--teal)">${(p.amount||0).toLocaleString()} AED</td><td>${fd(p.created_at)}</td><td><span class="bge ${p.status==='paid'?'active':'expired'}">${p.status==='paid'?'مكتمل':'فشل'}</span></td></tr>`).join('')}</tbody></table></div>`;}
 async function loadKf(){const {data}=await db.from('kafala_ads').select('*').order('created_at',{ascending:false});aKf=data||[];const w=document.getElementById('kf-wrap');if(!aKf.length){w.innerHTML=eh('لا توجد إعلانات نقل كفالة');return;}w.innerHTML=`<div class="tw"><table><thead><tr><th>العاملة</th><th>الإمارة</th><th>الجنسية</th><th>الأيام</th><th>ينتهي</th><th>المبلغ</th><th>الحالة</th><th>إجراء</th></tr></thead><tbody>${aKf.map(k=>{const d=k.ad_days||1;const a=!!k.is_active;return`<tr><td>${k.worker_name||'—'}</td><td>${k.emirate||'—'}</td><td>${k.nationality||'—'}</td><td>${d} يوم</td><td>${fd(k.ends_at)}</td><td style="font-weight:600;color:var(--teal)">${k.ad_price||d*30} AED</td><td><span class="bge ${a?'active':'expired'}">${a?'نشط':'منتهي'}</span></td><td><button class="btn ${a?'btn-d':'btn-o'} btn-s" onclick="togKf('${k.id}',${a})">${a?'إيقاف':'تجديد'}</button></td></tr>`;}).join('')}</tbody></table></div>`;}
 async function togKf(id,isActive){await db.from('kafala_ads').update({is_active:!isActive}).eq('id',id);toast(!isActive?'تم تفعيل الإعلان ✓':'تم إيقاف الإعلان');loadKf();}
-async function loadAds(){const {data}=await db.from('strip_ads').select('*').order('created_at',{ascending:false});aAds=data||[];const act=aAds.filter(a=>a.status==='active');const pend=aAds.filter(a=>a.status==='pending');const rev=aAds.reduce((s,a)=>s+(a.amount||0),0);document.getElementById('ads-cnt').textContent=act.length+' إعلان نشط';document.getElementById('ads-rev').textContent=rev.toLocaleString()+' AED';updateAdsBadge(pend.length);const w=document.getElementById('ads-wrap');if(!aAds.length){w.innerHTML=eh('لا توجد إعلانات بعد');return;}w.innerHTML=aAds.map(a=>`<div class="ac"><div class="ai"><strong>${a.ad_topic||'—'}</strong><span>${a.advertiser_name||'—'} • ${a.days||1} يوم • ${a.amount||0} AED</span><span style="display:block;margin-top:3px">📞 ${a.phone||'—'}${a.whatsapp?' • واتساب: '+a.whatsapp:''}</span><span style="display:block;margin-top:3px" class="lg">ينتهي: ${fd(a.expires_at)}</span></div><div style="display:flex;gap:6px;flex-shrink:0"><span class="bge ${a.status==='active'?'active':a.status==='pending'?'pending':'expired'}">${a.status==='active'?'نشط':a.status==='pending'?'انتظار':'منتهي'}</span>${a.status==='pending'?`<button class="btn btn-p btn-s" onclick="appAd('${a.id}')">موافقة</button>`:''}<button class="btn btn-d btn-s" onclick="delAd('${a.id}')">حذف</button></div></div>`).join('');}
+async function loadAds(){
+ const w=document.getElementById('ads-wrap');
+ const {data,error}=await db.from('strip_ads').select('*').order('created_at',{ascending:false});
+ if(error){w.textContent='تعذر تحميل طلبات الإعلانات: '+error.message;updateAdsBadge(0);return;}
+ aAds=data||[];
+ const pending=aAds.filter(a=>a.status==='pending');
+ const active=aAds.filter(a=>['active','approved'].includes(a.status)&&Date.parse(a.expires_at||0)>Date.now());
+ document.getElementById('ads-cnt').textContent=active.length+' إعلان نشط';
+ document.getElementById('ads-rev').textContent='0 AED';
+ updateAdsBadge(pending.length);
+ if(!aAds.length){w.textContent='لا توجد طلبات إعلانات مسجلة';return;}
+ w.replaceChildren();
+ for(const a of aAds){
+  const card=document.createElement('div');card.className='ac';
+  const info=document.createElement('div');info.className='ai';
+  const title=document.createElement('strong');title.textContent=a.ad_topic||'إعلان';
+  const meta=document.createElement('span');meta.textContent=(a.advertiser_name||'—')+' • '+(a.days||1)+' يوم • '+(a.amount||0)+' AED';
+  const details=document.createElement('span');details.style.display='block';details.textContent=(a.ad_details||'')+' | هاتف: '+(a.phone||'—');
+  info.append(title,meta,details);
+  const controls=document.createElement('div');controls.style.cssText='display:flex;gap:6px;align-items:center;flex-wrap:wrap';
+  const state=document.createElement('span');state.className='bge '+(a.status==='pending'?'pending':'active');state.textContent=a.status==='pending'?'بانتظار المراجعة':(['active','approved'].includes(a.status)?'معتمد':a.status);
+  controls.append(state);
+  if(a.status==='pending'){const approve=document.createElement('button');approve.className='btn btn-p btn-s';approve.textContent='موافقة ونشر';approve.onclick=()=>appAd(a.id);controls.append(approve);}
+  const del=document.createElement('button');del.className='btn btn-d btn-s';del.textContent='حذف';del.onclick=()=>delAd(a.id);controls.append(del);
+  card.append(info,controls);w.append(card);
+ }
+}
 function updateAdsBadge(n){const b=document.getElementById('ads-badge');if(!b)return;if(n>0){b.textContent=n>99?'99+':n;b.style.display='flex';}else{b.style.display='none';}}
 async function appAd(id){
-  const a=aAds.find(x=>x.id===id);
-  if(!a)return;
-  // لو فيه مبلغ مجمّد (payment_intent_id)، لازم نحصّله فعلياً قبل التفعيل
-  if(a.payment_intent_id){
-    toast('جاري تحصيل المبلغ من Stripe...');
-    try{
-      const {data:{session}}=await db.auth.getSession();
-      const r=await fetch(`${SU}/functions/v1/stripe-ad-payment`,{method:'POST',headers:{'Content-Type':'application/json',apikey:SK,Authorization:'Bearer '+(session?.access_token||SK)},body:JSON.stringify({action:'capture',payment_intent_id:a.payment_intent_id})});
-      const d=await r.json();
-      if(!r.ok||d.error){toast('فشل التحصيل: '+(d.error||'خطأ غير معروف'));return;}
-    }catch(e){toast('تعذّر الاتصال بخدمة الدفع');return;}
-  }
-  await db.from('strip_ads').update({status:'active',starts_at:new Date().toISOString(),expires_at:new Date(Date.now()+(a.days||1)*86400000).toISOString()}).eq('id',id);
-  toast('تم تحصيل المبلغ وتفعيل الإعلان ✓');
-  loadAds();
+ const a=aAds.find(x=>x.id===id);if(!a||a.status!=='pending')return;
+ if(!confirm('اعتماد الإعلان ونشره لمدة '+(a.days||1)+' يوم دون تحصيل مالي أثناء التجربة؟'))return;
+ if(a.payment_intent_id){toast('هذا الإعلان مرتبط بدفعة سابقة؛ يلزم مراجعتها قبل الاعتماد');return;}
+ const now=new Date(),expiry=new Date(now.getTime()+(Number(a.days)||1)*86400000);
+ const {error}=await db.from('strip_ads').update({status:'approved',starts_at:now.toISOString(),expires_at:expiry.toISOString()}).eq('id',id).eq('status','pending');
+ if(error){toast('تعذر اعتماد الإعلان: '+error.message);return;}
+ toast('تم اعتماد الإعلان دون تحصيل مالي ✓');await loadAds();
 }
 async function delAd(id){
   if(!confirm('حذف الإعلان؟'))return;
