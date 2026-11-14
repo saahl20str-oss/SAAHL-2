@@ -707,7 +707,21 @@ function stripUnit(ad){
  if(description){const desc=document.createElement('span');desc.textContent='— '+description.slice(0,240);span.appendChild(desc)}
  const number=saahlWhatsAppNumber(ad.whatsapp)||saahlWhatsAppNumber(ad.phone);
  if(number){const contact=document.createElement('a');const ref='S2-'+String(ad.id||'').replace(/-/g,'').slice(0,8).toUpperCase();
- const message=['السلام عليكم،','أرغب في الاستفسار عن الإعلان التالي المنشور في منصة ساهل 2:','','📌 عنوان الإعلان: '+(ad.ad_topic||'إعلان في ساهل 2'),'🏢 المعلن: '+(ad.advertiser_name||'غير محدد'),'🆔 رقم الإعلان: '+ref,'','📋 تفاصيل الإعلان:',ad.ad_details||'لم تُضف تفاصيل أخرى','','هل الإعلان ما زال متاحاً؟ أرجو تزويدي بالمزيد من المعلومات.'].join('\\n');
+ const details=String(ad.ad_details||'').trim();
+ const message=[
+  'السلام عليكم،',
+  '',
+  'أرغب في الاستفسار عن إعلان منشور في ساهل 2.',
+  '',
+  'الإعلان: '+(ad.ad_topic||'إعلان'),
+  'المعلن: '+(ad.advertiser_name||'غير محدد'),
+  'رقم الإعلان: '+ref,
+  '',
+  'تفاصيل الإعلان:',
+  details||'لا توجد تفاصيل إضافية',
+  '',
+  'هل الإعلان متاح؟ وشكراً لكم.'
+ ].join('\n');
  contact.href='https://wa.me/'+number+'?text='+encodeURIComponent(message);contact.target='_blank';contact.rel='noopener noreferrer';contact.textContent='تواصل مع المعلن: '+(ad.phone||ad.whatsapp);span.appendChild(contact)}
  return span;
 }
