@@ -678,6 +678,7 @@ body{padding-top:43px}
 <a class="saahl-ad-cta" href="advertise.html">أعلن هنا • 10 دراهم/يوم</a>
 <div class="saahl-ad-viewport"><span class="saahl-ad-track" id="saahl-ad-text">✦ مساحة إعلانية في ساهل 2 ✦ أعلن عن خدمات مكتبك وعاملاتك ✦ نقل كفالة وإعلانات ترويجية ✦</span></div>
 </div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js" defer></script>
 <script>
 const STRIP_SUPABASE_URL = 'https://hkfxikmpfgixrbrboxeb.supabase.co';
 const STRIP_ANON_KEY = 'sb_publishable_OcWY5nY_-b2odLqQxsu2Kw_iQ4YswBz';
@@ -747,7 +748,7 @@ function adjustLayoutForStrip(){
   positionSpotlight();
 }
 window.addEventListener('resize', adjustLayoutForStrip);
-loadAdStrip();
+window.addEventListener('load',()=>{loadAdStrip();adjustLayoutForStrip();});
 
 // ===== نافذة "أعلن هنا" — نشر إعلان بالشريط العلوي (مكتب/فرد/كفالة) =====
 function openAdvertiseModal(){ location.href='advertise.html'; return;
@@ -1134,7 +1135,7 @@ function expandSpotlight(skipSave){
   }
 }
 
-loadSpotlight();
+window.addEventListener('load',loadSpotlight);
 </script>
 
 <!-- MOBILE NAV -->
