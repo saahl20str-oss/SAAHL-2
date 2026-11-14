@@ -667,9 +667,9 @@ footer{
 <style>
 #ad-strip{position:fixed!important;top:68px!important;left:0;right:0;z-index:490!important;min-height:43px;display:flex!important;align-items:center;gap:16px;overflow:hidden;box-sizing:border-box;direction:rtl}
 #ad-strip .saahl-ad-cta{flex-shrink:0;background:#c9a84c;color:#16171c!important;text-decoration:none;font-weight:900;border-radius:6px;padding:5px 12px;font-size:13px;position:relative;z-index:2}
-#ad-strip .saahl-ad-viewport{flex:1;overflow:hidden;min-width:0}
-#ad-strip .saahl-ad-track{display:inline-block;white-space:nowrap;animation:saahlAdMove 22s linear infinite;color:#fff}
-@keyframes saahlAdMove{from{transform:translateX(0)}to{transform:translateX(100%)}}
+#ad-strip .saahl-ad-viewport{flex:1;overflow:hidden;min-width:0;direction:ltr;position:relative}
+#ad-strip .saahl-ad-track{display:inline-flex;align-items:center;white-space:nowrap;width:max-content;gap:18px;color:#fff;will-change:transform;direction:rtl}
+#ad-strip .saahl-ad-track a{color:#e5c36a;text-decoration:underline;text-underline-offset:3px;font-weight:800}#ad-strip .saahl-logo-separator{display:inline-flex;align-items:center;gap:5px;flex-shrink:0}#ad-strip .saahl-logo-separator img{width:17px;height:19px;object-fit:contain}#ad-strip .saahl-ad-unit{display:inline-flex;align-items:center;gap:8px;direction:rtl;flex-shrink:0}
 #ad-strip:hover .saahl-ad-track{animation-play-state:paused}
 body{padding-top:43px}
 @media(prefers-reduced-motion:reduce){#ad-strip .saahl-ad-track{animation:none}}
@@ -691,52 +691,59 @@ function escapeAdHtml(s){
   return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 }
 
+// إعلانات الشريط مستقلة عن إعلانات نافذة الأضواء
+function stripSeparator(){
+ const span=document.createElement('span');span.className='saahl-logo-separator';
+ for(let i=0;i<3;i++){const img=document.createElement('img');img.src='saahl-logo.png';img.alt='ساهل';span.appendChild(img)}
+ return span;
+}
+function stripUnit(ad){
+ const span=document.createElement('span');span.className='saahl-ad-unit';
+ const title=document.createElement('strong');title.textContent=ad.ad_topic||'إعلان في ساهل 2';span.appendChild(title);
+ if(ad.advertiser_name){const office=document.createElement('span');office.textContent='— '+ad.advertiser_name;span.appendChild(office)}
+ const description=(ad.ad_details||'').replace(/https?:\/\/\S+/g,'').trim();
+ if(description){const desc=document.createElement('span');desc.textContent='— '+description.slice(0,240);span.appendChild(desc)}
+ const number=(ad.whatsapp||ad.phone||'').replace(/[^0-9]/g,'');
+ if(number){const contact=document.createElement('a');contact.href='https://wa.me/'+number;contact.target='_blank';contact.rel='noopener noreferrer';contact.textContent='تواصل مع المعلن: '+(ad.phone||ad.whatsapp);span.appendChild(contact)}
+ return span;
+}
+function startStripMotion(){
+ const viewport=document.querySelector('#ad-strip .saahl-ad-viewport');
+ const track=document.getElementById('saahl-ad-text');
+ if(!viewport||!track)return;
+ const w=viewport.clientWidth,contentW=track.scrollWidth;
+ if(!w||!contentW)return;
+ // من أقصى يمين المساحة الإعلانية إلى أقصى يسارها؛ 160 بكسل/ثانية
+ const duration=(w+contentW)/160;
+ track.style.animation='none';
+ track.style.transform='translateX('+w+'px)';
+ let style=document.getElementById('saahl-strip-motion');
+ if(!style){style=document.createElement('style');style.id='saahl-strip-motion';document.head.appendChild(style)}
+ style.textContent='@keyframes saahlStripTravel{from{transform:translateX('+w+'px)}to{transform:translateX(-'+contentW+'px)}}';
+ void track.offsetWidth;
+ if(!window.matchMedia('(prefers-reduced-motion: reduce)').matches)track.style.animation='saahlStripTravel '+duration+'s linear infinite';
+}
 async function loadAdStrip(){
  const el=document.getElementById('saahl-ad-text');
- if(!el||!window.supabase)return;
+ if(!el)return;
+ let ads=[];
  try{
-  const client=window.supabase.createClient(STRIP_SUPABASE_URL,STRIP_ANON_KEY);
-  const {data,error}=await client.from('strip_ads').select('ad_topic,ad_details,placement,status,starts_at,expires_at,created_at,days').in('status',['approved','active']).order('created_at',{ascending:false}).limit(30);
-  if(error)throw error;
-  const now=Date.now();
-  const live=(data||[]).filter(ad=>{const start=Date.parse(ad.starts_at||ad.created_at||'');const end=Date.parse(ad.expires_at||'');return Number.isFinite(start)&&start<=now&&Number.isFinite(end)&&end>now;});
-  const strip=live.filter(ad=>ad.placement==='strip');
-  if(strip.length){
-   el.textContent=strip.slice(0,5).map(ad=>'✦ '+(ad.ad_topic||'إعلان')+' — '+(ad.ad_details||'').slice(0,100)).join('     ');
-  }else if(live.some(ad=>ad.placement==='spotlight')){
-   const featured=[...new Set(live.filter(ad=>ad.placement==='spotlight').map(ad=>ad.ad_topic))];
-   el.textContent='✦ عاملات مميزات في نافذة الأضواء: '+featured.join(' • ')+' ✦ شاهد التفاصيل في نافذة الأضواء ✦ أعلن عن خدماتك في ساهل 2';
+  if(window.supabase){
+   const client=window.supabase.createClient(STRIP_SUPABASE_URL,STRIP_ANON_KEY);
+   const {data,error}=await client.from('strip_ads').select('ad_topic,ad_details,advertiser_name,phone,whatsapp,placement,status,starts_at,expires_at,created_at').in('status',['approved','active']).order('created_at',{ascending:false}).limit(50);
+   if(error)throw error;
+   const now=Date.now();
+   ads=(data||[]).filter(ad=>ad.placement==='strip'&&Date.parse(ad.starts_at||ad.created_at)<=now&&Date.parse(ad.expires_at)>now);
   }
- }catch(e){console.warn('Ad strip unavailable:',e.message);}
+ }catch(e){console.warn('Ad strip unavailable:',e)}
+ el.replaceChildren();
+ if(!ads.length)ads=[{ad_topic:'أعلن عن خدمات مكتبك أو نقل كفالة أو عاملة متاحة في ساهل 2',advertiser_name:'مساحتك الإعلانية',ad_details:'10 دراهم لليوم'}];
+ ads.forEach((ad,i)=>{if(i)el.appendChild(stripSeparator());el.appendChild(stripUnit(ad))});
+ // تكرار الدورة بسلاسة مع فاصل شعار ساهل بين نهاية وآخر إعلان وبداية الأول
+ el.appendChild(stripSeparator());
+ requestAnimationFrame(startStripMotion);
 }
-// حركة دقيقة بالبكسل: تبدأ خارج الشاشة تماماً من جهة، وتنتهي خارجها تماماً من الجهة الأخرى، بدون أي تخمين نِسَبي
-function runMarquee(){
-  const container = document.getElementById('ad-strip');
-  const track = document.getElementById('ad-strip-track');
-  if(!container || !track) return;
-
-  const containerW = container.offsetWidth;
-  const textW = track.scrollWidth;
-  const distance = containerW + textW; // المسافة الكاملة من دخول النص لخروجه بالكامل
-  const speedPxPerSec = 90;
-  const duration = Math.max(6, distance / speedPxPerSec);
-
-  // إزالة أي keyframes سابقة بنفس الاسم لتفادي التراكم عند إعادة التحميل
-  const oldStyle = document.getElementById('marquee-keyframes');
-  if(oldStyle) oldStyle.remove();
-
-  const styleTag = document.createElement('style');
-  styleTag.id = 'marquee-keyframes';
-  styleTag.textContent = `
-    @keyframes adMarquee {
-      from { transform: translateX(${containerW}px); }
-      to   { transform: translateX(${-textW}px); }
-    }`;
-  document.head.appendChild(styleTag);
-  track.style.animation = `adMarquee ${duration}s linear infinite`;
-}
-window.addEventListener('resize', () => { if(document.getElementById('ad-strip-track')) runMarquee(); });
-
+window.addEventListener('resize',()=>requestAnimationFrame(startStripMotion));
 // يدفع الناف بار والقسم الرئيسي لأسفل بمقدار ارتفاع الشريط الفعلي، لمنع التداخل بينهما
 function adjustLayoutForStrip(){
   const strip = document.getElementById('ad-strip');
