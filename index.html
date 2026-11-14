@@ -738,7 +738,7 @@ window.addEventListener('resize', adjustLayoutForStrip);
 loadAdStrip();
 
 // ===== نافذة "أعلن هنا" — نشر إعلان بالشريط العلوي (مكتب/فرد/كفالة) =====
-function openAdvertiseModal(){
+function openAdvertiseModal(){ location.href='advertise.html'; return;
   if(document.getElementById('advertiseModalOverlay')) { document.getElementById('advertiseModalOverlay').style.display='flex'; return; }
   const overlay = document.createElement('div');
   overlay.id = 'advertiseModalOverlay';
