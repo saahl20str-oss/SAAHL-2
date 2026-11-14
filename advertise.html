@@ -224,7 +224,7 @@ body{font-family:'Tajawal',Arial,sans-serif;background:var(--bg);color:var(--tex
     <div class="step-line" id="line1"></div>
     <div class="step" id="step2-ind">
       <div class="step-num">2</div>
-      <span>المدة والدفع</span>
+      <span>المدة والمراجعة</span>
     </div>
     <div class="step-line" id="line2"></div>
     <div class="step" id="step3-ind">
@@ -238,7 +238,7 @@ body{font-family:'Tajawal',Arial,sans-serif;background:var(--bg);color:var(--tex
 
     <!-- بيانات المعلن -->
     <div class="card">
-      <div class="card-title"><span>👤</span> بيانات المعلن</div>
+      <div class="card-title"><span>👤</span> بيانات المعلن</div><div id="worker-source" style="display:none;padding:15px;margin:12px 0;border:1px solid #d7b86c;border-radius:12px;background:#fff9eb"></div>
       <div class="form-row">
         <div class="form-group">
           <label>اسم المعلن <span class="required">*</span></label>
@@ -320,14 +320,14 @@ body{font-family:'Tajawal',Arial,sans-serif;background:var(--bg);color:var(--tex
       </div>
 
       <div class="note">
-        ⚠️ سيظهر إعلانك بعد التحقق من الدفع واعتماد الإعلان — مرئي لجميع زوار المنصة.
+        الوضع التجريبي: لا يتم تحصيل أي مبلغ الآن. يُحفظ الطلب بانتظار مراجعة الإدارة، ولا يُنشر تلقائياً.
       </div>
 
       <div class="err-msg" id="err-msg"></div>
 
       <button class="pay-btn" id="pay-btn" onclick="submitAd()">
         <div class="spinner"></div>
-        <span class="btn-text">💳 ادفع وأطلق الإعلان</span>
+        <span class="btn-text">إرسال طلب الإعلان للمراجعة — دون دفع تجريبي</span>
       </button>
     </div>
 
@@ -337,7 +337,7 @@ body{font-family:'Tajawal',Arial,sans-serif;background:var(--bg);color:var(--tex
   <div id="success-screen">
     <div class="success-icon">🎉</div>
     <h2>تم استلام إعلانك!</h2>
-    <p>سيظهر إعلانك في الشريط العلوي فور تأكيد الدفع من Stripe.<br>شكراً لثقتك في ساهل 2.</p>
+    <p>تم إرسال طلبك للمراجعة. لن يظهر الإعلان قبل اعتماد الإدارة، ولن يتم تحصيل مبلغ خلال التجربة.<br>شكراً لثقتك في ساهل 2.</p>
     <a href="index.html" class="home-btn">العودة للرئيسية</a>
   </div>
 
@@ -353,7 +353,8 @@ const { createClient } = supabase;
 const db = createClient(SUPA_URL, SUPA_KEY);
 // Payment checkout is initiated by the server; do not instantiate Stripe until configured.
 
-let selectedDays = 3;
+let selectedDays = 1;
+let selectedWorker=null,selectedOffice=null;
 
 function selectDays(days, el){
   selectedDays = days;
@@ -366,6 +367,8 @@ function selectDays(days, el){
 // Check for success redirect from Stripe
 window.addEventListener('DOMContentLoaded', async ()=>{
   const params = new URLSearchParams(window.location.search);
+  const workerId=params.get('worker'), officeId=params.get('office');
+  if(workerId&&officeId){try{const [wr,of]=await Promise.all([db.from('workers').select('id,office_id,display_name,worker_number,nationality,age,experience_years,photo_url,status').eq('id',workerId).eq('office_id',officeId).single(),db.from('offices').select('id,name,phone,whatsapp,emirate,status').eq('id',officeId).single()]);if(wr.error||of.error||!wr.data||!of.data)throw new Error('تعذر قراءة بيانات العاملة أو المكتب');selectedWorker=wr.data;selectedOffice=of.data;document.getElementById('f-name').value=of.data.name||'';document.getElementById('f-type').value='office';document.getElementById('f-phone').value=of.data.phone||'';document.getElementById('f-whatsapp').value=of.data.whatsapp||of.data.phone||'';document.getElementById('f-topic').value='عاملة متاحة: '+(wr.data.display_name||wr.data.worker_number||'');document.getElementById('f-details').value='المكتب: '+of.data.name+' | الإمارة: '+(of.data.emirate||'غير محددة')+' | العاملة: '+(wr.data.display_name||'')+' | الرقم: '+(wr.data.worker_number||'')+' | الجنسية: '+(wr.data.nationality||'')+' | العمر: '+(wr.data.age||'')+' | الخبرة: '+(wr.data.experience_years||0)+' سنوات';const box=document.getElementById('worker-source');box.style.display='flex';box.style.alignItems='center';box.style.gap='16px';box.replaceChildren();if(wr.data.photo_url&&/^https:\/\//.test(wr.data.photo_url)){const im=document.createElement('img');im.src=wr.data.photo_url;im.alt='صورة العاملة';im.style.cssText='width:90px;height:90px;object-fit:cover;border-radius:10px';box.append(im)}const label=document.createElement('div');label.textContent='إعلان عاملة من مكتب '+of.data.name+' — '+(wr.data.display_name||wr.data.worker_number)+' (رقم '+(wr.data.worker_number||'—')+')';box.append(label)}catch(e){document.getElementById('err-msg').textContent='تعذر تحميل العاملة المختارة: '+e.message}}
   const sessionId = params.get('session_id');
   if(sessionId){
     await activateAd(sessionId);
@@ -389,6 +392,7 @@ async function submitAd(){
   if(!topic){ errEl.textContent='أدخل عنوان الإعلان'; return; }
   if(!details){ errEl.textContent='أدخل تفاصيل الإعلان'; return; }
 
+  if(selectedWorker&&selectedOffice){const {data:auth}=await db.auth.getUser();if(!auth?.user){errEl.textContent='يجب تسجيل الدخول إلى حساب المكتب قبل إرسال العاملة للأضواء.';return}const {data:owned,error:ownErr}=await db.from('offices').select('id').eq('id',selectedOffice.id).eq('owner_id',auth.user.id).single();if(ownErr||!owned){errEl.textContent='لا يمكنك إرسال عاملة تابعة لمكتب آخر.';return}}
   const btn = document.getElementById('pay-btn');
   btn.classList.add('loading');
   btn.disabled = true;
@@ -401,7 +405,7 @@ async function submitAd(){
       phone,
       whatsapp,
       ad_topic: topic,
-      ad_details: details,
+      ad_details: selectedWorker ? details+' | رابط العاملة: '+new URL('search.html?worker='+encodeURIComponent(selectedWorker.id),location.href).href+' | صورة العاملة: '+(selectedWorker.photo_url||'غير متوفرة') : details,
       days: selectedDays,
       amount: selectedDays * 10,
       status: 'pending'
@@ -409,30 +413,13 @@ async function submitAd(){
 
     if(insertErr) throw insertErr;
 
-    // Create Stripe Checkout session via Supabase Edge Function
-    const res = await fetch(`${SUPA_URL}/functions/v1/create-ad-checkout`, {
-      method:'POST',
-      headers:{
-        'Content-Type':'application/json',
-        'Authorization':`Bearer ${SUPA_KEY}`
-      },
-      body: JSON.stringify({
-        ad_id: ad.id,
-        days: selectedDays,
-        price_id: PRICE_ID,
-        quantity: selectedDays,
-        success_url: new URL('advertise.html?session_id={CHECKOUT_SESSION_ID}',window.location.href).href,
-        cancel_url: window.location.href
-      })
-    });
-
-    const {url, error:fnErr} = await res.json();
-    if(fnErr) throw new Error(fnErr);
-
-    if(!url || !/^https:\/\/checkout\.stripe\.com\//.test(url))throw new Error('Stripe checkout unavailable');window.location.href = url;
+    // Trial mode: no payment and no automatic publication. Admin approval required.
+    document.getElementById('form-screen').style.display='none';
+    document.getElementById('success-screen').style.display='block';
+    document.getElementById('step3-ind').classList.add('active');
 
   } catch(e) {
-    errEl.textContent = 'الدفع غير متاح حالياً حتى يكتمل الربط الآمن مع Stripe. لم يتم تحصيل أي مبلغ من هذه الصفحة.';
+    errEl.textContent = 'تعذر حفظ الطلب للمراجعة: '+(e.message||String(e))+' — لم يتم تحصيل أي مبلغ.';
     btn.classList.remove('loading');
     btn.disabled = false;
   }
