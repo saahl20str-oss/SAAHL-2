@@ -664,7 +664,7 @@ footer{
 </head>
 
 <body>
-<style>@keyframes saahlAdMove{from{transform:translateX(100vw)}to{transform:translateX(-110%)}}#ad-strip{overflow:hidden;white-space:nowrap}#ad-strip .saahl-ad-track{display:inline-block;animation:saahlAdMove 22s linear infinite;will-change:transform}#ad-strip:hover .saahl-ad-track{animation-play-state:paused}</style>
+<style>@keyframes saahlAdMove{from{transform:translateX(100vw)}to{transform:translateX(-110%)}}#ad-strip{position:fixed!important;top:68px!important;left:0;right:0;z-index:490!important;overflow:hidden;white-space:nowrap;min-height:40px;display:flex;align-items:center}body{padding-top:40px}#ad-strip .saahl-ad-track{display:inline-block;animation:saahlAdMove 22s linear infinite;will-change:transform}#ad-strip:hover .saahl-ad-track{animation-play-state:paused}</style>
 <div id="ad-strip" style="position:relative;z-index:5;background:#16171c;color:#fff;text-align:center;padding:10px 14px;font-family:Tajawal,sans-serif;font-size:15px;border-bottom:1px solid #c9a84c"><span class="saahl-ad-track">✦ أعلن عن خدمات مكتبك وعاملاتك في ساهل 2 ✦ عرض عاملة أو نقل كفالة أو إعلان ترويجي ✦ <a href="advertise.html" style="color:#e7c56a;font-weight:800;margin-inline:12px">أعلن هنا — 10 دراهم لليوم ←</a></span></div>
 <script>
 const STRIP_SUPABASE_URL = 'https://hkfxikmpfgixrbrboxeb.supabase.co';
@@ -732,7 +732,7 @@ function adjustLayoutForStrip(){
   const hero = document.querySelector('.hero');
   const stripH = (strip && strip.style.display !== 'none') ? strip.offsetHeight : 0;
   if(nav) nav.style.top = '0px';
-  if(hero) hero.style.paddingTop = '120px';
+  if(hero) hero.style.paddingTop = '160px';
   positionSpotlight();
 }
 window.addEventListener('resize', adjustLayoutForStrip);
