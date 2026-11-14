@@ -76,7 +76,7 @@ $('saveOffice').onclick=async()=>{if(!v('name')||!v('license')||!v('phone'))retu
 function openEditor(){if(!office)return;show('officeSettings',false);show('officeHome',false);show('workerEditor',true);$('workerEditor').scrollIntoView({behavior:'smooth',block:'start'})}
 function closeEditor(){show('workerEditor',false);show('officeHome',true);$('officeHome').scrollIntoView({behavior:'smooth',block:'start'})}
 $('newWorker').onclick=()=>{resetWorkerForm();openEditor()};$('cancelWorker').onclick=closeEditor;$('cancelWorker2').onclick=closeEditor;
-function resetWorkerForm(){editingWorkerId=null;updatePhotoPreview();$('editorTitle').textContent='إضافة عاملة جديدة';for(const f of ['workerName','workerNumber','religion','nationality','age','salary','photo','description','workerPhotoFile'])$(f).value='';$('experienceRows').innerHTML='';addExperienceRow();updateExperience()}
+function resetWorkerForm(){editingWorkerId=null;$('editorTitle').textContent='إضافة عاملة جديدة';for(const f of ['workerName','workerNumber','religion','nationality','age','salary','photo','description','workerPhotoFile'])$(f).value='';$('experienceRows').innerHTML='';addExperienceRow();updateExperience();updatePhotoPreview()}
 function updateExperience(){let total=0;document.querySelectorAll('.exp-row').forEach(row=>{total+=Math.max(0,Number(row.querySelector('.exp-years').value)||0)});$('experienceTotal').textContent='إجمالي الخبرة: '+total+' سنة'}
 function addExperienceRow(){const row=document.createElement('div');row.className='exp-row';const select=document.createElement('select');select.className='exp-country';for(const c of countries){let o=document.createElement('option');o.value=c;o.textContent=c;select.appendChild(o)}const years=document.createElement('input');years.type='number';years.min='1';years.max='60';years.placeholder='عدد السنوات';years.className='exp-years';years.oninput=updateExperience;const remove=document.createElement('button');remove.type='button';remove.className='secondary';remove.textContent='حذف';remove.onclick=()=>{row.remove();updateExperience()};row.append(select,years,remove);$('experienceRows').appendChild(row)}
 $('addExperience').onclick=addExperienceRow;addExperienceRow();
@@ -90,7 +90,7 @@ function updatePhotoPreview(){
   if(box.dataset.url){URL.revokeObjectURL(box.dataset.url);delete box.dataset.url}
   box.replaceChildren();
   if(file){
-    if(!['image/jpeg','image/png','image/webp'].includes(file.type)){box.textContent='نوع الصورة غير مدعوم. استخدم JPG أو PNG أو WebP';return}
+    if(!['image/jpeg','image/png','image/webp'].includes(file.type)){box.textContent='نوع الصورة غير مدعوم. استخدم JPG أو PNG أو WebP';$('saveWorkerPhoto').disabled=true;return}
     const url=URL.createObjectURL(file);box.dataset.url=url;
     const img=document.createElement('img');img.src=url;img.alt='معاينة صورة العاملة قبل الحفظ';box.append(img);
     const hint=document.createElement('small');hint.textContent='الصورة المختارة: '+file.name+' ('+(file.size/1024/1024).toFixed(1)+' ميجابايت)';box.append(hint);
