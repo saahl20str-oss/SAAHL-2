@@ -409,7 +409,7 @@ async function submitAd(){
       days: selectedDays,
       amount: selectedDays * 10,
       status: 'pending'
-    }).select().single();
+    });
 
     if(insertErr) throw insertErr;
 
