@@ -677,7 +677,31 @@ function escapeAdHtml(s){
   return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 }
 
-async function loadAdStrip(){ /* الإعلان الافتراضي ظاهر دائماً؛ لا تعرض إعلاناً مدفوعاً إلا بعد التحقق من الدفع على الخادم */ }
+async function loadAdStrip(){
+  // Only explicitly admin-approved ads; expiry is enforced client-side for display.
+  const bar=document.getElementById('ad-strip');
+  if(!bar||!window.supabase)return;
+  try{
+    const client=window.supabase.createClient(STRIP_SUPABASE_URL,STRIP_ANON_KEY);
+    const {data,error}=await client.from('strip_ads').select('*').eq('status','approved').order('created_at',{ascending:false}).limit(30);
+    if(error)throw error;
+    const now=Date.now();
+    const active=(data||[]).filter(ad=>{
+      const start=Date.parse(ad.approved_at||ad.starts_at||ad.start_at||ad.created_at||'');
+      const end=Date.parse(ad.expires_at||ad.ends_at||ad.end_at||'');
+      const days=Number(ad.days)||1;
+      return Number.isFinite(start)&&start<=now&&(Number.isFinite(end)?end>now:now<start+days*86400000);
+    });
+    if(!active.length)return;
+    const ad=active[0];
+    const label=document.createElement('span');
+    label.textContent='✦ '+(ad.ad_topic||'إعلان مميز')+' — '+(ad.ad_details||'').slice(0,135)+' ';
+    const link=document.createElement('a');
+    link.href='advertise.html';link.textContent='أعلن هنا — 10 دراهم لليوم';
+    link.style.cssText='color:#e7c56a;font-weight:800;margin-inline:12px';
+    bar.replaceChildren(label,link);
+  }catch(e){console.warn('Ad strip unavailable:',e.message)}
+}
 
 // حركة دقيقة بالبكسل: تبدأ خارج الشاشة تماماً من جهة، وتنتهي خارجها تماماً من الجهة الأخرى، بدون أي تخمين نِسَبي
 function runMarquee(){
