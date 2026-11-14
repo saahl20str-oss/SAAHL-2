@@ -668,8 +668,8 @@ footer{
 #ad-strip{position:fixed!important;top:68px!important;left:0;right:0;z-index:490!important;min-height:43px;display:flex!important;align-items:center;gap:16px;overflow:hidden;box-sizing:border-box;direction:rtl}
 #ad-strip .saahl-ad-cta{flex-shrink:0;background:#c9a84c;color:#16171c!important;text-decoration:none;font-weight:900;border-radius:6px;padding:5px 12px;font-size:13px;position:relative;z-index:2}
 #ad-strip .saahl-ad-viewport{flex:1;overflow:hidden;min-width:0}
-#ad-strip .saahl-ad-track{display:inline-block;white-space:nowrap;animation:saahlAdMove 22s linear infinite;animation-delay:-2s;color:#fff}
-@keyframes saahlAdMove{from{transform:translateX(-100%)}to{transform:translateX(100vw)}}
+#ad-strip .saahl-ad-track{display:inline-block;white-space:nowrap;animation:saahlAdMove 22s linear infinite;color:#fff}
+@keyframes saahlAdMove{from{transform:translateX(0)}to{transform:translateX(100%)}}
 #ad-strip:hover .saahl-ad-track{animation-play-state:paused}
 body{padding-top:43px}
 @media(prefers-reduced-motion:reduce){#ad-strip .saahl-ad-track{animation:none}}
@@ -1077,7 +1077,7 @@ async function loadSpotlight(){
    const field=(name)=>{const m=d.match(new RegExp('(?:^|\\|)\\s*'+name+':\\s*([^|]+)'));return m?m[1].trim():''};
    const photo=a.worker_photo_url||field('صورة العاملة');
    const url=field('رابط العاملة');
-   return {full_name:field('العاملة')||a.ad_topic.replace(/^عاملة متاحة:\s*/,''),nationality:field('الجنسية'),age:field('العمر'),office_name:field('المكتب')||a.advertiser_name,photo_url:photo,worker_url:url,skills:[],monthly_salary:null};
+   return {full_name:field('العاملة')||a.ad_topic.replace(/^عاملة متاحة:\s*/,''),nationality:field('الجنسية'),age:field('العمر'),office_name:field('المكتب')||a.advertiser_name,photo_url:photo,worker_url:url,ad_id:a.id,skills:[],monthly_salary:null};
   });
  }catch(e){console.warn('Spotlight load failed:',e);_spotData=[];}
  if(!_spotData.length){
@@ -1097,7 +1097,7 @@ function renderSpotSlides(){
  const wrap=document.getElementById('spotSlides'),dots=document.getElementById('spotDots');
  wrap.innerHTML=_spotData.map(m=>{
   const photo=/^https:\/\//.test(m.photo_url||'')?'<img src="'+escapeHtml(m.photo_url)+'" alt="صورة العاملة" style="width:76px;height:86px;object-fit:cover;border-radius:10px">':'<span style="font-size:32px">✦</span>';
-  const url=(m.worker_url||'').startsWith(location.origin+'/SAAHL-2/')?m.worker_url:'marketplace.html';
+  const url='worker.html?ad='+encodeURIComponent(m.ad_id);
   return '<div style="flex:0 0 100%;box-sizing:border-box;padding:12px;text-align:center;color:#fff">'+photo+
    '<div style="font-size:13px;font-weight:800;margin-top:8px">'+escapeHtml(m.full_name)+'</div>'+
    '<div style="font-size:11px;color:#ddd;margin:5px 0">'+escapeHtml(m.nationality)+(m.age?' • '+escapeHtml(m.age)+' سنة':'')+'</div>'+
