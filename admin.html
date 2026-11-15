@@ -343,7 +343,7 @@ const SU='https://hkfxikmpfgixrbrboxeb.supabase.co';
 const SK='sb_publishable_OcWY5nY_-b2odLqQxsu2Kw_iQ4YswBz';
 // AE/AP (بيانات الدخول الوهمية) أُزيلت — الدخول الآن عبر Supabase Auth حقيقي + تحقق من role='ADMIN'
 const {createClient}=supabase;
-const db=createClient(SU,SK);
+const db=createClient(SU,SK,{auth:{storageKey:'saahl2-admin-auth-v2',autoRefreshToken:true,persistSession:true,detectSessionInUrl:false}});
 let aOff=[],aSpo=[],aBk=[],aPy=[],aKf=[],aAds=[];
 let rC,pC,isDark=localStorage.getItem('saahl_dark')==='1';
 const clrs=['#0f766e','#2563eb','#7c3aed','#d97706','#059669','#dc2626','#0891b2'];
@@ -385,10 +385,11 @@ async function doLogin(){
  const btn=document.getElementById('le-btn');
  adminLoginMessage('');
  if(!email||!password){adminLoginMessage('أدخل البريد الإلكتروني وكلمة المرور.');return;}
- adminAuthBusy=true;btn.disabled=true;btn.textContent='جاري التحقق...';
+ adminAuthBusy=true;btn.disabled=true;btn.textContent='جاري التحقق...';adminLoginMessage('المرحلة 1/2: التحقق من البريد وكلمة المرور...');
  try{
   const {data,error}=await adminTimeout(db.auth.signInWithPassword({email,password}),15000,'تسجيل الدخول');
   if(error){adminLoginMessage(error.message?.includes('Invalid login credentials')?'البريد الإلكتروني أو كلمة المرور غير صحيحة.':'تعذّر تسجيل الدخول: '+(error.message||'خطأ غير معروف'));return;}
+  adminLoginMessage('المرحلة 2/2: التحقق من صلاحية الآدمن...');
   const check=await adminRoleCheck(data?.user);
   if(!check.ok){
    adminLoginMessage(check.reason);
@@ -418,24 +419,9 @@ function showApp(){
  }
  Promise.resolve().then(loadAll).catch(error=>{console.error('Admin dashboard load failed',error);toast('تم الدخول، لكن تعذر تحميل بعض البيانات. أعد تحديث الصفحة.',5000);});
 }
-window.addEventListener('DOMContentLoaded',async ()=>{
+window.addEventListener('DOMContentLoaded',()=>{
  if(isDark)document.body.classList.add('dark');
- document.getElementById('ls-form').style.display='none';
- document.getElementById('ls-loading').style.display='block';
- try{
-  const {data,error}=await adminTimeout(db.auth.getSession(),12000,'استعادة الجلسة');
-  if(error)console.warn('Admin session restore:',error.message);
-  if(data?.session?.user){
-   const check=await adminRoleCheck(data.session.user);
-   if(check.ok){showApp();return;}
-   if(check.notAdmin)await db.auth.signOut();
-   adminShowLogin();
-   adminLoginMessage(check.reason);
-   return;
-  }
- }catch(error){
-  console.warn('Admin session restoration failed:',error);
- }
+ // Keep login interactive; avoid an automatic getSession call racing with signIn.
  adminShowLogin();
 });
 async function loadAll(){await Promise.all([loadStats(),loadOff(),loadSpo(),loadBk(),loadPy(),loadKf(),loadAds()]);buildCharts();}
