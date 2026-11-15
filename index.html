@@ -660,6 +660,17 @@ footer{
   .hero-title{letter-spacing:-1px}
 }
 .nav-logo img{mix-blend-mode:multiply;background:transparent}.footer-brand-logo img{background:#fff;border-radius:8px;padding:4px;object-fit:contain}.footer-note{display:block;font-size:12px;color:#b6b3ad;line-height:1.7;margin-bottom:12px}.footer-brand-desc{color:#c3c0b9}.footer-col a{color:#c3c0b9}.footer-copy,.footer-uae{color:#aaa69e}
+
+/* ساهل 2: نافذة الأضواء داخل تدفق الصفحة على الهاتف فقط */
+@media(max-width:700px){
+ #spotlightWidget{position:relative!important;top:auto!important;left:auto!important;right:auto!important;width:calc(100% - 28px)!important;max-width:390px!important;margin:12px auto 8px!important;z-index:2!important;box-shadow:0 5px 20px rgba(0,0,0,.12)!important;border-radius:14px!important}
+ #spotlightWidget #spotSlides>div{padding:8px 12px!important}
+ #spotlightWidget #spotSlides img{width:65px!important;height:75px!important}
+ #spotlightReopen{position:relative!important;top:auto!important;left:auto!important;right:auto!important;margin:8px auto!important}
+ .hero{padding-top:45px!important}
+ #ad-strip{min-height:42px}
+ #ad-strip .saahl-ad-cta{font-size:11px!important;white-space:nowrap}
+}
 </style>
 </head>
 
@@ -769,7 +780,7 @@ function adjustLayoutForStrip(){
   const hero = document.querySelector('.hero');
   const stripH = (strip && strip.style.display !== 'none') ? strip.offsetHeight : 0;
   if(nav) nav.style.top = '0px';
-  if(hero) hero.style.paddingTop = '160px';
+  if(hero) hero.style.paddingTop = window.innerWidth<=700?'45px':'160px';
   positionSpotlight();
 }
 window.addEventListener('resize', adjustLayoutForStrip);
@@ -1006,6 +1017,7 @@ async function submitAdvertise(){
 </nav>
 
 
+<div id="mobileSpotAnchor" style="display:none"></div>
 <!-- SPOTLIGHT WIDGET — اشتراك "عاملة مميزة" المدفوع (مرتبط ببيانات المكتب الفعلية) -->
 <div id="spotlightWidget" style="
   position:fixed;left:12px;z-index:120;
@@ -1079,8 +1091,8 @@ function positionSpotlight(){
   if(!nav) return;
   const bottom = nav.getBoundingClientRect().bottom;
   const strip=document.getElementById('ad-strip');const stripBottom=strip?strip.getBoundingClientRect().bottom:bottom;const top=Math.max(8,bottom,stripBottom)+10+'px';
-  if(widget) widget.style.top = top;
-  if(reopenBtn) reopenBtn.style.top = top;
+  if(widget){ widget.style.top = window.innerWidth<=700?'auto':top; const anchor=document.getElementById('mobileSpotAnchor'); if(anchor){if(window.innerWidth<=700){anchor.style.display='block';if(widget.parentElement!==anchor)anchor.appendChild(widget);}else if(widget.parentElement===anchor){anchor.parentElement.insertBefore(widget,anchor.nextSibling);anchor.style.display='none';}} }
+  if(reopenBtn) reopenBtn.style.top = window.innerWidth<=700?'auto':top;
 }
 window.addEventListener('resize', positionSpotlight);
 
