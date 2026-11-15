@@ -491,7 +491,7 @@ async function loadAds(){
   const title=document.createElement('strong');title.textContent=a.ad_topic||'إعلان';
   heading.append(title,saahlAdLine(a.advertiser_name||'معلن غير محدد','ad-office-name'));
   const state=document.createElement('span');state.className='bge '+(a.status==='pending'?'pending':'active');
-  state.textContent=a.status==='pending'?'بانتظار المراجعة':(['active','approved'].includes(a.status)?'معتمد':a.status||'—';
+  state.textContent=a.status==='pending'?'بانتظار المراجعة':(['active','approved'].includes(a.status)?'معتمد':a.status||'—');
   header.append(heading,state);
   const content=document.createElement('div');content.className='ad-card-content';
   if(parsed.photo){
