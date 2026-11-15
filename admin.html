@@ -154,7 +154,7 @@ body.admin-menu-open .admin-menu-backdrop{display:block}
     <div class="lw"><img src="saahl-logo.png" alt="ساهل" onerror="this.parentElement.innerHTML='<span style=font-size:18px;color:#c9a227;font-weight:700>س</span>'"></div>
     <div><div class="bn">ساهل</div><div class="bs">لوحة الأدمن</div></div>
   </div>
-  <div class="tb-r"><button class="mobile-admin-menu" type="button" onclick="toggleAdminMenu()" aria-label="فتح قائمة الإدارة">☰ القائمة</button>
+  <div class="tb-r"><button class="mobile-admin-menu" type="button" onclick="toggleAdminMenu()" aria-expanded="false" aria-label="فتح قائمة الإدارة">☰ القائمة</button>
     <span class="abg">أدمن</span>
     <button class="dtg" id="dkb" onclick="toggleDark()">🌙</button>
     <button class="tbtn" onclick="navTo('settings')">⚙️ إعدادات</button>
@@ -303,7 +303,7 @@ const ini=s=>(s||'?')[0];
 const fd=d=>{if(!d)return'—';return new Date(d).toLocaleDateString('ar-AE',{year:'numeric',month:'short',day:'numeric'});};
 const eh=m=>`<div class="es"><div class="ei">📭</div><p>${m}<br><small>ستظهر هنا عند أول تسجيل</small></p></div>`;
 function toast(m,d=2500){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),d);}
-function navTo(id){document.querySelectorAll('.pg').forEach(p=>p.classList.remove('active'));document.querySelectorAll('.ni').forEach(n=>n.classList.remove('active'));document.getElementById('pg-'+id).classList.add('active');document.querySelector('[data-p='+id+']')?.classList.add('active');}
+function toggleAdminMenu(force){const open=typeof force==='boolean'?force:!document.body.classList.contains('admin-menu-open');document.body.classList.toggle('admin-menu-open',open);const btn=document.querySelector('.mobile-admin-menu');if(btn)btn.setAttribute('aria-expanded',String(open));}\nfunction navTo(id){toggleAdminMenu(false);document.querySelectorAll('.pg').forEach(p=>p.classList.remove('active'));document.querySelectorAll('.ni').forEach(n=>n.classList.remove('active'));document.getElementById('pg-'+id).classList.add('active');document.querySelector('[data-p='+id+']')?.classList.add('active');}
 function toggleDark(){isDark=!isDark;document.body.classList.toggle('dark',isDark);localStorage.setItem('saahl_dark',isDark?'1':'0');const cb=document.getElementById('dk-cb');if(cb)cb.checked=isDark;document.getElementById('dkb').textContent=isDark?'☀️':'🌙';}
 async function doLogin(){
   const e=document.getElementById('le-email').value.trim();
