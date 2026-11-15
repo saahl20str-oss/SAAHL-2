@@ -702,6 +702,8 @@ footer{
 #ad-strip:hover .saahl-ad-track{animation-play-state:paused}
 body{padding-top:43px}
 @media(prefers-reduced-motion:reduce){#ad-strip .saahl-ad-track{animation:none}}
+#ad-strip .saahl-logo-separator{gap:3px!important}
+#ad-strip .saahl-original-mark{width:13px!important;height:19px!important;object-fit:contain!important;background:transparent!important;border:0!important;box-shadow:none!important}
 </style>
 <svg aria-hidden="true" width="0" height="0" style="position:absolute;pointer-events:none"><defs><filter id="saahlLogoTransparentGold" color-interpolation-filters="sRGB"><feColorMatrix in="SourceGraphic" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  -1 -1 -1 0 2.95" result="mask"/><feComponentTransfer in="mask" result="cleanMask"><feFuncA type="linear" slope="3" intercept="0"/></feComponentTransfer><feFlood flood-color="#c9a84c" result="gold"/><feComposite in="gold" in2="cleanMask" operator="in"/></filter></defs></svg>
 <style id="saahl-unified-mobile-strip">@media(max-width:700px){#ad-strip{flex-wrap:nowrap!important;gap:8px!important;padding:6px 8px!important;min-height:48px!important}#ad-strip .saahl-ad-cta{order:0!important;font-size:11px!important;padding:7px 9px!important}#ad-strip .saahl-ad-viewport{order:0!important;flex:1 1 auto!important;width:auto!important;background:transparent!important;border-radius:0!important;padding:0!important;min-height:0!important;overflow:hidden!important;direction:ltr!important}#ad-strip .saahl-ad-track{display:inline-flex!important;position:relative!important;align-items:center!important;width:max-content!important;min-width:max-content!important;white-space:nowrap!important;direction:rtl!important;will-change:transform}#ad-strip .saahl-ad-unit,#ad-strip .saahl-ad-unit.mobile-active{display:inline-flex!important;width:auto!important;max-width:none!important;min-width:max-content!important;flex:none!important;white-space:nowrap!important;overflow:visible!important;gap:10px!important;animation:none!important}#ad-strip .saahl-ad-unit strong{max-width:none!important;white-space:nowrap!important;overflow:visible!important}#ad-strip .saahl-ad-unit .saahl-ad-summary,#ad-strip .saahl-ad-unit>a,#ad-strip .saahl-logo-separator{display:inline-flex!important}.saahl-mobile-ad-controls{display:none!important}}</style>
@@ -749,6 +751,13 @@ async function loadAdStrip(){
    if(error)throw error;
    const now=Date.now();
    ads=(data||[]).filter(ad=>['strip','spotlight'].includes(ad.placement)&&(!ad.starts_at||Date.parse(ad.starts_at)<=now)&&(!ad.expires_at||Date.parse(ad.expires_at)>now));
+   // عرض نسخة واحدة فقط من الإعلانات المتطابقة في المحتوى؛ دون حذف أي سجل من قاعدة البيانات.
+   const seenAdContents=new Set();
+   ads=ads.filter(ad=>{
+     const key=[ad.ad_topic,ad.ad_details,ad.advertiser_name,ad.phone,ad.whatsapp].map(v=>String(v||'').trim().replace(/\\s+/g,' ').toLowerCase()).join('|');
+     if(seenAdContents.has(key))return false;
+     seenAdContents.add(key);return true;
+   });
   }
  }catch(e){console.warn('Ad strip unavailable:',e)}
  el.replaceChildren();
