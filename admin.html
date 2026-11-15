@@ -130,6 +130,28 @@ body.admin-menu-open .admin-menu-backdrop{display:block}
 .cr{min-width:0}.cr>*{min-width:0}
 }
 @media(max-width:420px){.sg{grid-template-columns:repeat(2,minmax(0,1fr))}.tb-r .abg{display:none}.tb-r .tbtn{padding:5px}.ct{padding:12px 9px}}
+
+/* Mobile admin: prevent horizontal overflow and keep menu within viewport */
+html,body{max-width:100%;overflow-x:hidden}
+#mw,.main,.ct,.pg,.cd,#ads-wrap{min-width:0;max-width:100%}
+.ac{min-width:0;max-width:100%;overflow:hidden;gap:12px}
+.ac .ai{min-width:0;flex:1 1 0;overflow-wrap:anywhere;word-break:break-word}
+.ac .ai span{overflow-wrap:anywhere;word-break:break-word;white-space:normal;line-height:1.8}
+@media(max-width:900px){
+.tb{width:100%;max-width:100vw;overflow:hidden;justify-content:space-between}
+.tb-r{min-width:0;flex-shrink:1}
+.sb{width:min(78vw,300px)!important;max-width:calc(100vw - 48px);right:0!important;left:auto!important;transform:translateX(110%)!important;box-shadow:-12px 0 32px #0002}
+body.admin-menu-open .sb{transform:translateX(0)!important}
+body.admin-menu-open{overflow:hidden}
+.ct{width:100%;max-width:100vw;overflow-x:hidden;padding:16px 12px}
+#pg-ads .cd{padding:12px;overflow:hidden}
+#pg-ads .ac{display:flex;flex-direction:column;align-items:stretch;padding:14px 12px;margin:0 0 10px;max-width:100%}
+#pg-ads .ac .ai{width:100%;flex:auto;min-width:0}
+#pg-ads .ac .ai strong{display:block;font-size:14px;line-height:1.7;margin-bottom:6px}
+#pg-ads .ac .ai span{display:block;font-size:12px;line-height:1.8;overflow-wrap:anywhere;word-break:break-word}
+#pg-ads .ac>div:last-child{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:flex-start;width:100%}
+#pg-ads .ac .btn{min-height:38px;padding:8px 12px}
+}
 </style>
 </head>
 <body>
@@ -162,7 +184,8 @@ body.admin-menu-open .admin-menu-backdrop{display:block}
   </div>
 </div>
 
-<div class="admin-menu-backdrop" onclick="toggleAdminMenu(false)"></div>\n<div class="main" id="mw" style="display:none">
+<div class="admin-menu-backdrop" onclick="toggleAdminMenu(false)"></div>
+<div class="main" id="mw" style="display:none">
   <div class="sb">
     <div class="ns">الرئيسية</div>
     <div class="ni active" data-p="overview" onclick="navTo('overview')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>نظرة عامة</div>
