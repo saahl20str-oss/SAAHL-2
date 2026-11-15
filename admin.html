@@ -368,9 +368,10 @@ function adminShowLogin(){
  document.getElementById('topbar').style.display='none';
  document.getElementById('mw').style.display='none';
 }
+function adminTimeout(promise,ms,label){return Promise.race([promise,new Promise((_,reject)=>setTimeout(()=>reject(new Error('انتهت مهلة '+label+' بعد '+Math.round(ms/1000)+' ثوانٍ. تحقق من الاتصال أو إعدادات Supabase.')),ms))]);}
 async function adminRoleCheck(user){
  if(!user?.id)return {ok:false,reason:'لا توجد جلسة دخول صالحة.'};
- const {data,error}=await db.from('profiles').select('role').eq('id',user.id).maybeSingle();
+ const {data,error}=await adminTimeout(db.from('profiles').select('role').eq('id',user.id).maybeSingle(),12000,'التحقق من صلاحية الإدارة');
  if(error)return {ok:false,reason:'تعذّر التحقق من صلاحية الإدارة: '+error.message};
  if(!data)return {ok:false,reason:'لم تظهر صلاحية الإدارة لهذا الحساب. يرجى إعادة المحاولة.'};
  if(String(data.role||'').trim().toUpperCase()!=='ADMIN')
@@ -386,7 +387,7 @@ async function doLogin(){
  if(!email||!password){adminLoginMessage('أدخل البريد الإلكتروني وكلمة المرور.');return;}
  adminAuthBusy=true;btn.disabled=true;btn.textContent='جاري التحقق...';
  try{
-  const {data,error}=await db.auth.signInWithPassword({email,password});
+  const {data,error}=await adminTimeout(db.auth.signInWithPassword({email,password}),15000,'تسجيل الدخول');
   if(error){adminLoginMessage(error.message?.includes('Invalid login credentials')?'البريد الإلكتروني أو كلمة المرور غير صحيحة.':'تعذّر تسجيل الدخول: '+(error.message||'خطأ غير معروف'));return;}
   const check=await adminRoleCheck(data?.user);
   if(!check.ok){
@@ -422,7 +423,7 @@ window.addEventListener('DOMContentLoaded',async ()=>{
  document.getElementById('ls-form').style.display='none';
  document.getElementById('ls-loading').style.display='block';
  try{
-  const {data,error}=await db.auth.getSession();
+  const {data,error}=await adminTimeout(db.auth.getSession(),12000,'استعادة الجلسة');
   if(error)console.warn('Admin session restore:',error.message);
   if(data?.session?.user){
    const check=await adminRoleCheck(data.session.user);
