@@ -176,6 +176,8 @@ body.admin-menu-open{overflow:hidden}
  #pg-ads .ad-card-heading strong{font-size:14px}
  #pg-ads .ad-card-actions .btn{font-size:12px;padding:7px 10px}
 }
+/* Explicit admin authentication errors visible on phones */
+#le-err{display:none;white-space:normal;overflow-wrap:anywhere;line-height:1.8;margin-top:12px;color:#b91c1c;font-size:13px;font-weight:600;text-align:center}
 </style>
 </head>
 <body>
@@ -354,51 +356,86 @@ function toggleAdminMenu(force){const open=typeof force==='boolean'?force:!docum
 function navTo(id){toggleAdminMenu(false);document.querySelectorAll('.pg').forEach(p=>p.classList.remove('active'));document.querySelectorAll('.ni').forEach(n=>n.classList.remove('active'));document.getElementById('pg-'+id).classList.add('active');document.querySelector('[data-p='+id+']')?.classList.add('active');}
 function toggleDark(){isDark=!isDark;document.body.classList.toggle('dark',isDark);localStorage.setItem('saahl_dark',isDark?'1':'0');const cb=document.getElementById('dk-cb');if(cb)cb.checked=isDark;document.getElementById('dkb').textContent=isDark?'☀️':'🌙';}
 function toggleAdminPassword(){const el=document.getElementById('le-pass');el.type=el.type==='password'?'text':'password'}
+let adminAuthBusy=false;
+function adminLoginMessage(message){
+ const err=document.getElementById('le-err');
+ if(err){err.textContent=message||'';err.style.display=message?'block':'none';err.setAttribute('role','alert');}
+}
+function adminShowLogin(){
+ document.getElementById('ls').style.display='flex';
+ document.getElementById('ls-loading').style.display='none';
+ document.getElementById('ls-form').style.display='block';
+ document.getElementById('topbar').style.display='none';
+ document.getElementById('mw').style.display='none';
+}
+async function adminRoleCheck(user){
+ if(!user?.id)return {ok:false,reason:'لا توجد جلسة دخول صالحة.'};
+ const {data,error}=await db.from('profiles').select('role').eq('id',user.id).maybeSingle();
+ if(error)return {ok:false,reason:'تعذّر التحقق من صلاحية الإدارة: '+error.message};
+ if(!data)return {ok:false,reason:'لم تظهر صلاحية الإدارة لهذا الحساب. يرجى إعادة المحاولة.'};
+ if(String(data.role||'').trim().toUpperCase()!=='ADMIN')
+  return {ok:false,reason:'الحساب لا يحمل صلاحية ADMIN.',notAdmin:true};
+ return {ok:true};
+}
 async function doLogin(){
-  const e=document.getElementById('le-email').value.trim();
-  const p=document.getElementById('le-pass').value;
-  const er=document.getElementById('le-err');
-  const btn=document.getElementById('le-btn');
-  er.textContent='';
-  if(!e||!p){er.textContent='أدخل الإيميل وكلمة المرور';return;}
-  btn.disabled=true;btn.textContent='جاري التحقق...';
-  try{
-    const {data,error}=await db.auth.signInWithPassword({email:e,password:p});
-    if(error){er.textContent=error.message?.includes('Invalid login credentials')?'البريد الإلكتروني أو كلمة المرور غير صحيحة. تحقق من بيانات الحساب.':'تعذّر تسجيل الدخول: '+(error.message||'خطأ غير معروف');return;}
-    // تحقق إضافي: هل هذا المستخدم فعلاً أدمن؟ (مو مجرد حساب مسجّل عادي)
-    const {data:prof,error:profileError}=await db.from('profiles').select('role').eq('id',data.user.id).maybeSingle();
-    if(profileError){er.textContent='تعذّر التحقق من صلاحيات الإدارة: '+profileError.message;return;}
-    if(!prof||String(prof.role).toUpperCase()!=='ADMIN'){
-      er.textContent='تم التحقق من الحساب، لكنه لا يحمل صلاحية ADMIN في قاعدة البيانات.';
-      await db.auth.signOut();
-      return;
-    }
-    showApp();
-  }catch(e){
-    er.textContent='تعذّر إكمال تسجيل الدخول: '+(e?.message||'تحقق من الاتصال');
-  }finally{
-    btn.disabled=false;btn.textContent='دخول';
+ if(adminAuthBusy)return;
+ const email=document.getElementById('le-email').value.trim();
+ const password=document.getElementById('le-pass').value;
+ const btn=document.getElementById('le-btn');
+ adminLoginMessage('');
+ if(!email||!password){adminLoginMessage('أدخل البريد الإلكتروني وكلمة المرور.');return;}
+ adminAuthBusy=true;btn.disabled=true;btn.textContent='جاري التحقق...';
+ try{
+  const {data,error}=await db.auth.signInWithPassword({email,password});
+  if(error){adminLoginMessage(error.message?.includes('Invalid login credentials')?'البريد الإلكتروني أو كلمة المرور غير صحيحة.':'تعذّر تسجيل الدخول: '+(error.message||'خطأ غير معروف'));return;}
+  const check=await adminRoleCheck(data?.user);
+  if(!check.ok){
+   adminLoginMessage(check.reason);
+   if(check.notAdmin)await db.auth.signOut();
+   return;
   }
+  showApp();
+ }catch(error){
+  adminLoginMessage('تعذّر إكمال تسجيل الدخول: '+(error?.message||'تحقق من الاتصال بالإنترنت.'));
+ }finally{
+  adminAuthBusy=false;btn.disabled=false;btn.textContent='دخول';
+ }
 }
 async function doLogout(){
-  await db.auth.signOut();
-  document.getElementById('ls').style.display='flex';
-  document.getElementById('topbar').style.display='none';
-  document.getElementById('mw').style.display='none';
+ await db.auth.signOut();
+ adminLoginMessage('');
+ adminShowLogin();
 }
-function showApp(){document.getElementById('ls').style.display='none';document.getElementById('topbar').style.display='flex';document.getElementById('mw').style.display='flex';if(isDark){document.body.classList.add('dark');document.getElementById('dkb').textContent='☀️';const cb=document.getElementById('dk-cb');if(cb)cb.checked=true;}loadAll();}
+function showApp(){
+ document.getElementById('ls').style.display='none';
+ document.getElementById('topbar').style.display='flex';
+ document.getElementById('mw').style.display='flex';
+ if(isDark){
+  document.body.classList.add('dark');
+  document.getElementById('dkb').textContent='☀️';
+  const cb=document.getElementById('dk-cb');if(cb)cb.checked=true;
+ }
+ Promise.resolve().then(loadAll).catch(error=>{console.error('Admin dashboard load failed',error);toast('تم الدخول، لكن تعذر تحميل بعض البيانات. أعد تحديث الصفحة.',5000);});
+}
 window.addEventListener('DOMContentLoaded',async ()=>{
-  if(isDark)document.body.classList.add('dark');
-  document.getElementById('ls-form').style.display='none';
-  document.getElementById('ls-loading').style.display='block';
-  let session=null;try{const result=await db.auth.getSession();session=result.data?.session||null;}catch(e){console.warn('Session check failed',e)}
-  if(session){
-    const {data:prof}=await db.from('profiles').select('role').eq('id',session.user.id).single();
-    if(prof&&String(prof.role).toUpperCase()==='ADMIN'){showApp();return;}
-    await db.auth.signOut();
+ if(isDark)document.body.classList.add('dark');
+ document.getElementById('ls-form').style.display='none';
+ document.getElementById('ls-loading').style.display='block';
+ try{
+  const {data,error}=await db.auth.getSession();
+  if(error)console.warn('Admin session restore:',error.message);
+  if(data?.session?.user){
+   const check=await adminRoleCheck(data.session.user);
+   if(check.ok){showApp();return;}
+   if(check.notAdmin)await db.auth.signOut();
+   adminShowLogin();
+   adminLoginMessage(check.reason);
+   return;
   }
-  document.getElementById('ls-loading').style.display='none';
-  document.getElementById('ls-form').style.display='block';
+ }catch(error){
+  console.warn('Admin session restoration failed:',error);
+ }
+ adminShowLogin();
 });
 async function loadAll(){await Promise.all([loadStats(),loadOff(),loadSpo(),loadBk(),loadPy(),loadKf(),loadAds()]);buildCharts();}
 async function loadStats(){
