@@ -701,6 +701,7 @@ body{padding-top:43px}
 @media(prefers-reduced-motion:reduce){#ad-strip .saahl-ad-track{animation:none}}
 </style>
 <svg aria-hidden="true" width="0" height="0" style="position:absolute;pointer-events:none"><defs><filter id="saahlLogoTransparentGold" color-interpolation-filters="sRGB"><feColorMatrix in="SourceGraphic" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  -1 -1 -1 0 2.95" result="mask"/><feComponentTransfer in="mask" result="cleanMask"><feFuncA type="linear" slope="3" intercept="0"/></feComponentTransfer><feFlood flood-color="#c9a84c" result="gold"/><feComposite in="gold" in2="cleanMask" operator="in"/></filter></defs></svg>
+<style id="saahl-unified-mobile-strip">@media(max-width:700px){#ad-strip{flex-wrap:nowrap!important;gap:8px!important;padding:6px 8px!important;min-height:48px!important}#ad-strip .saahl-ad-cta{order:0!important;font-size:11px!important;padding:7px 9px!important}#ad-strip .saahl-ad-viewport{order:0!important;flex:1 1 auto!important;width:auto!important;background:transparent!important;border-radius:0!important;padding:0!important;min-height:0!important;overflow:hidden!important;direction:ltr!important}#ad-strip .saahl-ad-track{display:inline-flex!important;position:relative!important;align-items:center!important;width:max-content!important;min-width:max-content!important;white-space:nowrap!important;direction:rtl!important;will-change:transform}#ad-strip .saahl-ad-unit,#ad-strip .saahl-ad-unit.mobile-active{display:inline-flex!important;width:auto!important;max-width:none!important;min-width:max-content!important;flex:none!important;white-space:nowrap!important;overflow:visible!important;gap:10px!important;animation:none!important}#ad-strip .saahl-ad-unit strong{max-width:none!important;white-space:nowrap!important;overflow:visible!important}#ad-strip .saahl-ad-unit .saahl-ad-summary,#ad-strip .saahl-ad-unit>a,#ad-strip .saahl-logo-separator{display:inline-flex!important}.saahl-mobile-ad-controls{display:none!important}}</style>
 <div id="ad-strip" style="background:#16171c;color:#fff;padding:6px 14px;font-family:Tajawal,sans-serif;font-size:14px;border-bottom:1px solid #c9a84c">
 <a class="saahl-ad-cta" href="advertise.html">أعلن هنا • 10 دراهم/يوم</a>
 <div class="saahl-ad-viewport"><span class="saahl-ad-track" id="saahl-ad-text">✦ مساحة إعلانية في ساهل 2 ✦ أعلن عن خدمات مكتبك وعاملاتك ✦ نقل كفالة وإعلانات ترويجية ✦</span></div><div class="saahl-mobile-ad-controls"><button type="button" aria-label="الإعلان السابق" onclick="moveSaahlMobileAd(-1)">‹</button><span id="saahl-ad-counter">1 / 1</span><button type="button" aria-label="الإعلان التالي" onclick="moveSaahlMobileAd(1)">›</button></div>
@@ -733,23 +734,7 @@ function showSaahlMobileAd(index){const units=[...document.querySelectorAll('#sa
 function startSaahlMobileRotation(){clearInterval(saahlMobileTimer);saahlMobileIndex=0;showSaahlMobileAd(0);resetSaahlMobileTimer()}
 function resetSaahlMobileTimer(){clearInterval(saahlMobileTimer);if(document.querySelectorAll('#saahl-ad-text .saahl-ad-unit').length>1)saahlMobileTimer=setInterval(()=>{if(!document.getElementById('adDetailOverlay'))showSaahlMobileAd(saahlMobileIndex+1)},5500)}
 function moveSaahlMobileAd(step){showSaahlMobileAd(saahlMobileIndex+step);resetSaahlMobileTimer()}
-function startStripMotion(){
- const viewport=document.querySelector('#ad-strip .saahl-ad-viewport');
- const track=document.getElementById('saahl-ad-text');
- if(!viewport||!track)return;
- const w=viewport.clientWidth,contentW=track.scrollWidth;
- if(!w||!contentW)return;
- if(window.innerWidth<=700){track.style.animation='none';track.style.transform='none';return;}
- // من اليسار إلى اليمين بسرعة قراءة متوسطة 105 بكسل/ثانية
- const duration=(w+contentW)/105;
- track.style.animation='none';
- track.style.transform='translateX(-'+contentW+'px)';
- let style=document.getElementById('saahl-strip-motion');
- if(!style){style=document.createElement('style');style.id='saahl-strip-motion';document.head.appendChild(style)}
- style.textContent='@keyframes saahlStripTravel{from{transform:translateX(-'+contentW+'px)}to{transform:translateX('+w+'px)}}';
- void track.offsetWidth;
- if(!window.matchMedia('(prefers-reduced-motion: reduce)').matches){track.style.animation='saahlStripTravel '+duration+'s linear infinite';track.style.animationDelay='-'+(contentW/105)+'s';}
-}
+function startStripMotion(){const viewport=document.querySelector('#ad-strip .saahl-ad-viewport'),track=document.getElementById('saahl-ad-text');if(!viewport||!track)return;clearInterval(saahlMobileTimer);const w=viewport.clientWidth,contentW=track.scrollWidth;if(!w||!contentW)return;const speed=window.innerWidth<=700?58:80,duration=(w+contentW)/speed;track.style.animation='none';track.style.transform='translateX(-'+contentW+'px)';let style=document.getElementById('saahl-strip-motion');if(!style){style=document.createElement('style');style.id='saahl-strip-motion';document.head.appendChild(style)}style.textContent='@keyframes saahlStripTravel{from{transform:translateX(-'+contentW+'px)}to{transform:translateX('+w+'px)}}';void track.offsetWidth;if(!window.matchMedia('(prefers-reduced-motion: reduce)').matches){track.style.animation='saahlStripTravel '+duration+'s linear infinite';track.style.animationDelay='-'+(contentW/speed)+'s';}}
 async function loadAdStrip(){
  const el=document.getElementById('saahl-ad-text');
  if(!el)return;
@@ -768,7 +753,7 @@ async function loadAdStrip(){
  ads.forEach((ad,i)=>{if(i)el.appendChild(stripSeparator());el.appendChild(stripUnit(ad))});
  // تكرار الدورة بسلاسة مع فاصل شعار ساهل بين نهاية وآخر إعلان وبداية الأول
  el.appendChild(stripSeparator());
- requestAnimationFrame(startStripMotion);startSaahlMobileRotation();
+ requestAnimationFrame(startStripMotion);
 }
 window.addEventListener('resize',()=>requestAnimationFrame(startStripMotion));
 // يدفع الناف بار والقسم الرئيسي لأسفل بمقدار ارتفاع الشريط الفعلي، لمنع التداخل بينهما
