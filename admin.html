@@ -109,6 +109,27 @@ tr:hover td{background:var(--bl)}
 #toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1e293b;color:#fff;padding:10px 22px;border-radius:10px;font-size:13px;opacity:0;transition:opacity .3s;pointer-events:none;z-index:9999}
 #toast.show{opacity:1}
 @media(max-width:900px){.sb{display:none}.ct{margin-right:0}.sg{grid-template-columns:repeat(2,1fr)}.cr{grid-template-columns:1fr}}
+
+/* Responsive admin navigation: keep all sections available on mobile */
+.mobile-admin-menu{display:none}
+@media(max-width:900px){
+.tb{height:62px;padding:0 12px;gap:8px}
+.tb-brand{gap:5px;min-width:0}.lw{width:32px;height:32px}.lw img{width:30px;height:30px}
+.bn{font-size:14px}.bs{font-size:10px}
+.tb-r{gap:5px;flex-wrap:nowrap}.abg{font-size:10px;padding:4px 7px}
+.tb-r .tbtn{padding:7px;font-size:11px}.dtg{padding:5px 7px;font-size:15px}
+.mobile-admin-menu{display:inline-flex;align-items:center;justify-content:center;background:var(--white);border:1px solid var(--border);border-radius:8px;padding:7px 10px;color:var(--text);font:700 12px Cairo,sans-serif}
+.sb{display:block!important;position:fixed;top:62px;right:0;bottom:0;width:min(82vw,290px);z-index:120;transform:translateX(105%);transition:transform .2s ease;box-shadow:-10px 0 35px #0002}
+body.admin-menu-open .sb{transform:translateX(0)}
+.admin-menu-backdrop{display:none;position:fixed;inset:62px 0 0;background:#0006;z-index:119}
+body.admin-menu-open .admin-menu-backdrop{display:block}
+.main{margin-top:62px}.ct{margin-right:0;padding:18px 12px;min-width:0;width:100%}
+.pt{font-size:18px;margin-bottom:15px}
+.sg{gap:8px;margin-bottom:14px}.sc{padding:12px;min-width:0}.si{width:30px;height:30px;font-size:16px;margin-bottom:7px}
+.sl{font-size:11px;line-height:1.6}.sv{font-size:23px}.ss{font-size:10px}
+.cr{min-width:0}.cr>*{min-width:0}
+}
+@media(max-width:420px){.sg{grid-template-columns:repeat(2,minmax(0,1fr))}.tb-r .abg{display:none}.tb-r .tbtn{padding:5px}.ct{padding:12px 9px}}
 </style>
 </head>
 <body>
@@ -133,7 +154,7 @@ tr:hover td{background:var(--bl)}
     <div class="lw"><img src="saahl-logo.png" alt="ساهل" onerror="this.parentElement.innerHTML='<span style=font-size:18px;color:#c9a227;font-weight:700>س</span>'"></div>
     <div><div class="bn">ساهل</div><div class="bs">لوحة الأدمن</div></div>
   </div>
-  <div class="tb-r">
+  <div class="tb-r"><button class="mobile-admin-menu" type="button" onclick="toggleAdminMenu()" aria-label="فتح قائمة الإدارة">☰ القائمة</button>
     <span class="abg">أدمن</span>
     <button class="dtg" id="dkb" onclick="toggleDark()">🌙</button>
     <button class="tbtn" onclick="navTo('settings')">⚙️ إعدادات</button>
@@ -141,7 +162,7 @@ tr:hover td{background:var(--bl)}
   </div>
 </div>
 
-<div class="main" id="mw" style="display:none">
+<div class="admin-menu-backdrop" onclick="toggleAdminMenu(false)"></div>\n<div class="main" id="mw" style="display:none">
   <div class="sb">
     <div class="ns">الرئيسية</div>
     <div class="ni active" data-p="overview" onclick="navTo('overview')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>نظرة عامة</div>
