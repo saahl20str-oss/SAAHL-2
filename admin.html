@@ -152,6 +152,30 @@ body.admin-menu-open{overflow:hidden}
 #pg-ads .ac>div:last-child{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:flex-start;width:100%}
 #pg-ads .ac .btn{min-height:38px;padding:8px 12px}
 }
+
+/* Structured advertisement cards; hide internal identifiers without changing stored records */
+#pg-ads .saahl-ad-card{display:flex;flex-direction:column;align-items:stretch;gap:12px;padding:16px;border-radius:14px;min-width:0}
+#pg-ads .ad-card-header{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;min-width:0}
+#pg-ads .ad-card-heading{min-width:0;flex:1}
+#pg-ads .ad-card-heading strong{font-size:15px;line-height:1.6;overflow-wrap:anywhere}
+#pg-ads .ad-office-name{color:var(--muted);font-size:12px}
+#pg-ads .ad-card-header .bge{flex-shrink:0}
+#pg-ads .ad-card-content{display:flex;align-items:flex-start;gap:14px;min-width:0}
+#pg-ads .ad-worker-photo{width:100px;height:126px;border-radius:10px;object-fit:cover;flex-shrink:0;background:var(--bl);border:1px solid var(--border)}
+#pg-ads .ad-card-info{min-width:0;flex:1;overflow-wrap:anywhere}
+#pg-ads .ad-card-info .ad-detail-line{font-size:12px;line-height:1.9;color:var(--muted);overflow-wrap:normal;word-break:normal}
+#pg-ads .ad-facts{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:6px}
+#pg-ads .ad-fact{background:var(--bl);color:var(--text);border:1px solid var(--border);font-size:12px;border-radius:7px;padding:3px 9px}
+#pg-ads .ad-phone{font-size:12px;color:var(--text);margin-top:4px;direction:rtl}
+#pg-ads .ad-card-actions{display:flex;justify-content:flex-end;gap:8px;align-items:center;flex-wrap:wrap;border-top:1px solid var(--border);padding-top:11px}
+#pg-ads .ad-view-link{border:1px solid var(--border);color:var(--teal);text-decoration:none;background:var(--white)}
+@media(max-width:480px){
+ #pg-ads .saahl-ad-card{padding:12px;gap:10px}
+ #pg-ads .ad-worker-photo{width:82px;height:106px}
+ #pg-ads .ad-card-content{gap:10px}
+ #pg-ads .ad-card-heading strong{font-size:14px}
+ #pg-ads .ad-card-actions .btn{font-size:12px;padding:7px 10px}
+}
 </style>
 </head>
 <body>
@@ -406,6 +430,22 @@ async function loadBk(){const {data}=await db.from('bookings').select('*').order
 async function loadPy(){const {data}=await db.from('payments').select('*').order('created_at',{ascending:false});aPy=data||[];let o=0,b=0,k=0;aPy.forEach(p=>{if(p.type==='subscription')o+=p.amount||0;else if(p.type==='booking')b+=p.amount||0;else if(p.type==='kafala_ad')k+=p.amount||0;});document.getElementById('py-off').textContent=o.toLocaleString()+' AED';document.getElementById('py-bk').textContent=b.toLocaleString()+' AED';document.getElementById('py-kf').textContent=k.toLocaleString()+' AED';const w=document.getElementById('py-wrap');if(!aPy.length){w.innerHTML=eh('لا توجد مدفوعات');return;}const tl={subscription:'اشتراك شهري',booking:'عمولة حجز',kafala_ad:'إعلان كفالة',strip_ad:'إعلان شريط'};w.innerHTML=`<div class="tw"><table><thead><tr><th>المستخدم</th><th>النوع</th><th>المبلغ</th><th>التاريخ</th><th>الحالة</th></tr></thead><tbody>${aPy.map(p=>`<tr><td>${p.user_name||'—'}</td><td>${tl[p.type]||p.type||'—'}</td><td style="font-weight:600;color:var(--teal)">${(p.amount||0).toLocaleString()} AED</td><td>${fd(p.created_at)}</td><td><span class="bge ${p.status==='paid'?'active':'expired'}">${p.status==='paid'?'مكتمل':'فشل'}</span></td></tr>`).join('')}</tbody></table></div>`;}
 async function loadKf(){const {data}=await db.from('kafala_ads').select('*').order('created_at',{ascending:false});aKf=data||[];const w=document.getElementById('kf-wrap');if(!aKf.length){w.innerHTML=eh('لا توجد إعلانات نقل كفالة');return;}w.innerHTML=`<div class="tw"><table><thead><tr><th>العاملة</th><th>الإمارة</th><th>الجنسية</th><th>الأيام</th><th>ينتهي</th><th>المبلغ</th><th>الحالة</th><th>إجراء</th></tr></thead><tbody>${aKf.map(k=>{const d=k.ad_days||1;const a=!!k.is_active;return`<tr><td>${k.worker_name||'—'}</td><td>${k.emirate||'—'}</td><td>${k.nationality||'—'}</td><td>${d} يوم</td><td>${fd(k.ends_at)}</td><td style="font-weight:600;color:var(--teal)">${k.ad_price||d*30} AED</td><td><span class="bge ${a?'active':'expired'}">${a?'نشط':'منتهي'}</span></td><td><button class="btn ${a?'btn-d':'btn-o'} btn-s" onclick="togKf('${k.id}',${a})">${a?'إيقاف':'تجديد'}</button></td></tr>`;}).join('')}</tbody></table></div>`;}
 async function togKf(id,isActive){await db.from('kafala_ads').update({is_active:!isActive}).eq('id',id);toast(!isActive?'تم تفعيل الإعلان ✓':'تم إيقاف الإعلان');loadKf();}
+function saahlAdDetails(raw){
+ const text=String(raw||'');
+ const links=text.match(/https?:\/\/[^\s|<>"]+/gi)||[];
+ const cleanUrl=u=>u.replace(/[،؛,.)]+$/,'');
+ const photo=links.map(cleanUrl).find(u=>/^https:\/\/[^/]+\.supabase\.co\/storage\/v1\/object\/public\/[^?#]+\.(jpg|jpeg|png|webp)(?:[?#]|$)/i.test(u))||'';
+ const worker=links.map(cleanUrl).find(u=>/^https:\/\/saahl20str-oss\.github\.io\/SAAHL-2\/search\.html\?/i.test(u))||'';
+ const parts=text.split('|').map(p=>p.trim()).filter(Boolean).filter(p=>!(/https?:\/\//i.test(p)));
+ const safe=parts.map(p=>p.replace(/\b[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\b/gi,'').replace(/(?:صورة العاملة|رابط العاملة|رابط|worker)\s*[:：]?\s*$/gi,'').trim()).filter(p=>p&&p!=='—');
+ return {photo,worker,parts:safe};
+}
+function saahlAdLine(text,className){
+ const node=document.createElement('div');
+ node.className=className||'ad-detail-line';
+ node.textContent=text;
+ return node;
+}
 async function loadAds(){
  const w=document.getElementById('ads-wrap');
  const {data,error}=await db.from('strip_ads').select('*').order('created_at',{ascending:false});
@@ -419,18 +459,42 @@ async function loadAds(){
  if(!aAds.length){w.textContent='لا توجد طلبات إعلانات مسجلة';return;}
  w.replaceChildren();
  for(const a of aAds){
-  const card=document.createElement('div');card.className='ac';
-  const info=document.createElement('div');info.className='ai';
+  const parsed=saahlAdDetails(a.ad_details);
+  const card=document.createElement('article');card.className='ac saahl-ad-card';
+  const header=document.createElement('div');header.className='ad-card-header';
+  const heading=document.createElement('div');heading.className='ad-card-heading';
   const title=document.createElement('strong');title.textContent=a.ad_topic||'إعلان';
-  const meta=document.createElement('span');meta.textContent=(a.advertiser_name||'—')+' • '+(a.days||1)+' يوم • '+(a.amount||0)+' AED';
-  const details=document.createElement('span');details.style.display='block';details.textContent=(a.ad_details||'')+' | هاتف: '+(a.phone||'—');
-  info.append(title,meta,details);
-  const controls=document.createElement('div');controls.style.cssText='display:flex;gap:6px;align-items:center;flex-wrap:wrap';
-  const state=document.createElement('span');state.className='bge '+(a.status==='pending'?'pending':'active');state.textContent=a.status==='pending'?'بانتظار المراجعة':(['active','approved'].includes(a.status)?'معتمد':a.status);
-  controls.append(state);
-  if(a.status==='pending'){const approve=document.createElement('button');approve.className='btn btn-p btn-s';approve.textContent='موافقة ونشر';approve.onclick=()=>appAd(a.id);controls.append(approve);}
-  const del=document.createElement('button');del.className='btn btn-d btn-s';del.textContent='حذف';del.onclick=()=>delAd(a.id);controls.append(del);
-  card.append(info,controls);w.append(card);
+  heading.append(title,saahlAdLine(a.advertiser_name||'معلن غير محدد','ad-office-name'));
+  const state=document.createElement('span');state.className='bge '+(a.status==='pending'?'pending':'active');
+  state.textContent=a.status==='pending'?'بانتظار المراجعة':(['active','approved'].includes(a.status)?'معتمد':a.status||'—';
+  header.append(heading,state);
+  const content=document.createElement('div');content.className='ad-card-content';
+  if(parsed.photo){
+   const img=document.createElement('img');
+   img.className='ad-worker-photo';img.src=parsed.photo;img.alt='صورة العاملة';
+   img.loading='lazy';img.referrerPolicy='no-referrer';
+   img.onerror=()=>{img.style.display='none';};
+   content.append(img);
+  }
+  const info=document.createElement('div');info.className='ai ad-card-info';
+  const facts=document.createElement('div');facts.className='ad-facts';
+  facts.append(saahlAdLine((a.days||1)+' يوم','ad-fact'),saahlAdLine((a.amount||0)+' AED','ad-fact'));
+  info.append(facts);
+  parsed.parts.forEach(part=>info.append(saahlAdLine(part)));
+  if(a.phone)info.append(saahlAdLine('الهاتف: '+a.phone,'ad-phone'));
+  content.append(info);
+  const controls=document.createElement('div');controls.className='ad-card-actions';
+  if(parsed.worker){
+   const view=document.createElement('a');view.href=parsed.worker;view.target='_blank';view.rel='noopener noreferrer';
+   view.className='btn btn-s ad-view-link';view.textContent='عرض العاملة';controls.append(view);
+  }
+  if(a.status==='pending'){
+   const approve=document.createElement('button');approve.className='btn btn-p btn-s';approve.textContent='موافقة ونشر';
+   approve.onclick=()=>appAd(a.id);controls.append(approve);
+  }
+  const del=document.createElement('button');del.className='btn btn-d btn-s';del.textContent='حذف';
+  del.onclick=()=>delAd(a.id);controls.append(del);
+  card.append(header,content,controls);w.append(card);
  }
 }
 function updateAdsBadge(n){const b=document.getElementById('ads-badge');if(!b)return;if(n>0){b.textContent=n>99?'99+':n;b.style.display='flex';}else{b.style.display='none';}}
