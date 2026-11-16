@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>SAAHL — نقل كفالة</title>
+<title>ساهل 2 — عرض نقل كفالة</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://js.stripe.com/v3/"></script>
 <style>
@@ -224,7 +224,7 @@ select.inp{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.
   .lcard-img{height:150px}
 }
 </style>
-</head>
+<style>input[type="number"],input[type="tel"],.pay-total-amt,#adNum{font-variant-numeric:lining-nums;direction:ltr;unicode-bidi:plaintext}</style></head>
 <body>
 
 <nav>
@@ -476,7 +476,7 @@ select.inp{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.
               </div>
             </div>
             <div class="pb-note">
-              <strong>العرض يبدأ فور اكتمال الدفع</strong> ويُوقف تلقائياً بعد انتهاء المدة المختارة.<br>
+              <strong>مدة العرض تُحسب عند تفعيل الإعلان بعد المراجعة</strong> ويُوقف تلقائياً بعد انتهاء المدة المختارة.<br>
               يمكنك تجديد العرض في أي وقت بنفس السعر.
             </div>
           </div>
@@ -507,20 +507,19 @@ select.inp{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.
 
           <!-- PAYMENT -->
           <div class="pay-box">
-            <h4>إتمام الدفع لنشر الإعلان</h4>
+            <h4>إرسال إعلان نقل الكفالة للتجربة — دون دفع</h4>
             <div class="pay-total-row">
               <span class="pay-total-lbl">المبلغ الإجمالي (<span id="pay-days">7</span> أيام)</span>
               <span class="pay-total-amt"><span id="pay-total">210</span> د.إ</span>
             </div>
-            <div id="kafala-card-element" style="padding:12px;border:1.5px solid var(--border);border-radius:9px;background:#fff;margin-bottom:10px"></div>
+            <div id="kafala-card-element" style="display:none;padding:12px;border:1.5px solid var(--border);border-radius:9px;background:#fff;margin-bottom:10px"></div>
             <div id="kafala-pay-msg" style="font-size:13px;margin-bottom:10px"></div>
             <button class="stripe-btn" id="kafala-pay-btn" onclick="processPayment()">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
-              ادفع الآن عبر Stripe
+              إرسال الإعلان دون دفع
             </button>
             <div class="stripe-note">
-              دفع آمن ومشفر — نقبل فيزا، ماستركارد، وجميع البطاقات الرئيسية<br>
-              الإعلان يُنشر فوراً بعد تأكيد الدفع
+              الدفع متوقف مؤقتاً خلال التجربة. يُحفظ الطلب غير منشور لحين مراجعة الإدارة.
             </div>
           </div>
 
@@ -800,41 +799,13 @@ function collectSkills() {
 async function processPayment() {
   if (!validateForm()) { alert('يرجى إكمال جميع الحقول المطلوبة أولاً'); return; }
   if (!document.getElementById('agreeTerms').checked) { alert('يرجى الموافقة على الشروط والأحكام'); return; }
-  if (!_kCardEl) { alert('تعذّر تحميل نموذج الدفع، أعد تحميل الصفحة'); return; }
-
   const days = parseInt(document.getElementById('adDays').value) || 7;
-  const total = days * 30; // درهم
+  const total = days * 30;
   const btn = document.getElementById('kafala-pay-btn');
   const msgEl = document.getElementById('kafala-pay-msg');
-
   btn.disabled = true;
-  btn.textContent = 'جاري معالجة الدفع...';
-  msgEl.style.color = '#777';
-  msgEl.textContent = 'جاري إنشاء عملية الدفع...';
-
+  msgEl.textContent = 'جاري حفظ الطلب دون دفع...';
   try {
-    // 1) إنشاء PaymentIntent بخصم فوري عبر الدالة الخادمية (نفس الدالة المستخدمة لتمييز العاملات)
-    const intentRes = await fetch(K_STRIPE_EDGE_FN_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ amount: total * 100 })
-    });
-    const intentData = await intentRes.json();
-    if (!intentRes.ok || !intentData.client_secret) {
-      throw new Error(intentData.error || 'تعذّر بدء عملية الدفع');
-    }
-
-    // 2) تأكيد الدفع فعلياً من البطاقة
-    msgEl.textContent = 'جاري تأكيد الدفع من البطاقة...';
-    const { error: confirmError, paymentIntent } = await _kStripe.confirmCardPayment(intentData.client_secret, {
-      payment_method: { card: _kCardEl }
-    });
-    if (confirmError) throw new Error(confirmError.message || 'فشل الدفع من البطاقة');
-    if (paymentIntent.status !== 'succeeded') {
-      throw new Error('لم تكتمل عملية الدفع (الحالة: ' + paymentIntent.status + ')');
-    }
-
-    // 3) الدفع نجح فعلياً — الآن فقط نُنشئ الإعلان الحقيقي
     const startsAt = new Date();
     const endsAt = new Date(startsAt.getTime() + days * 86400000);
     const { data: inserted, error: insertError } = await _db.from('kafala_ads').insert({
@@ -853,21 +824,17 @@ async function processPayment() {
       ad_price: total,
       starts_at: startsAt.toISOString(),
       ends_at: endsAt.toISOString(),
-      payment_status: 'paid',
-      stripe_session_id: paymentIntent.id,
-      is_active: true
+      payment_status: 'pending',
+      stripe_session_id: null,
+      is_active: false
     }).select().single();
-    if (insertError) throw new Error('الدفع نجح لكن تعذّر نشر الإعلان: ' + insertError.message);
+    if (insertError) throw new Error('تعذّر حفظ طلب الإعلان: ' + insertError.message);
 
+    
     showSuccess(inserted.id);
-    loadListings();
-  } catch (e) {
-    msgEl.style.color = '#E53E3E';
-    msgEl.textContent = e.message || 'تعذّر إتمام العملية، حاول لاحقاً';
-  } finally {
-    btn.disabled = false;
-    btn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg> ادفع الآن عبر Stripe';
-  }
+    msgEl.textContent = '';
+  } catch(e) { msgEl.style.color='#b42318'; msgEl.textContent=e.message||'تعذّر إرسال الطلب'; }
+  finally { btn.disabled=false; }
 }
 
 function showSuccess(adId) {
@@ -890,7 +857,7 @@ document.querySelectorAll('.inp').forEach(inp => {
 // Init
 loadListings();
 calcPrice();
-initKafalaCardElement();
+// Trial mode: card entry disabled; no Stripe payment request.
 </script>
 </body>
 </html>
