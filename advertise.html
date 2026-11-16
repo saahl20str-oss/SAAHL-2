@@ -392,7 +392,7 @@ async function submitAd(){
   if(!topic){ errEl.textContent='أدخل عنوان الإعلان'; return; }
   if(!details){ errEl.textContent='أدخل تفاصيل الإعلان'; return; }
 
-  if(selectedWorker&&selectedOffice){const {data:auth}=await db.auth.getUser();if(!auth?.user){errEl.textContent='يجب تسجيل الدخول إلى حساب المكتب قبل إرسال العاملة للأضواء.';return}const {data:owned,error:ownErr}=await db.from('offices').select('id').eq('id',selectedOffice.id).eq('owner_id',auth.user.id).single();if(ownErr||!owned){errEl.textContent='لا يمكنك إرسال عاملة تابعة لمكتب آخر.';return}}
+  if(selectedWorker&&selectedOffice){const {data:auth}=await db.auth.getUser();if(!auth?.user){errEl.textContent='يجب تسجيل الدخول إلى حساب المكتب قبل إرسال إعلان العاملة إلى الشريط العلوي.';return}const {data:owned,error:ownErr}=await db.from('offices').select('id').eq('id',selectedOffice.id).eq('owner_id',auth.user.id).single();if(ownErr||!owned){errEl.textContent='لا يمكنك إرسال عاملة تابعة لمكتب آخر.';return}}
   const btn = document.getElementById('pay-btn');
   btn.classList.add('loading');
   btn.disabled = true;
@@ -409,7 +409,7 @@ async function submitAd(){
       days: selectedDays,
       amount: selectedDays * 10,
       status: 'pending',
-      placement: selectedWorker ? 'spotlight' : 'strip',
+      placement: 'strip',
       worker_id: selectedWorker?.id || null,
       office_id: selectedOffice?.id || null,
       worker_photo_url: selectedWorker?.photo_url || null
