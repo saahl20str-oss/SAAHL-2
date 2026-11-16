@@ -179,6 +179,7 @@ body.admin-menu-open{overflow:hidden}
 }
 /* Explicit admin authentication errors visible on phones */
 #le-err{display:none;white-space:normal;overflow-wrap:anywhere;line-height:1.8;margin-top:12px;color:#b91c1c;font-size:13px;font-weight:600;text-align:center}
+.kf-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr));gap:12px;padding:14px}.kf-review{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:16px;min-width:0;overflow-wrap:anywhere}.kf-top,.kf-actions{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}.kf-meta{font-size:12px;color:var(--muted);line-height:1.9;margin-top:7px}.kf-actions{justify-content:flex-start;margin-top:12px}@media(max-width:600px){.kf-grid{padding:10px;grid-template-columns:minmax(0,1fr)}}
 </style>
 </head>
 <body>
@@ -453,8 +454,27 @@ function filterSponsors(){const q=document.getElementById('spo-s').value.toLower
 async function delSpo(id){if(!confirm('حذف الكفيل؟'))return;await db.from('sponsor_profiles').delete().eq('id',id);toast('تم حذف الكفيل ✓');loadSpo();}
 async function loadBk(){const {data}=await db.from('bookings').select('*').order('created_at',{ascending:false});aBk=data||[];const w=document.getElementById('bk-wrap');if(!aBk.length){w.innerHTML=eh('لا توجد حجوزات');return;}w.innerHTML=`<div class="tw"><table><thead><tr><th>الكفيل</th><th>العاملة</th><th>المكتب</th><th>التاريخ</th><th>الحالة</th><th>العمولة</th></tr></thead><tbody>${aBk.map(b=>`<tr><td>${b.sponsor_name||'—'}</td><td>${b.maid_name||'—'}</td><td>${b.office_name||'—'}</td><td>${fd(b.created_at)}</td><td><span class="bge ${b.status==='booked'?'booked':b.status==='completed'?'active':'pending'}">${b.status==='booked'?'محجوزة':b.status==='completed'?'مكتملة':'معلقة'}</span></td><td style="font-weight:600;color:var(--teal)">69 AED</td></tr>`).join('')}</tbody></table></div>`;}
 async function loadPy(){const {data}=await db.from('payments').select('*').order('created_at',{ascending:false});aPy=data||[];let o=0,b=0,k=0;aPy.forEach(p=>{if(p.type==='subscription')o+=p.amount||0;else if(p.type==='booking')b+=p.amount||0;else if(p.type==='kafala_ad')k+=p.amount||0;});document.getElementById('py-off').textContent=o.toLocaleString()+' AED';document.getElementById('py-bk').textContent=b.toLocaleString()+' AED';document.getElementById('py-kf').textContent=k.toLocaleString()+' AED';const w=document.getElementById('py-wrap');if(!aPy.length){w.innerHTML=eh('لا توجد مدفوعات');return;}const tl={subscription:'اشتراك شهري',booking:'عمولة حجز',kafala_ad:'إعلان كفالة',strip_ad:'إعلان شريط'};w.innerHTML=`<div class="tw"><table><thead><tr><th>المستخدم</th><th>النوع</th><th>المبلغ</th><th>التاريخ</th><th>الحالة</th></tr></thead><tbody>${aPy.map(p=>`<tr><td>${p.user_name||'—'}</td><td>${tl[p.type]||p.type||'—'}</td><td style="font-weight:600;color:var(--teal)">${(p.amount||0).toLocaleString()} AED</td><td>${fd(p.created_at)}</td><td><span class="bge ${p.status==='paid'?'active':'expired'}">${p.status==='paid'?'مكتمل':'فشل'}</span></td></tr>`).join('')}</tbody></table></div>`;}
-async function loadKf(){const {data}=await db.from('kafala_ads').select('*').order('created_at',{ascending:false});aKf=data||[];const w=document.getElementById('kf-wrap');if(!aKf.length){w.innerHTML=eh('لا توجد إعلانات نقل كفالة');return;}w.innerHTML=`<div class="tw"><table><thead><tr><th>العاملة</th><th>الإمارة</th><th>الجنسية</th><th>الأيام</th><th>ينتهي</th><th>المبلغ</th><th>الحالة</th><th>إجراء</th></tr></thead><tbody>${aKf.map(k=>{const d=k.ad_days||1;const a=!!k.is_active;return`<tr><td>${k.worker_name||'—'}</td><td>${k.emirate||'—'}</td><td>${k.nationality||'—'}</td><td>${d} يوم</td><td>${fd(k.ends_at)}</td><td style="font-weight:600;color:var(--teal)">${k.ad_price||d*30} AED</td><td><span class="bge ${a?'active':'expired'}">${a?'نشط':'منتهي'}</span></td><td><button class="btn ${a?'btn-d':'btn-o'} btn-s" onclick="togKf('${k.id}',${a})">${a?'إيقاف':'تجديد'}</button></td></tr>`;}).join('')}</tbody></table></div>`;}
-async function togKf(id,isActive){await db.from('kafala_ads').update({is_active:!isActive}).eq('id',id);toast(!isActive?'تم تفعيل الإعلان ✓':'تم إيقاف الإعلان');loadKf();}
+const kfSafe=v=>String(v??'—').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+async function loadKf(){
+ const w=document.getElementById('kf-wrap');
+ const {data,error}=await db.from('kafala_ads').select('*').order('created_at',{ascending:false});
+ if(error){w.textContent='تعذر تحميل طلبات نقل الكفالة: '+error.message;return;}
+ aKf=data||[];
+ if(!aKf.length){w.innerHTML=eh('لا توجد طلبات نقل كفالة');return;}
+ const pending=aKf.filter(k=>k.review_status==='pending_review').length;
+ w.innerHTML='<div style="padding:14px;font-weight:700">طلبات نقل الكفالة: '+aKf.length+' | بانتظار المراجعة: '+pending+'</div><div class="kf-grid">'+aKf.map(k=>{
+ const status=k.review_status==='rejected'?'مرفوض':k.is_active?'منشور':k.review_status==='approved'?'موقوف':'بانتظار المراجعة';
+ const remaining=k.is_active&&k.ends_at?Math.max(0,Math.ceil((new Date(k.ends_at)-Date.now())/86400000)):null;
+ return '<article class="kf-review"><div class="kf-top"><strong>'+kfSafe(k.worker_name)+'</strong><span class="bge '+(k.is_active?'active':'pending')+'">'+status+'</span></div><div class="kf-meta">الإمارة: '+kfSafe(k.emirate)+' | الجنسية: '+kfSafe(k.nationality)+' | المهنة: '+kfSafe(k.profession)+'</div><div class="kf-meta">العمر: '+kfSafe(k.age)+' | الخبرة: '+kfSafe(k.experience_years)+' سنة | المدة: '+kfSafe(k.ad_days)+' يوم</div><div class="kf-meta">المهارات: '+kfSafe((k.skills||[]).join('، ')||'غير محددة')+'</div><div class="kf-meta">سبب النقل: '+kfSafe(k.reason)+'</div><div class="kf-meta">اسم الكفيل: '+kfSafe(k.sponsor_display_name)+' | الهاتف: <span dir="ltr">'+kfSafe(k.contact_phone)+'</span></div><div class="kf-meta">تاريخ الطلب: '+fd(k.created_at)+' | انتهاء العرض: '+(k.is_active?fd(k.ends_at):'يحدد عند النشر')+(remaining!==null?' | المتبقي: '+remaining+' يوم':'')+'</div><div class="kf-actions">'+(k.review_status!=='approved'?'<button class="btn btn-s" onclick="reviewKf(\''+k.id+'\',\'approve\')">موافقة ونشر</button>':'')+(k.review_status!=='rejected'?'<button class="btn btn-o btn-s" onclick="reviewKf(\''+k.id+'\',\'reject\')">رفض</button>':'')+(k.is_active?'<button class="btn btn-d btn-s" onclick="reviewKf(\''+k.id+'\',\'stop\')">إيقاف</button>':k.review_status==='approved'?'<button class="btn btn-s" onclick="reviewKf(\''+k.id+'\',\'resume\')">استئناف إن لم تنتهِ المدة</button>':'')+'</div></article>';
+ }).join('')+'</div>';
+}
+async function reviewKf(id,action){
+ const label={approve:'الموافقة ونشر الإعلان',reject:'رفض الإعلان',stop:'إيقاف الإعلان',resume:'استئناف الإعلان'}[action];
+ if(!label||!confirm('تأكيد '+label+'؟'))return;
+ const {error}=await db.rpc('review_kafala_ad',{p_id:id,p_action:action});
+ if(error){toast('تعذر تنفيذ الإجراء: '+error.message,5000);return;}
+ toast('تم تنفيذ الإجراء بنجاح');await loadKf();
+}
 function saahlAdDetails(raw){
  const text=String(raw||'');
  const links=text.match(/https?:\/\/[^\s|<>"]+/gi)||[];
