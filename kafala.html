@@ -225,6 +225,25 @@ select.inp{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.
 }
 
 .lcard{display:flex;flex-direction:column;overflow:hidden}.lcard-body{display:flex;flex-direction:column;flex:1}.lcard-btn{margin-top:auto}.lcard-img .lcard-avatar{overflow:hidden}.lcard-img .lcard-avatar:has(img){width:100%;height:100%;border:0;border-radius:0;background:transparent}.lcard-img .lcard-avatar img{display:block;width:100%;height:100%;object-fit:contain;background:#171721}.lcard-img .lcard-profession{z-index:1}
+
+/* SA AHL 2 — compact editorial transfer cards */
+.listings-grid{grid-template-columns:repeat(auto-fill,minmax(265px,1fr));gap:18px;align-items:stretch}
+.lcard.transfer-poster{--poster:#557d78;--poster-ink:#fff;border:1px solid #e7e0d3;border-radius:15px;box-shadow:0 3px 14px rgba(22,27,33,.05);display:flex;flex-direction:column;transform:none;min-width:0}
+.transfer-poster .poster-top{background:var(--poster);color:var(--poster-ink);display:grid;grid-template-columns:43% minmax(0,1fr);gap:12px;padding:14px;min-height:220px;direction:ltr}
+.transfer-poster .poster-photo{width:100%;height:192px;border-radius:70px 70px 12px 12px;border:2px solid rgba(255,255,255,.65);overflow:hidden;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.16);color:#fff;font-size:40px;font-weight:800}
+.transfer-poster .poster-photo img{width:100%;height:100%;object-fit:contain;display:block}
+.transfer-poster .poster-info{direction:rtl;text-align:right;min-width:0;display:flex;flex-direction:column;gap:7px;justify-content:center}
+.transfer-poster .poster-heading{font-size:16px;font-weight:850;line-height:1.5;overflow-wrap:anywhere}
+.transfer-poster .poster-label{display:inline-block;background:#17191d;color:#fff;border-radius:30px;padding:4px 11px;font-size:11px;font-weight:800;align-self:flex-start;max-width:100%}
+.transfer-poster .poster-fact{font-size:12px;line-height:1.55;overflow-wrap:anywhere}
+.transfer-poster .poster-fact strong{font-weight:800}
+.transfer-poster .poster-bottom{padding:13px 14px 14px;display:flex;flex-direction:column;flex:1;gap:10px}
+.transfer-poster .poster-skills{font-size:12px;color:#42444a;line-height:1.8;overflow-wrap:anywhere;min-height:42px}
+.transfer-poster .poster-expiry{font-size:11px;color:#767676;border-top:1px solid #eee7dc;padding-top:8px}
+.transfer-poster .lcard-btn{margin-top:auto;background:#17191d;border-radius:9px;padding:11px}
+.transfer-poster .lcard-btn:hover{background:#3b3327}
+@media(max-width:600px){.listings-grid{grid-template-columns:1fr;gap:13px}.transfer-poster .poster-top{min-height:190px;padding:12px;grid-template-columns:40% minmax(0,1fr)}.transfer-poster .poster-photo{height:170px}.transfer-poster .poster-heading{font-size:15px}}
+
 </style>
 <style>input[type="number" inputmode="numeric"],input[type="tel"],.pay-total-amt,#adNum{font-variant-numeric:lining-nums;direction:ltr;unicode-bidi:plaintext}</style></head>
 <body>
@@ -666,28 +685,36 @@ function renderListings(list) {
     grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:60px 20px"><div style="font-size:15px;font-weight:700;color:var(--dark);margin-bottom:8px">لا توجد نتائج</div><div style="font-size:13px;color:var(--muted)">جرب تغيير فلاتر البحث</div></div>';
     return;
   }
-  grid.innerHTML = list.map(l => `
-    <div class="lcard" onclick="openDetail('${l.id}')">
-      <div class="lcard-img">
-        <div class="lcard-avatar">${kafalaPhotoMarkup(l)}</div>
-        <div class="lcard-profession">
-          <span class="lcard-prof-name">${l.prof} — ${l.nat}</span>
-          <span class="lcard-expiry">ينتهي: ${l.expiry}</span>
+  grid.innerHTML = list.map(l => {
+    const palettes=['#5d8983','#9a776e','#647c95','#8a8067','#7d7195','#668b7c','#a17d57','#6d8290'];
+    const hash=Array.from(String(l.id)).reduce((acc,ch)=>((acc*31+ch.charCodeAt(0))>>>0),0);
+    const color=palettes[hash%palettes.length];
+    const photo=safeKafalaImageUrl(l.photo);
+    const photoMarkup=photo ? `<img src="${photo}" alt="صورة العامل" loading="lazy" onerror="this.style.display='none';this.parentElement.textContent='صورة غير متاحة'">` : (l.name?.[0] || 'ع');
+    const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    const skills=(Array.isArray(l.skills)?l.skills:[]).filter(Boolean);
+    return `
+    <div class="lcard transfer-poster" style="--poster:${color}" onclick="openDetail('${esc(l.id)}')">
+      <div class="poster-top">
+        <div class="poster-photo">${photoMarkup}</div>
+        <div class="poster-info">
+          <div class="poster-heading">${esc(l.name)}</div>
+          <span class="poster-label">البيانات الأساسية</span>
+          <div class="poster-fact"><strong>الجنسية:</strong> ${esc(l.nat)}</div>
+          <div class="poster-fact"><strong>المهنة:</strong> ${esc(l.prof)}</div>
+          <div class="poster-fact"><strong>العمر:</strong> ${esc(l.age)} سنة</div>
+          <div class="poster-fact"><strong>الخبرة:</strong> ${esc(l.exp)} سنة</div>
+          <span class="poster-label">الوضع الحالي</span>
+          <div class="poster-fact">${esc(l.status)}</div>
         </div>
       </div>
-      <div class="lcard-body">
-        <div class="lcard-name">${l.name}</div>
-        <div class="lcard-tags">
-          <span class="lcard-tag">${l.emirate}</span>
-          <span class="lcard-tag">${l.age} سنة</span>
-          <span class="lcard-tag">${l.exp} سنة خبرة</span>
-          <span class="lcard-tag status">${l.status}</span>
-        </div>
-        <div class="lcard-skills">${l.skills.slice(0,3).map(s=>`<span class="lcard-skill">${s}</span>`).join('')}${l.skills.length>3?`<span class="lcard-skill">+${l.skills.length-3} مهارات</span>`:''}</div>
-        <button class="lcard-btn">عرض التفاصيل والتواصل</button>
+      <div class="poster-bottom">
+        <div class="poster-skills"><strong>المهارات:</strong> ${skills.length?esc(skills.slice(0,4).join('، '))+(skills.length>4?'، والمزيد…':''):'غير محددة'}</div>
+        <div class="poster-expiry">الإمارة: ${esc(l.emirate||'غير محددة')} · ينتهي الإعلان: ${esc(l.expiry)}</div>
+        <button type="button" class="lcard-btn">عرض التفاصيل والتواصل</button>
       </div>
-    </div>
-  `).join('');
+    </div>`;
+  }).join('');
 }
 
 function filterListings() {
