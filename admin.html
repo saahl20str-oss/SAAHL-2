@@ -236,8 +236,9 @@ body.admin-menu-open{overflow:hidden}
       <div class="pt">نظرة عامة</div>
       <div class="sg">
         <div class="sc"><div class="si teal">🏢</div><div class="sl">المكاتب المسجلة</div><div class="sv" id="s-off">—</div><div class="ss" id="ss-off">جارٍ التحميل...</div></div>
-        <div class="sc"><div class="si blue">👥</div><div class="sl">الكفلاء المسجلون</div><div class="sv" id="s-spo">—</div><div class="ss" id="ss-spo">جارٍ التحميل...</div></div>
+        <div class="sc"><div class="si blue">👥</div><div class="sl">حسابات الكفلاء</div><div class="sv" id="s-spo">—</div><div class="ss" id="ss-spo">جارٍ التحميل...</div></div>
         <div class="sc" role="button" tabindex="0" onclick="navTo(\'kafala\')" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();navTo(\'kafala\')}"><div class="si amber">📣</div><div class="sl">إعلانات نقل الكفالة</div><div class="sv" id="s-kf">—</div><div class="ss" id="ss-kf">جارٍ التحميل...</div><div class="ss" id="ss-kf-status">اضغط لعرض الطلبات</div></div>
+        <div class="sc" role="button" tabindex="0" onclick="navTo(\'kafala\')" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();navTo(\'kafala\')}"><div class="si amber">⏳</div><div class="sl">إعلانات بانتظار المراجعة</div><div class="sv" id="s-kf-pending">—</div><div class="ss" id="ss-kf-pending">اضغط لمراجعة الطلبات</div></div>
         <div class="sc"><div class="si amber">💰</div><div class="sl">إيرادات هذا الشهر</div><div class="sv" id="s-rev">—</div><div class="ss" id="ss-rev">جارٍ التحميل...</div></div>
         <div class="sc"><div class="si green">📋</div><div class="sl">الحجوزات النشطة</div><div class="sv" id="s-bk">—</div><div class="ss" id="ss-bk">جارٍ التحميل...</div></div>
       </div>
@@ -460,13 +461,14 @@ const kfSafe=v=>String(v??'—').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;',
 async function loadKf(){
  const w=document.getElementById('kf-wrap');
  const {data,error}=await db.from('kafala_ads').select('*').order('created_at',{ascending:false});
- if(error){w.textContent='تعذر تحميل طلبات نقل الكفالة: '+error.message;const badge=document.getElementById('kf-badge');if(badge)badge.style.display='none';const total=document.getElementById('s-kf');if(total)total.textContent='—';const summary=document.getElementById('ss-kf');if(summary)summary.textContent='تعذر تحميل الإعلانات';return;}
+ if(error){w.textContent='تعذر تحميل طلبات نقل الكفالة: '+error.message;const badge=document.getElementById('kf-badge');if(badge)badge.style.display='none';const total=document.getElementById('s-kf');if(total)total.textContent='—';const pendingCard=document.getElementById('s-kf-pending');if(pendingCard)pendingCard.textContent='—';const summary=document.getElementById('ss-kf');if(summary)summary.textContent='تعذر تحميل الإعلانات';return;}
  aKf=data||[];
  const kfTotal=document.getElementById('s-kf'),kfSummary=document.getElementById('ss-kf'),kfStatus=document.getElementById('ss-kf-status');
  const kfPending=aKf.filter(k=>k.review_status==='pending_review').length;
  const kfPublished=aKf.filter(k=>k.is_active===true).length;
  const kfRejected=aKf.filter(k=>k.review_status==='rejected').length;
  if(kfTotal)kfTotal.textContent=String(aKf.length);
+ const kfPendingCard=document.getElementById('s-kf-pending');if(kfPendingCard)kfPendingCard.textContent=String(kfPending);
  if(kfSummary)kfSummary.textContent=kfPublished+' منشور · '+kfPending+' بانتظار المراجعة';
  if(kfStatus)kfStatus.textContent=kfRejected+' مرفوض · اضغط لعرض الطلبات';
  const badgeAll=document.getElementById('kf-badge');if(badgeAll){badgeAll.textContent=String(kfPending);badgeAll.style.display=kfPending?'inline-flex':'none';}
