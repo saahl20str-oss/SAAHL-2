@@ -66,8 +66,8 @@ nav{background:#fff;border-bottom:2px solid var(--border);padding:0 5%;display:f
 /* LISTING CARD */
 .lcard{background:#fff;border-radius:var(--radius);border:1.5px solid var(--border);overflow:hidden;transition:all .25s;cursor:pointer}
 .lcard:hover{border-color:var(--gold);transform:translateY(-3px);box-shadow:0 12px 32px rgba(201,168,76,.12)}
-.lcard-img{height:220px;background:linear-gradient(135deg,#1a1a2e,#111);display:flex;align-items:center;justify-content:center;position:relative}
-.lcard-avatar{width:100%;height:100%;border-radius:0;border-radius:50%;background:var(--gold-l);display:flex;align-items:center;justify-content:center;font-size:34px;font-weight:800;color:var(--gold-d);border:3px solid rgba(201,168,76,.3)}
+.lcard-img{height:132px;background:linear-gradient(135deg,#1a1a2e,#111);display:flex;align-items:center;justify-content:center;position:relative}
+.lcard-avatar{width:68px;height:68px;border-radius:50%;background:var(--gold-l);display:flex;align-items:center;justify-content:center;font-size:34px;font-weight:800;color:var(--gold-d);border:3px solid rgba(201,168,76,.3)}
 .lcard-profession{position:absolute;bottom:10px;right:10px;left:10px;background:rgba(0,0,0,.65);backdrop-filter:blur(4px);border-radius:8px;padding:6px 10px;display:flex;align-items:center;justify-content:space-between}
 .lcard-prof-name{font-size:12px;color:#fff;font-weight:700}
 .lcard-expiry{font-size:10px;color:rgba(255,255,255,.5)}
@@ -221,10 +221,10 @@ select.inp{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.
 }
 @media(max-width:480px){
   .listings-grid{grid-template-columns:1fr 1fr}
-  .lcard-img{height:185px}
+  .lcard-img{height:118px}
 }
 
-.lcard{display:flex;flex-direction:column;overflow:hidden}.lcard-body{display:flex;flex-direction:column;flex:1}.lcard-btn{margin-top:auto}.lcard-img .lcard-avatar{border:0;overflow:hidden}.lcard-img .lcard-profession{z-index:1}
+.lcard{display:flex;flex-direction:column;overflow:hidden}.lcard-body{display:flex;flex-direction:column;flex:1}.lcard-btn{margin-top:auto}.lcard-img .lcard-avatar{overflow:hidden}.lcard-img .lcard-avatar:has(img){width:100%;height:100%;border:0;border-radius:0;background:transparent}.lcard-img .lcard-avatar img{display:block;width:100%;height:100%;object-fit:contain;background:#171721}.lcard-img .lcard-profession{z-index:1}
 </style>
 <style>input[type="number" inputmode="numeric"],input[type="tel"],.pay-total-amt,#adNum{font-variant-numeric:lining-nums;direction:ltr;unicode-bidi:plaintext}</style></head>
 <body>
