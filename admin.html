@@ -223,7 +223,7 @@ body.admin-menu-open{overflow:hidden}
     <div class="ni" data-p="bookings" onclick="navTo('bookings')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/><path d="M9 16l2 2 4-4"/></svg>الحجوزات</div>
     <div class="ns">المالية</div>
     <div class="ni" data-p="payments" onclick="navTo('payments')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="1" y="4" width="22" height="16" rx="2"/><path d="M1 10h22"/></svg>المدفوعات</div>
-    <div class="ni" data-p="kafala" onclick="navTo('kafala')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M7 16V4m0 0L3 8m4-4 4 4M17 8v12m0 0 4-4m-4 4-4-4"/></svg>نقل الكفالة</div>
+    <div class="ni" data-p="kafala" onclick="navTo('kafala')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M7 16V4m0 0L3 8m4-4 4 4M17 8v12m0 0 4-4m-4 4-4-4"/></svg>نقل الكفالة<span id="kf-badge" aria-label="طلبات نقل كفالة بانتظار المراجعة" style="margin-right:auto;background:#dc2626;color:#fff;font-size:11px;font-weight:700;min-width:21px;height:21px;border-radius:12px;display:none;align-items:center;justify-content:center;padding:0 6px">0</span></div>
     <div class="ns">أدوات</div>
     <div class="ni" data-p="ads" onclick="navTo('ads')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>الإعلانات<span id="ads-badge" style="margin-right:auto;background:#ef4444;color:#fff;font-size:11px;font-weight:700;min-width:18px;height:18px;border-radius:9px;display:none;align-items:center;justify-content:center;padding:0 5px">0</span></div>
     <div class="ni" data-p="notifications" onclick="navTo('notifications')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>الإشعارات</div>
@@ -458,10 +458,11 @@ const kfSafe=v=>String(v??'—').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;',
 async function loadKf(){
  const w=document.getElementById('kf-wrap');
  const {data,error}=await db.from('kafala_ads').select('*').order('created_at',{ascending:false});
- if(error){w.textContent='تعذر تحميل طلبات نقل الكفالة: '+error.message;return;}
+ if(error){w.textContent='تعذر تحميل طلبات نقل الكفالة: '+error.message;const badge=document.getElementById('kf-badge');if(badge)badge.style.display='none';return;}
  aKf=data||[];
  if(!aKf.length){w.innerHTML=eh('لا توجد طلبات نقل كفالة');return;}
  const pending=aKf.filter(k=>k.review_status==='pending_review').length;
+ const badge=document.getElementById('kf-badge');if(badge){badge.textContent=String(pending);badge.style.display=pending?'inline-flex':'none';}
  w.innerHTML='<div style="padding:14px;font-weight:700">طلبات نقل الكفالة: '+aKf.length+' | بانتظار المراجعة: '+pending+'</div><div class="kf-grid">'+aKf.map(k=>{
  const status=k.review_status==='rejected'?'مرفوض':k.is_active?'منشور':k.review_status==='approved'?'موقوف':'بانتظار المراجعة';
  const remaining=k.is_active&&k.ends_at?Math.max(0,Math.ceil((new Date(k.ends_at)-Date.now())/86400000)):null;
