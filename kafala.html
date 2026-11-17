@@ -634,7 +634,8 @@ async function loadListings() {
         contact: r.contact_phone,
         sponsor: r.sponsor_display_name || 'الكفيل',
         expiry: formatArabicDate(r.ends_at),
-        daysLeft
+        daysLeft,
+        photo: r.worker_photo_url || null
       };
     });
     renderListings(listings);
@@ -646,6 +647,11 @@ async function loadListings() {
 
 let currentDetail = null;
 let photoData = null;
+let selectedPhotoFile = null;
+function safeKafalaImageUrl(value) { try { const u = new URL(value); return u.protocol === 'https:' && u.hostname === 'hkfxikmpfgixrbrboxeb.supabase.co' && u.pathname.startsWith('/storage/v1/object/public/saahl-kafala-photos/') ? u.href : ''; } catch { return ''; } }
+function kafalaPhotoMarkup(l) { const url = safeKafalaImageUrl(l.photo); return url ? `<img src="${url}" alt="صورة العامل" style="width:100%;height:100%;object-fit:cover" onerror="this.replaceWith(document.createTextNode(${JSON.stringify('صورة غير متاحة')}))">` : (l.name?.[0] || 'ع'); }
+async function uploadKafalaPhoto() { if (!selectedPhotoFile) return null; const f = selectedPhotoFile; if (!['image/jpeg','image/png','image/webp'].includes(f.type) || f.size > 5*1024*1024) throw new Error('الصورة يجب أن تكون JPG أو PNG أو WEBP وبحجم لا يزيد عن 5MB'); const ext = f.type === 'image/png' ? 'png' : f.type === 'image/webp' ? 'webp' : 'jpg'; const path = 'kafala/' + crypto.randomUUID() + '.' + ext; const {error} = await _db.storage.from('saahl-kafala-photos').upload(path,f,{contentType:f.type,upsert:false}); if(error) throw new Error('تعذّر رفع الصورة: '+error.message); return _db.storage.from('saahl-kafala-photos').getPublicUrl(path).data.publicUrl; }
+
 
 // ===== RENDER =====
 function renderListings(list) {
@@ -658,7 +664,7 @@ function renderListings(list) {
   grid.innerHTML = list.map(l => `
     <div class="lcard" onclick="openDetail('${l.id}')">
       <div class="lcard-img">
-        <div class="lcard-avatar">${l.name[0]}</div>
+        <div class="lcard-avatar">${kafalaPhotoMarkup(l)}</div>
         <div class="lcard-profession">
           <span class="lcard-prof-name">${l.prof} — ${l.nat}</span>
           <span class="lcard-expiry">ينتهي: ${l.expiry}</span>
@@ -698,7 +704,7 @@ function openDetail(id) {
   const l = listings.find(x => x.id === id);
   if (!l) return;
   currentDetail = l;
-  document.getElementById('dm-avatar').textContent = l.name[0];
+  document.getElementById('dm-avatar').innerHTML = kafalaPhotoMarkup(l);
   document.getElementById('dm-name').textContent = l.name;
   document.getElementById('dm-tags').innerHTML = [l.nat, l.prof, l.emirate, l.status].map(t=>`<span class="dm-tag">${t}</span>`).join('');
   document.getElementById('dm-grid').innerHTML = [
@@ -751,6 +757,8 @@ function toggleSkill(el) {
 function previewPhoto(input) {
   const file = input.files[0];
   if (!file) return;
+  if (!['image/jpeg','image/png','image/webp'].includes(file.type) || file.size > 5*1024*1024) { alert('اختر صورة JPG أو PNG أو WEBP بحجم لا يتجاوز 5MB'); input.value=''; return; }
+  selectedPhotoFile = file;
   const reader = new FileReader();
   reader.onload = e => {
     photoData = e.target.result;
@@ -823,8 +831,10 @@ async function processPayment() {
     const startsAt = new Date();
     const endsAt = new Date(startsAt.getTime() + days * 86400000);
     const trackingToken = crypto.randomUUID();
+    const workerPhotoUrl = await uploadKafalaPhoto();
     const { error: insertError } = await _db.from('kafala_ads').insert({
       tracking_token: trackingToken,
+      worker_photo_url: workerPhotoUrl,
       worker_name: document.getElementById('wName').value.trim(),
       nationality: document.getElementById('wNat').value,
       age: parseInt(document.getElementById('wAge').value) || null,
