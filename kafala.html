@@ -66,8 +66,8 @@ nav{background:#fff;border-bottom:2px solid var(--border);padding:0 5%;display:f
 /* LISTING CARD */
 .lcard{background:#fff;border-radius:var(--radius);border:1.5px solid var(--border);overflow:hidden;transition:all .25s;cursor:pointer}
 .lcard:hover{border-color:var(--gold);transform:translateY(-3px);box-shadow:0 12px 32px rgba(201,168,76,.12)}
-.lcard-img{height:180px;background:linear-gradient(135deg,#1a1a2e,#111);display:flex;align-items:center;justify-content:center;position:relative}
-.lcard-avatar{width:88px;height:88px;border-radius:50%;background:var(--gold-l);display:flex;align-items:center;justify-content:center;font-size:34px;font-weight:800;color:var(--gold-d);border:3px solid rgba(201,168,76,.3)}
+.lcard-img{height:220px;background:linear-gradient(135deg,#1a1a2e,#111);display:flex;align-items:center;justify-content:center;position:relative}
+.lcard-avatar{width:100%;height:100%;border-radius:0;border-radius:50%;background:var(--gold-l);display:flex;align-items:center;justify-content:center;font-size:34px;font-weight:800;color:var(--gold-d);border:3px solid rgba(201,168,76,.3)}
 .lcard-profession{position:absolute;bottom:10px;right:10px;left:10px;background:rgba(0,0,0,.65);backdrop-filter:blur(4px);border-radius:8px;padding:6px 10px;display:flex;align-items:center;justify-content:space-between}
 .lcard-prof-name{font-size:12px;color:#fff;font-weight:700}
 .lcard-expiry{font-size:10px;color:rgba(255,255,255,.5)}
@@ -89,7 +89,7 @@ nav{background:#fff;border-bottom:2px solid var(--border);padding:0 5%;display:f
 .dm-head{background:linear-gradient(135deg,#111,#1a1a2e);padding:26px;text-align:center;position:relative}
 .dm-close{position:absolute;top:14px;left:14px;width:32px;height:32px;border-radius:8px;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.08);color:rgba(255,255,255,.6);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;transition:all .2s}
 .dm-close:hover{background:rgba(255,255,255,.15);color:#fff}
-.dm-avatar{width:84px;height:84px;border-radius:50%;background:var(--gold-l);display:flex;align-items:center;justify-content:center;font-size:34px;font-weight:800;color:var(--gold-d);border:3px solid rgba(201,168,76,.3);margin:0 auto 14px}
+.dm-avatar{width:120px;height:120px;border-radius:50%;background:var(--gold-l);display:flex;align-items:center;justify-content:center;font-size:34px;font-weight:800;color:var(--gold-d);border:3px solid rgba(201,168,76,.3);margin:0 auto 14px}
 .dm-name{font-size:20px;font-weight:800;color:#fff;margin-bottom:8px}
 .dm-tags{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin-bottom:14px}
 .dm-tag{font-size:11px;color:rgba(255,255,255,.55);background:rgba(255,255,255,.08);padding:4px 10px;border-radius:50px;border:1px solid rgba(255,255,255,.1)}
@@ -221,8 +221,10 @@ select.inp{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.
 }
 @media(max-width:480px){
   .listings-grid{grid-template-columns:1fr 1fr}
-  .lcard-img{height:150px}
+  .lcard-img{height:185px}
 }
+
+.lcard{display:flex;flex-direction:column;overflow:hidden}.lcard-body{display:flex;flex-direction:column;flex:1}.lcard-btn{margin-top:auto}.lcard-img .lcard-avatar{border:0;overflow:hidden}.lcard-img .lcard-profession{z-index:1}
 </style>
 <style>input[type="number" inputmode="numeric"],input[type="tel"],.pay-total-amt,#adNum{font-variant-numeric:lining-nums;direction:ltr;unicode-bidi:plaintext}</style></head>
 <body>
@@ -344,12 +346,13 @@ select.inp{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.
             </div>
             <div class="field">
               <label><span class="req">*</span> الجنسية</label>
-              <select class="inp" id="wNat">
+              <select class="inp" id="wNat" onchange="toggleKafalaOther('wNat')">
                 <option value="">اختر</option>
                 <option>فلبيني</option><option>إندونيسي</option><option>إثيوبي</option>
                 <option>باكستاني</option><option>هندي</option><option>بنغلاديشي</option>
-                <option>سوداني</option><option>غاني</option><option>أخرى</option>
+                <option>سوداني</option><option>غاني</option><option value="__other__">أخرى — اكتب بنفسك</option>
               </select>
+              <input class="inp" id="wNatOther" type="text" maxlength="100" placeholder="اكتب الجنسية" style="display:none;margin-top:8px" autocomplete="off">
               <span class="err-txt" id="e-wNat">يرجى اختيار الجنسية</span>
             </div>
           </div>
@@ -361,12 +364,13 @@ select.inp{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.
             </div>
             <div class="field">
               <label><span class="req">*</span> المهنة</label>
-              <select class="inp" id="wProf">
+              <select class="inp" id="wProf" onchange="toggleKafalaOther('wProf')">
                 <option value="">اختر</option>
                 <option>خادمة منزلية</option><option>سائق</option><option>طباخ</option>
                 <option>حلاق</option><option>عامل نظافة</option><option>بستاني</option>
-                <option>حارس أمن</option><option>أخرى</option>
+                <option>حارس أمن</option><option value="__other__">أخرى — اكتب بنفسك</option>
               </select>
+              <input class="inp" id="wProfOther" type="text" maxlength="100" placeholder="اكتب المهنة" style="display:none;margin-top:8px" autocomplete="off">
               <span class="err-txt" id="e-wProf">يرجى اختيار المهنة</span>
             </div>
             <div class="field">
@@ -377,14 +381,15 @@ select.inp{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.
           <div class="row r2">
             <div class="field">
               <label><span class="req">*</span> الوضع الحالي</label>
-              <select class="inp" id="wStatus">
+              <select class="inp" id="wStatus" onchange="toggleKafalaOther('wStatus')">
                 <option value="">اختر</option>
                 <option>على كفالتي</option>
                 <option>موقوف عن العمل</option>
                 <option>منتهية عقده</option>
                 <option>جاهز لنقل الكفالة</option>
-                <option>أخرى</option>
+                <option value="__other__">أخرى — اكتب بنفسك</option>
               </select>
+              <input class="inp" id="wStatusOther" type="text" maxlength="100" placeholder="اكتب الوضع الحالي" style="display:none;margin-top:8px" autocomplete="off">
               <span class="err-txt" id="e-wStatus">يرجى اختيار الوضع الحالي</span>
             </div>
             <div class="field">
@@ -649,7 +654,7 @@ let currentDetail = null;
 let photoData = null;
 let selectedPhotoFile = null;
 function safeKafalaImageUrl(value) { try { const u = new URL(value); return u.protocol === 'https:' && u.hostname === 'hkfxikmpfgixrbrboxeb.supabase.co' && u.pathname.startsWith('/storage/v1/object/public/saahl-kafala-photos/') ? u.href : ''; } catch { return ''; } }
-function kafalaPhotoMarkup(l) { const url = safeKafalaImageUrl(l.photo); return url ? `<img src="${url}" alt="صورة العامل" style="width:100%;height:100%;object-fit:cover" onerror="this.replaceWith(document.createTextNode(${JSON.stringify('صورة غير متاحة')}))">` : (l.name?.[0] || 'ع'); }
+function kafalaPhotoMarkup(l) { const url = safeKafalaImageUrl(l.photo); return url ? `<img src="${url}" alt="صورة العامل" style="width:100%;height:100%;object-fit:contain;background:#171721" onerror="this.replaceWith(document.createTextNode(${JSON.stringify('صورة غير متاحة')}))">` : (l.name?.[0] || 'ع'); }
 async function uploadKafalaPhoto() { if (!selectedPhotoFile) return null; const f = selectedPhotoFile; if (!['image/jpeg','image/png','image/webp'].includes(f.type) || f.size > 5*1024*1024) throw new Error('الصورة يجب أن تكون JPG أو PNG أو WEBP وبحجم لا يزيد عن 5MB'); const ext = f.type === 'image/png' ? 'png' : f.type === 'image/webp' ? 'webp' : 'jpg'; const path = 'kafala/' + crypto.randomUUID() + '.' + ext; const {error} = await _db.storage.from('saahl-kafala-photos').upload(path,f,{contentType:f.type,upsert:false}); if(error) throw new Error('تعذّر رفع الصورة: '+error.message); return _db.storage.from('saahl-kafala-photos').getPublicUrl(path).data.publicUrl; }
 
 
@@ -678,7 +683,7 @@ function renderListings(list) {
           <span class="lcard-tag">${l.exp} سنة خبرة</span>
           <span class="lcard-tag status">${l.status}</span>
         </div>
-        <div class="lcard-skills">${l.skills.map(s=>`<span class="lcard-skill">${s}</span>`).join('')}</div>
+        <div class="lcard-skills">${l.skills.slice(0,3).map(s=>`<span class="lcard-skill">${s}</span>`).join('')}${l.skills.length>3?`<span class="lcard-skill">+${l.skills.length-3} مهارات</span>`:''}</div>
         <button class="lcard-btn">عرض التفاصيل والتواصل</button>
       </div>
     </div>
@@ -785,14 +790,16 @@ function setErr(id, show) {
   else { el.classList.remove('err'); if (err) err.classList.remove('show'); }
 }
 
+function toggleKafalaOther(id) { const select=document.getElementById(id), input=document.getElementById(id+'Other'); if(!select||!input)return; const other=select.value==='__other__'; input.style.display=other?'block':'none'; input.required=other; if(other)input.focus(); else input.value=''; }
+function kafalaFieldValue(id) { const el=document.getElementById(id); return el.value==='__other__' ? document.getElementById(id+'Other').value.trim() : el.value; }
 function validateForm() {
   let ok = true;
   const checks = [
     ['wName', document.getElementById('wName').value.trim()],
-    ['wNat', document.getElementById('wNat').value],
+    ['wNat', kafalaFieldValue('wNat')],
     ['wAge', document.getElementById('wAge').value],
-    ['wProf', document.getElementById('wProf').value],
-    ['wStatus', document.getElementById('wStatus').value],
+    ['wProf', kafalaFieldValue('wProf')],
+    ['wStatus', kafalaFieldValue('wStatus')],
     ['wReason', document.getElementById('wReason').value.trim()],
     ['wContact', document.getElementById('wContact').value.trim()],
   ];
@@ -836,11 +843,11 @@ async function processPayment() {
       tracking_token: trackingToken,
       worker_photo_url: workerPhotoUrl,
       worker_name: document.getElementById('wName').value.trim(),
-      nationality: document.getElementById('wNat').value,
+      nationality: kafalaFieldValue('wNat'),
       age: parseInt(document.getElementById('wAge').value) || null,
-      profession: document.getElementById('wProf').value,
+      profession: kafalaFieldValue('wProf'),
       experience_years: parseInt(document.getElementById('wExp').value) || 0,
-      current_status: document.getElementById('wStatus').value,
+      current_status: kafalaFieldValue('wStatus'),
       emirate: document.getElementById('wEmirate').value,
       skills: collectSkills(),
       reason: document.getElementById('wReason').value.trim(),
