@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="referrer" content="no-referrer">
+<link rel="stylesheet" href="kafala-owner.css?v=3">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>ساهل 2 — عرض نقل كفالة</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -360,15 +361,14 @@ select.inp{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.
   </a>
   <div class="nav-r">
     <a href="index.html" class="nav-link">الرئيسية</a>
-    <a href="kafala.html#manage" class="nav-link">إدارة إعالني</a>
+    <a href="kafala.html#manage" class="nav-link">إدارة إعلاني</a>
     <button class="nav-link gold" onclick="newKafalaAd()">عرض عاملك</button>
   </div>
 </nav>
 
 <div class="page" id="page-manage">
-  <div class="form-page">
-    <div class="fp-header"><h1 class="fp-title">إدارة إعالني</h1></div>
-    <div class="fcard"><div class="fcard-body">
+  <div class="form-page owner-wrap">
+    <div class="fp-header"><h1 class="fp-title">إدارة إعلاني</h1></div>
       <form id="ownerLogin">
         <label for="ownerNumber">رقم الطلب</label>
         <input class="inp" id="ownerNumber" dir="ltr" required maxlength="20" autocomplete="off">
@@ -380,29 +380,52 @@ select.inp{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.
           <select id="ownerRecentNumbers" class="inp"></select>
         </div>
       </form>
-      <div id="ownerPanel" hidden>
-        <h2 id="ownerName"></h2>
-        <p id="ownerStatus"></p>
-        <div id="ownerNumberInfo" style="margin:10px 0"></div>
-        <p id="ownerExpiredNotice" role="status" hidden style="padding:12px;background:#fff3d6;color:#754511;border-radius:10px">انتهت فترة الإعلان وهو غير ظاهر للزوار. يمكنك حذفه من هنا.</p>
-        <img id="ownerPhoto" alt="صورة العامل" hidden style="max-width:100%;max-height:220px;object-fit:contain">
-        <dl id="ownerDetails"></dl>
-        <div style="display:flex;gap:8px;flex-wrap:wrap">
-          <button class="btn-gold" type="button" id="ownerEdit">تعديل الإعلان</button>
-          <button class="btn-gold" type="button" id="ownerChange">تغيير الرمز السري</button>
-          <button class="nav-link" type="button" id="ownerDelete" hidden style="color:#a62b23;border:1px solid #e5aaa5">حذف الإعلان</button>
-          <button class="nav-link" type="button" id="ownerLogout">إغلاق الطلب</button>
+      <article id="ownerPanel" class="owner-card" aria-labelledby="ownerName" hidden>
+        <header class="owner-header">
+          <div class="owner-heading">
+            <p id="ownerStatus" class="owner-status"></p>
+            <h2 id="ownerName"></h2>
+            <p id="ownerSummary" class="owner-summary" hidden></p>
+          </div>
+          <div class="owner-photo" id="ownerPhotoFrame" hidden>
+            <img id="ownerPhoto" alt="صورة العامل">
+          </div>
+        </header>
+        <div class="owner-meta">
+          <div class="owner-request">
+            <label for="ownerNumberInfo">رقم طلبك</label>
+            <div class="owner-number-row">
+              <input id="ownerNumberInfo" readonly dir="ltr">
+              <button type="button" id="ownerCopyNumber" class="owner-button owner-button-quiet">نسخ الرقم</button>
+            </div>
+            <p id="ownerCopyStatus" role="status"></p>
+          </div>
+          <div class="owner-expiry" id="ownerExpiry" hidden>
+            <span>تاريخ الانتهاء</span>
+            <strong id="ownerExpiryDate"></strong>
+          </div>
         </div>
-        <form id="ownerChangeForm" hidden style="margin-top:16px">
+        <p id="ownerDraftNotice" class="owner-notice" role="status" hidden></p>
+        <p id="ownerExpiredNotice" class="owner-notice" role="status" hidden>انتهت فترة الإعلان وهو غير ظاهر للزوار. يمكنك حذفه من هنا.</p>
+        <section class="owner-details" id="ownerDetailsSection" aria-labelledby="ownerDetailsTitle">
+          <h3 id="ownerDetailsTitle">تفاصيل الإعلان</h3>
+          <dl id="ownerDetails"></dl>
+        </section>
+        <div class="owner-actions">
+          <button class="owner-button owner-button-primary" type="button" id="ownerEdit">تعديل الإعلان</button>
+          <button class="owner-button owner-button-quiet" type="button" id="ownerChange" aria-expanded="false" aria-controls="ownerChangeForm">تغيير الرمز السري</button>
+          <button class="owner-button owner-button-danger" type="button" id="ownerDelete" hidden>حذف الإعلان</button>
+          <button class="owner-button owner-button-quiet owner-close" type="button" id="ownerLogout">إغلاق الطلب</button>
+        </div>
+        <form id="ownerChangeForm" hidden>
           <label for="newOwnerPin">الرمز الجديد</label>
           <input class="inp" id="newOwnerPin" dir="ltr" required type="password" inputmode="numeric" maxlength="6" autocomplete="new-password">
           <label for="newOwnerPinAgain">تأكيد الرمز الجديد</label>
           <input class="inp" id="newOwnerPinAgain" dir="ltr" required type="password" inputmode="numeric" maxlength="6" autocomplete="new-password">
-          <button class="btn-gold" type="submit">حفظ الرمز</button>
+          <button class="owner-button owner-button-primary" type="submit">حفظ الرمز</button>
         </form>
-      </div>
-      <p id="ownerMessage" role="status" aria-live="polite" style="margin-top:12px"></p>
-    </div></div>
+      </article>
+      <p id="ownerMessage" role="status" aria-live="polite"></p>
   </div>
 </div>
 <!-- ============ PAGE: LIST ============ -->
@@ -688,7 +711,7 @@ select.inp{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.
                 <button type="button" class="btn-gold" id="copyReservedNumber" disabled>نسخ رقم الطلب</button>
                 <button type="button" class="nav-link" id="retryReservedNumber" hidden>إعادة المحاولة</button>
               </div>
-              <p style="margin-top:8px">احفظ رقم الطلب والرمز السري لتفتح إعلانك لاحقًا من «إدارة إعالني».</p>
+              <p style="margin-top:8px">احفظ رقم الطلب والرمز السري لتفتح إعلانك لاحقًا من «إدارة إعلاني».</p>
               <p id="reserveNumberStatus" role="status" aria-live="polite"></p>
             </div>
             <p>اختر رمزًا سريًا من 6 أرقام.</p>
@@ -722,7 +745,7 @@ select.inp{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.
         <p id="copySuccessNumber" role="status" aria-live="polite"></p>
       </div>
       <div class="success-sub">
-        تم حفظ طلبك وهو بانتظار مراجعة الإدارة. لن يظهر الإعلان في القائمة إلا بعد الموافقة.<br>احتفظ برقم الطلب والرمز السري للدخول إلى «إدارة إعالني».
+        تم حفظ طلبك وهو بانتظار مراجعة الإدارة. لن يظهر الإعلان في القائمة إلا بعد الموافقة.<br>احتفظ برقم الطلب والرمز السري للدخول إلى «إدارة إعلاني».
       </div>
       <div id="trackingActions" style="display:none;max-width:480px;margin:20px auto 12px;padding:18px;background:#fff;border:1px solid #e9ddbd;border-radius:16px;text-align:center">
         <div style="font-weight:700;color:#242424;margin-bottom:6px">رابط متابعة طلبك</div>
@@ -1046,5 +1069,5 @@ calcPrice();
 function toEnglishDigits(v){return String(v).replace(/[٠-٩۰-۹]/g,c=>String('٠١٢٣٤٥٦٧٨٩'.indexOf(c)>=0?'٠١٢٣٤٥٦٧٨٩'.indexOf(c):'۰۱۲۳۴۵۶۷۸۹'.indexOf(c)));}
 document.querySelectorAll('input,textarea').forEach(el=>{el.addEventListener('input',()=>{if(el.type!=='file'&&el.type!=='checkbox'){const next=toEnglishDigits(el.value);if(next!==el.value)el.value=next;}})});
 </script>
-<script src="kafala-owner.js?v=2"></script></body>
+<script src="kafala-owner.js?v=3"></script></body>
 </html>

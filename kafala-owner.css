@@ -1,0 +1,49 @@
+#page-manage .owner-wrap{max-width:760px;margin-inline:auto}
+#ownerLogin,#ownerPanel{border:1px solid #e5e7eb;background:#fff;border-radius:20px;box-shadow:0 12px 36px #1d293911}
+#ownerLogin{max-width:480px;margin-inline:auto;padding:clamp(18px,4vw,30px)}
+#ownerLogin .inp,#ownerChangeForm .inp{margin-block:5px 14px}
+.owner-card{overflow:hidden;color:#172437}
+.owner-header{display:flex;align-items:center;justify-content:space-between;gap:22px;padding:clamp(18px,4vw,30px);background:#17263c;color:#fff}
+.owner-heading{min-width:0;flex:1}
+.owner-heading h2{font-size:clamp(25px,5vw,37px);line-height:1.25;overflow-wrap:anywhere}
+.owner-summary{color:#e0e8f2;margin-top:6px;overflow-wrap:anywhere}
+.owner-status{display:inline-block;margin:0 0 10px;padding:3px 11px;border-radius:24px;background:#fff0ca;color:#6c4b0b;font-size:13px;font-weight:800}
+.owner-status[data-state="active"]{background:#d9f5e7;color:#14583e}
+.owner-status[data-state="expired"]{background:#fde7e2;color:#8c3026}
+.owner-photo{width:clamp(86px,23vw,170px);aspect-ratio:1.15;flex:none;background:#25364e;border-radius:12px;overflow:hidden}
+.owner-photo img{display:block;width:100%;height:100%;object-fit:contain}
+.owner-meta{display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:12px;padding:14px clamp(14px,4vw,24px);background:#fbf7ee;border-bottom:1px solid #ece5d6}
+.owner-meta label,.owner-expiry span{display:block;margin-bottom:4px;font-size:13px;font-weight:700;color:#59564e}
+.owner-number-row{display:flex;align-items:center;gap:8px}
+#ownerNumberInfo{width:105px;padding:0;border:0;background:transparent;color:#172437;font:800 18px/1.5 Tajawal,sans-serif;letter-spacing:.05em;text-align:right}
+#ownerCopyStatus:not(:empty){margin-top:5px;font-size:13px;color:#14583e}
+.owner-expiry strong{white-space:nowrap}
+.owner-notice{margin:14px 16px 0;padding:10px 12px;border-radius:10px;background:#fff1d5;color:#71460e;font-size:14px}
+.owner-details{padding:18px clamp(14px,4vw,24px)}
+.owner-details h3{margin-bottom:10px;font-size:17px}
+#ownerDetails{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+#ownerDetails>div{min-width:0;padding:9px 12px;background:#f4f6f9;border-radius:10px}
+#ownerDetails .owner-detail-wide{grid-column:span 2}
+#ownerDetails dt{color:#526173;font-size:13px}
+#ownerDetails dd{margin:2px 0 0;font-weight:700;overflow-wrap:anywhere;white-space:pre-line}
+#ownerDetails dd[dir="ltr"]{text-align:right}
+.owner-actions{display:flex;flex-wrap:wrap;gap:8px;padding:14px clamp(14px,4vw,24px);border-top:1px solid #e8edf2}
+.owner-button{min-height:40px;padding:7px 12px;border:1px solid transparent;border-radius:9px;font:700 14px Tajawal,sans-serif;cursor:pointer}
+.owner-button:focus-visible{outline:2px solid #986e20;outline-offset:2px}
+.owner-button:disabled{opacity:.6;cursor:wait}
+.owner-button-primary{background:#17263c;color:white}
+.owner-button-quiet{border-color:#dce3ec;background:#fff;color:#25364e}
+.owner-button-danger{border-color:#f1ccc5;background:#fff4f1;color:#8c3026}
+.owner-close{margin-inline-start:auto}
+.owner-number-row .owner-button{min-height:34px}
+#ownerChangeForm{padding:16px clamp(14px,4vw,24px);border-top:1px solid #e8edf2}
+#ownerChangeForm .inp{display:block;max-width:300px}
+#ownerMessage:not(:empty){margin:12px auto 0;padding:10px 14px;border-radius:10px;background:#edf3fa;color:#172437}
+@media(max-width:560px){
+  #ownerDetails{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .owner-header{gap:12px}
+}
+@media(max-width:360px){
+  .owner-number-row,.owner-actions{gap:5px}
+  .owner-button{padding-inline:8px}
+}

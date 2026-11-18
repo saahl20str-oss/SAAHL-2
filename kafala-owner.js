@@ -7,10 +7,9 @@
     contact_phone: 'wContact', sponsor_display_name: 'sponsorDisplayName'
   };
   const labels = {
-    worker_name: 'اسم العامل', nationality: 'الجنسية', age: 'العمر', profession: 'المهنة',
-    experience_years: 'الخبرة', monthly_salary: 'الراتب الشهري', religion: 'الديانة',
-    current_status: 'الوضع الحالي', emirate: 'الإمارة', skills: 'المهارات', reason: 'سبب النقل',
-    contact_phone: 'رقم التواصل', sponsor_display_name: 'اسم الكفيل'
+    nationality: 'الجنسية', age: 'العمر', experience_years: 'الخبرة', monthly_salary: 'الراتب الشهري',
+    religion: 'الديانة', current_status: 'الوضع الحالي', contact_phone: 'رقم التواصل',
+    sponsor_display_name: 'اسم الكفيل', skills: 'المهارات', reason: 'سبب النقل'
   };
   const customFields = new Set(['wNat', 'wProf', 'wStatus']);
   const validPin = value => /^[0-9]{6}$/.test(value);
@@ -93,6 +92,8 @@
   }
 
   el('retryReservedNumber').onclick = reserveNumber;
+  el('ownerCopyNumber').onclick = () => copyNumber('ownerNumberInfo','ownerCopyStatus');
+  el('ownerPhoto').onerror = () => { el('ownerPhotoFrame').hidden = true; };
   el('copyReservedNumber').onclick = () => copyNumber('reservedNumber','reserveNumberStatus');
   el('createOwnerPin').addEventListener('focus', reserveNumber);
   el('ownerRecentNumbers').onchange = event => {
@@ -175,29 +176,45 @@
     el('ownerLogin').hidden = true;
     el('ownerPanel').hidden = false;
     el('ownerChangeForm').hidden = true;
-    message('ownerName', data.fields.worker_name);
-    const expires = data.ends_at ? ' · تاريخ الانتهاء ' + formatArabicDate(data.ends_at) : '';
-    const draft = {pending:' · التعديل بانتظار المراجعة', rejected:' · التعديل مرفوض'}[data.draft_status] || '';
-    message('ownerStatus', statusText(data.active, data.status, data.ends_at) + expires + draft);
-    message('ownerNumberInfo', 'رقم طلبك: ' + data.request_number);
+    el('ownerChange').setAttribute('aria-expanded', 'false');
+    const ad = data.fields;
+    message('ownerName', ad.worker_name);
+    const summary = [ad.profession, ad.emirate].filter(Boolean).join(' · ');
+    message('ownerSummary', summary);
+    el('ownerSummary').hidden = !summary;
+    message('ownerStatus', statusText(data.active, data.status, data.ends_at));
+    el('ownerStatus').dataset.state = data.expired ? 'expired' : data.active ? 'active' : 'review';
+    el('ownerExpiry').hidden = !data.ends_at;
+    message('ownerExpiryDate', data.ends_at ? formatArabicDate(data.ends_at) : '');
+    const draft = {pending:'التعديل بانتظار المراجعة', rejected:'التعديل مرفوض'}[data.draft_status] || '';
+    message('ownerDraftNotice', draft);
+    el('ownerDraftNotice').hidden = !draft;
+    el('ownerNumberInfo').value = data.request_number;
+    message('ownerCopyStatus', '');
     el('ownerDelete').hidden = !data.expired;
     el('ownerExpiredNotice').hidden = !data.expired;
     el('ownerEdit').hidden = Boolean(data.expired);
-    const photo = safeKafalaImageUrl(data.fields.worker_photo_url);
-    el('ownerPhoto').hidden = !photo;
+    const photo = safeKafalaImageUrl(ad.worker_photo_url);
+    el('ownerPhotoFrame').hidden = !photo;
     if (photo) el('ownerPhoto').src = photo;
     else el('ownerPhoto').removeAttribute('src');
     const detail = el('ownerDetails');
     detail.replaceChildren();
     for (const [key, label] of Object.entries(labels)) {
-      const value = data.fields[key];
+      const value = ad[key];
       if (value == null || value === '' || (Array.isArray(value) && !value.length)) continue;
+      const item = document.createElement('div');
       const dt = document.createElement('dt');
       dt.textContent = label;
       const dd = document.createElement('dd');
       dd.textContent = Array.isArray(value) ? value.join('، ') : value;
-      detail.append(dt, dd);
+      if (key === 'contact_phone') dd.dir = 'ltr';
+      if (key === 'monthly_salary') dd.textContent = Number(value).toLocaleString('en-AE') + ' درهم';
+      if (key === 'reason' || key === 'skills') item.classList.add('owner-detail-wide');
+      item.append(dt, dd);
+      detail.append(item);
     }
+    el('ownerDetailsSection').hidden = !detail.childElementCount;
     message('ownerMessage', note);
     showPage('manage');
   }
@@ -212,6 +229,8 @@
     el('ownerChangeForm').hidden = true;
     el('ownerPhoto').removeAttribute('src');
     el('ownerDetails').replaceChildren();
+    el('ownerNumberInfo').value = '';
+    message('ownerCopyStatus', '');
     message('ownerName', '');
     message('ownerStatus', '');
     el('ownerLogin').hidden = false;
@@ -296,6 +315,7 @@
   el('ownerChange').onclick = () => {
     const form = el('ownerChangeForm');
     form.hidden = !form.hidden;
+    el('ownerChange').setAttribute('aria-expanded', String(!form.hidden));
     if (!form.hidden) el('newOwnerPin').focus();
   };
   el('ownerChangeForm').addEventListener('submit', async event => {
