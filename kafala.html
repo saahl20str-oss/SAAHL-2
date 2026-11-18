@@ -264,6 +264,28 @@ select.inp{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.
 .transfer-poster .poster-expiry{grid-column:1/-1}.transfer-poster .lcard-btn{grid-column:1/-1;background:#17191d;color:#fff;border:0;border-radius:9px;padding:12px;cursor:pointer}
 @media(max-width:600px){.listings-grid{grid-template-columns:1fr}.transfer-poster .poster-top{grid-template-columns:105px minmax(0,1fr);padding:12px;gap:10px}.transfer-poster .poster-photo{width:105px;height:128px}.transfer-poster .poster-heading{font-size:19px}}
 @media(max-width:360px){.transfer-poster .poster-top{grid-template-columns:88px minmax(0,1fr)}.transfer-poster .poster-photo{width:88px;height:112px}.transfer-poster .poster-heading{font-size:17px}}
+
+/* Refined SAAHL-2 horizontal transfer cards — reference layout */
+.listings-grid{grid-template-columns:repeat(auto-fill,minmax(min(100%,350px),1fr));gap:16px;align-items:start}
+.lcard.transfer-poster{border:1px solid #e5e6e7;border-top:5px solid var(--poster);border-radius:16px;background:#fff;box-shadow:0 5px 20px rgba(20,30,44,.075);overflow:hidden}
+.transfer-poster .poster-top{direction:ltr;display:grid;grid-template-columns:minmax(100px,36%) minmax(0,1fr);align-items:center;gap:15px;padding:14px 14px 9px;background:#fff;min-height:0}
+.transfer-poster .poster-photo{width:100%;height:175px;max-width:none;border-radius:18px;background:#f3f1ed;border:1px solid #ece7df;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.transfer-poster .poster-photo img{width:100%;height:100%;object-fit:cover;object-position:center 20%}
+.transfer-poster .poster-info{direction:rtl;gap:7px;text-align:right;align-items:stretch}
+.transfer-poster .poster-heading{font-size:23px;line-height:1.25;color:#15243b;font-weight:850}
+.transfer-poster .poster-sub{font-size:13px;font-weight:650;color:#253349;line-height:1.5}
+.transfer-poster .poster-status{background:color-mix(in srgb,var(--poster) 13%,white);border:1px solid color-mix(in srgb,var(--poster) 50%,white);color:#203b39;padding:3px 9px;font-weight:800}
+.transfer-poster .poster-salary{font-size:13px;font-weight:700;border-top:1px solid #d6ac55;padding-top:10px;color:#18263b}
+.transfer-poster .poster-salary strong{font-size:17px;color:#15243b}
+.transfer-poster .poster-toggle{width:calc(100% - 24px);margin:0 12px 12px;background:var(--poster);border-radius:10px;padding:12px;font-size:15px;color:#fff}
+.transfer-poster .poster-details{padding:2px 12px 14px;gap:9px}
+.transfer-poster .poster-detail{background:#f9faf9;border-color:color-mix(in srgb,var(--poster) 35%,#ddd);padding:10px;border-radius:9px;font-size:12px}
+.transfer-poster .poster-detail b{color:var(--poster)}
+.transfer-poster .poster-expiry{font-size:12px;color:#6b7280}
+.transfer-poster .lcard-btn{background:#fff;color:var(--poster);border:1px solid var(--poster);font-weight:800}
+@media(max-width:600px){.listings-grid{grid-template-columns:1fr}.transfer-poster .poster-top{grid-template-columns:minmax(96px,36%) minmax(0,1fr);gap:10px;padding:12px}.transfer-poster .poster-photo{height:155px}.transfer-poster .poster-heading{font-size:20px}.transfer-poster .poster-sub{font-size:12px}}
+@media(max-width:360px){.transfer-poster .poster-photo{height:135px}.transfer-poster .poster-heading{font-size:18px}.transfer-poster .poster-salary strong{font-size:15px}}
+
 </style>
 <style>input[type="number" inputmode="numeric"],input[type="tel"],.pay-total-amt,#adNum{font-variant-numeric:lining-nums;direction:ltr;unicode-bidi:plaintext}</style></head>
 <body>
@@ -712,7 +734,7 @@ function renderListings(list) {
     return;
   }
   grid.innerHTML = list.map(l => {
-    const palettes=['#5d8983','#9a776e','#647c95','#8a8067','#7d7195','#668b7c','#a17d57','#6d8290'];
+    const palettes=['#31867e','#a57b67','#567c9b','#89734d','#806ba1','#53896d','#ad8352','#557e89'];
     const hash=Array.from(String(l.id)).reduce((acc,ch)=>((acc*31+ch.charCodeAt(0))>>>0),0);
     const color=palettes[hash%palettes.length];
     const photo=safeKafalaImageUrl(l.photo);
