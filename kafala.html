@@ -324,6 +324,30 @@ select.inp{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.
 #listingsGrid .transfer-poster .lcard-btn{background:#f3f6f4;color:#315d54;border-color:#dbe5df}
 @media(max-width:600px){#listingsGrid{grid-template-columns:1fr}#listingsGrid .transfer-poster .poster-top{grid-template-columns:78px minmax(0,1fr);gap:10px;padding:10px}#listingsGrid .transfer-poster .poster-photo{width:78px;height:100px}#listingsGrid .transfer-poster .poster-heading{font-size:16px}}
 
+
+/* 2026 SAAHL 2 transfer listing redesign: navy, gold, distinct jewel accents */
+#listingsGrid{grid-template-columns:repeat(auto-fill,minmax(min(100%,345px),1fr));gap:16px;align-items:start}
+#listingsGrid .transfer-poster{background:#fff;border:1px solid #e8e9ee;border-top:4px solid var(--poster);border-radius:17px;box-shadow:0 6px 18px rgba(12,31,59,.085);overflow:hidden}
+#listingsGrid .transfer-poster .poster-top{background:#fff!important;display:grid;grid-template-columns:100px minmax(0,1fr);gap:13px;padding:14px 14px 10px;min-height:0;align-items:center}
+#listingsGrid .transfer-poster .poster-photo{width:100px;max-width:100px;height:123px;border-radius:13px;background:#f0f2f7;color:var(--poster);font-size:30px;border:0;overflow:hidden}
+#listingsGrid .transfer-poster .poster-photo img{object-fit:cover;object-position:center 22%}
+#listingsGrid .transfer-poster .poster-info{gap:6px;justify-content:center}
+#listingsGrid .transfer-poster .poster-heading{font-size:18px;line-height:1.35;font-weight:850;color:#102542}
+#listingsGrid .transfer-poster .poster-sub{font-size:12px;color:#4a5670;line-height:1.55;font-weight:600}
+#listingsGrid .transfer-poster .poster-status{display:inline-block;border-radius:30px;background:color-mix(in srgb,var(--poster) 12%,white);border:1px solid color-mix(in srgb,var(--poster) 27%,white);color:#24354b;padding:3px 8px;font-size:10px}
+#listingsGrid .transfer-poster .poster-salary{font-size:12px;color:#273a57;border-top:1px solid #e9e9ed;padding-top:8px;margin-top:2px}
+#listingsGrid .transfer-poster .poster-salary strong{font-size:14px;color:#0c2442}
+#listingsGrid .transfer-poster .poster-toggle{width:calc(100% - 28px);margin:0 14px 13px;padding:11px 8px;border:0!important;border-radius:10px;background:var(--poster)!important;color:#fff!important;font-size:13px;font-weight:800;transition:filter .15s}
+#listingsGrid .transfer-poster .poster-toggle:hover{filter:brightness(.9);background:var(--poster)!important}
+#listingsGrid .transfer-poster .poster-details{padding:0 14px 14px;gap:8px}
+#listingsGrid .transfer-poster .poster-detail{background:#f8f9fc;border:1px solid #e7e9f0;color:#1c2c47;padding:9px}
+#listingsGrid .transfer-poster .poster-detail b{color:#213e63}
+#listingsGrid .transfer-poster .poster-expiry{color:#66738a}
+#listingsGrid .transfer-poster .lcard-btn{background:#102542;color:white;border:0;border-radius:9px}
+.kafala-more-btn{background:#fff;color:#102542;border:1px solid #c7a34a}
+@media(max-width:600px){#listingsGrid{grid-template-columns:1fr;gap:12px}#listingsGrid .transfer-poster .poster-top{grid-template-columns:90px minmax(0,1fr);gap:11px;padding:12px}#listingsGrid .transfer-poster .poster-photo{width:90px;height:112px}#listingsGrid .transfer-poster .poster-heading{font-size:17px}#listingsGrid .transfer-poster .poster-toggle{margin:0 12px 12px;width:calc(100% - 24px)}}
+@media(min-width:601px) and (max-width:820px){#listingsGrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
 </style>
 <style>input[type="number" inputmode="numeric"],input[type="tel"],.pay-total-amt,#adNum{font-variant-numeric:lining-nums;direction:ltr;unicode-bidi:plaintext}</style></head>
 <body>
@@ -781,7 +805,7 @@ function renderListings(list) {
     return;
   }
   grid.innerHTML = visibleList.map(l => {
-    const palettes=['#638b83','#8d8272','#71879b','#8a8a76','#857d92','#7a9282','#9b8974','#768b90'];
+    const palettes=['#145c9a','#9a6f20','#167b70','#7763a7','#b36572','#087f8c','#8a5d9c','#b16a34'];
     const hash=Array.from(String(l.id)).reduce((acc,ch)=>((acc*31+ch.charCodeAt(0))>>>0),0);
     const color=palettes[hash%palettes.length];
     const photo=safeKafalaImageUrl(l.photo);
