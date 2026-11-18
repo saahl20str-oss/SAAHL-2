@@ -2,6 +2,7 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
+<meta name="referrer" content="no-referrer">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>ساهل 2 — عرض نقل كفالة</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -349,7 +350,7 @@ select.inp{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.
 @media(min-width:601px) and (max-width:820px){#listingsGrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 
 </style>
-<style>input[type="number" inputmode="numeric"],input[type="tel"],.pay-total-amt,#adNum{font-variant-numeric:lining-nums;direction:ltr;unicode-bidi:plaintext}</style></head>
+<style>#page-form [hidden],#page-manage [hidden]{display:none!important}input[type="number" inputmode="numeric"],input[type="tel"],.pay-total-amt,#adNum{font-variant-numeric:lining-nums;direction:ltr;unicode-bidi:plaintext}</style></head>
 <body>
 
 <nav>
@@ -359,10 +360,44 @@ select.inp{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.
   </a>
   <div class="nav-r">
     <a href="index.html" class="nav-link">الرئيسية</a>
-    <button class="nav-link gold" onclick="showPage('form')">عرض عاملك</button>
+    <a href="kafala.html#manage" class="nav-link">إدارة إعالني</a>
+    <button class="nav-link gold" onclick="newKafalaAd()">عرض عاملك</button>
   </div>
 </nav>
 
+<div class="page" id="page-manage">
+  <div class="form-page">
+    <div class="fp-header"><h1 class="fp-title">إدارة إعالني</h1></div>
+    <div class="fcard"><div class="fcard-body">
+      <form id="ownerLogin">
+        <label for="ownerNumber">رقم الطلب</label>
+        <input class="inp" id="ownerNumber" dir="ltr" required maxlength="20" autocomplete="off">
+        <label for="ownerPin">الرمز السري</label>
+        <input class="inp" id="ownerPin" dir="ltr" required type="password" inputmode="numeric" maxlength="6" autocomplete="off">
+        <button class="btn-gold" type="submit">فتح الطلب</button>
+      </form>
+      <div id="ownerPanel" hidden>
+        <h2 id="ownerName"></h2>
+        <p id="ownerStatus"></p>
+        <img id="ownerPhoto" alt="صورة العامل" hidden style="max-width:100%;max-height:220px;object-fit:contain">
+        <dl id="ownerDetails"></dl>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn-gold" type="button" id="ownerEdit">تعديل الإعلان</button>
+          <button class="btn-gold" type="button" id="ownerChange">تغيير الرمز السري</button>
+          <button class="nav-link" type="button" id="ownerLogout">إغلاق الطلب</button>
+        </div>
+        <form id="ownerChangeForm" hidden style="margin-top:16px">
+          <label for="newOwnerPin">الرمز الجديد</label>
+          <input class="inp" id="newOwnerPin" dir="ltr" required type="password" inputmode="numeric" maxlength="6" autocomplete="new-password">
+          <label for="newOwnerPinAgain">تأكيد الرمز الجديد</label>
+          <input class="inp" id="newOwnerPinAgain" dir="ltr" required type="password" inputmode="numeric" maxlength="6" autocomplete="new-password">
+          <button class="btn-gold" type="submit">حفظ الرمز</button>
+        </form>
+      </div>
+      <p id="ownerMessage" role="status" aria-live="polite" style="margin-top:12px"></p>
+    </div></div>
+  </div>
+</div>
 <!-- ============ PAGE: LIST ============ -->
 <div class="page on" id="page-list">
 
@@ -374,7 +409,7 @@ select.inp{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.
       <div class="lh-title">ابحث عن <span>عامل لنقل كفالته</span></div>
       <div class="lh-sub">قائمة بعمال ومساعدات منزلية متاحين لنقل الكفالة مباشرة من كفيلهم الحالي — تواصل مباشر بدون وسيط</div>
       <div class="lh-btns">
-        <button class="btn-gold" onclick="showPage('form')">أضف عاملك للقائمة</button>
+        <button class="btn-gold" onclick="newKafalaAd()">أضف عاملك للقائمة</button>
         <a href="index.html" class="btn-outline-w">العودة للرئيسية</a>
       </div>
     </div>
@@ -424,8 +459,8 @@ select.inp{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.
 <div class="page" id="page-form">
   <div class="form-page">
     <div class="fp-header">
-      <div class="fp-title">أضف عاملك للقائمة</div>
-      <div class="fp-sub">أدخل بيانات العامل واختر مدة العرض — يظهر في القائمة فور اكتمال الدفع</div>
+      <div class="fp-title" id="kafalaFormTitle">أضف عاملك للقائمة</div>
+      <div class="fp-sub" id="kafalaFormSubtitle">أدخل بيانات العامل واختر مدة العرض. يُنشر الإعلان بعد موافقة الإدارة.</div>
     </div>
 
     <div id="formContent">
@@ -595,7 +630,7 @@ select.inp{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.
           <div class="fcard-sub">العرض يظهر في القائمة فقط بعد اكتمال الدفع</div>
         </div>
         <div class="fcard-body">
-          <div class="pricing-box">
+          <div class="pricing-box" id="kafalaPricing">
             <div class="pb-title">احسب تكلفة العرض</div>
             <div class="pb-calc">
               <input class="pb-days-inp" type="number" id="adDays" value="7" min="1" max="90" oninput="calcPrice()">
@@ -614,7 +649,7 @@ select.inp{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.
           </div>
 
           <!-- TERMS -->
-          <div class="terms-card">
+          <div class="terms-card" id="kafalaTerms">
             <h4>الشروط والأحكام — يجب القراءة قبل النشر</h4>
             <ul class="terms-list">
               <li><strong>منصة SAAHL وسيط عرض فقط</strong> — لا تتدخل في أي نزاع أو خلاف بين الكفيل الحالي والعامل أو أي طرف آخر</li>
@@ -630,29 +665,26 @@ select.inp{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.
             </ul>
           </div>
 
-          <div class="agree-wrap">
+          <div class="agree-wrap" id="kafalaAgree">
             <input type="checkbox" id="agreeTerms">
             <label for="agreeTerms">
               أقرأت وأوافق على جميع الشروط والأحكام أعلاه وأتحمل المسؤولية الكاملة عن صحة البيانات المقدمة
             </label>
           </div>
 
+          <div id="kafalaPinFields" style="margin:16px 0">
+            <h4>حماية إعلانك</h4>
+            <p>اختر رمزًا سريًا من 6 أرقام واحتفظ به للرجوع إلى الطلب.</p>
+            <label for="createOwnerPin">الرمز السري</label>
+            <input class="inp" id="createOwnerPin" type="password" dir="ltr" inputmode="numeric" maxlength="6" autocomplete="new-password">
+            <label for="createOwnerPinAgain">تأكيد الرمز السري</label>
+            <input class="inp" id="createOwnerPinAgain" type="password" dir="ltr" inputmode="numeric" maxlength="6" autocomplete="new-password">
+          </div>
           <!-- PAYMENT -->
           <div class="pay-box">
-            <h4>إرسال إعلان نقل الكفالة للتجربة — دون دفع</h4>
-            <div class="pay-total-row">
-              <span class="pay-total-lbl">المبلغ الإجمالي (<span id="pay-days">7</span> أيام)</span>
-              <span class="pay-total-amt"><span id="pay-total">210</span> د.إ</span>
-            </div>
-            <div id="kafala-card-element" style="display:none;padding:12px;border:1.5px solid var(--border);border-radius:9px;background:#fff;margin-bottom:10px"></div>
-            <div id="kafala-pay-msg" style="font-size:13px;margin-bottom:10px"></div>
-            <button class="stripe-btn" id="kafala-pay-btn" onclick="processPayment()">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
-              إرسال الإعلان دون دفع
-            </button>
-            <div class="stripe-note">
-              الدفع متوقف مؤقتاً خلال التجربة. يُحفظ الطلب غير منشور لحين مراجعة الإدارة.
-            </div>
+            <div id="kafala-pay-msg" role="status" aria-live="polite" style="font-size:13px;margin-bottom:10px"></div>
+            <button class="stripe-btn" id="kafala-pay-btn" type="button" onclick="processPayment()">إرسال الإعلان دون دفع</button>
+            <button class="nav-link" id="kafalaCancelEdit" type="button" hidden>الرجوع إلى الطلب</button>
           </div>
 
         </div>
@@ -668,13 +700,14 @@ select.inp{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.
       <div class="success-title">تم استلام طلب إعلانك بنجاح</div>
       <div class="success-num" id="adNum">AD-2026-00001</div>
       <div class="success-sub">
-        تم حفظ طلبك وهو بانتظار مراجعة الإدارة. لن يظهر الإعلان في القائمة إلا بعد الموافقة.<br>احتفظ برابط المتابعة لمعرفة حالة الطلب.
+        تم حفظ طلبك وهو بانتظار مراجعة الإدارة. لن يظهر الإعلان في القائمة إلا بعد الموافقة.<br>احتفظ برقم الطلب والرمز السري للدخول إلى «إدارة إعالني».
       </div>
       <div id="trackingActions" style="display:none;max-width:480px;margin:20px auto 12px;padding:18px;background:#fff;border:1px solid #e9ddbd;border-radius:16px;text-align:center">
         <div style="font-weight:700;color:#242424;margin-bottom:6px">رابط متابعة طلبك</div>
         <div style="font-size:12px;color:#777;line-height:1.8;margin-bottom:14px">احتفظ بهذا الرابط لمعرفة قرار الإدارة. لا تحتاج إلى تقديم طلب جديد.</div>
         <input id="trackingLink" readonly dir="ltr" style="width:100%;min-width:0;padding:12px;border:1px solid #e8e8e8;border-radius:9px;text-align:left;font-size:12px;margin-bottom:12px" aria-label="رابط متابعة الإعلان">
         <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center">
+          <button type="button" class="nav-link" onclick="copyKafalaTracking(true)">نسخ رقم الطلب</button>
           <button type="button" id="trackingCopy" style="background:#C9A84C;color:#111;border:0;border-radius:9px;padding:12px 20px;cursor:pointer;font-weight:700;min-height:44px" onclick="copyKafalaTracking()">📋 نسخ الرابط</button>
           <button type="button" style="background:#fff;color:#111;border:1px solid #ddd;border-radius:9px;padding:12px 20px;cursor:pointer;font-weight:700;min-height:44px" onclick="openKafalaTracking()">متابعة الطلب</button>
         </div><div id="trackingCopyStatus" role="status" aria-live="polite" style="font-size:12px;color:#0f766e;margin-top:9px"></div>
@@ -724,9 +757,6 @@ const K_SUPABASE_URL = 'https://hkfxikmpfgixrbrboxeb.supabase.co';
 const K_ANON_KEY = 'sb_publishable_OcWY5nY_-b2odLqQxsu2Kw_iQ4YswBz';
 const _db = supabase.createClient(K_SUPABASE_URL, K_ANON_KEY);
 
-const K_STRIPE_PUBLISHABLE_KEY = 'pk_test_51T0igO7KLniAPTryituPffaYmZSnx5w3ZATjWUeT3ShIfc0jg37hTI5Cad4rf2jY0eK4uxoZ69euNEQBMaW6TZTL00XhKSLy1x';
-const K_STRIPE_EDGE_FN_URL = `${K_SUPABASE_URL}/functions/v1/stripe-featured-payment`;
-let _kStripe = null, _kCardEl = null;
 
 // ===== DATA (تُحمَّل حياً من kafala_ads — إعلانات مدفوعة ونشطة فقط) =====
 let listings = [];
@@ -744,7 +774,7 @@ async function loadListings() {
     const nowIso = new Date().toISOString();
     const { data, error } = await _db
       .from('kafala_ads')
-      .select('*')
+      .select('id,worker_name,nationality,age,profession,experience_years,monthly_salary,religion,current_status,emirate,skills,reason,contact_phone,sponsor_display_name,ends_at,worker_photo_url')
       .eq('is_active', true)
       .eq('review_status', 'approved')
       .gt('ends_at', nowIso)
@@ -780,12 +810,23 @@ async function loadListings() {
 }
 
 let currentDetail = null;
-let photoData = null;
 let selectedPhotoFile = null;
-function safeKafalaImageUrl(value) { try { const u = new URL(value); return u.protocol === 'https:' && u.hostname === 'hkfxikmpfgixrbrboxeb.supabase.co' && u.pathname.startsWith('/storage/v1/object/public/saahl-kafala-photos/') ? u.href : ''; } catch { return ''; } }
-function kafalaPhotoMarkup(l) { const url = safeKafalaImageUrl(l.photo); return url ? `<img src="${url}" alt="صورة العامل" style="width:100%;height:100%;object-fit:contain;background:#171721" onerror="this.replaceWith(document.createTextNode(${JSON.stringify('صورة غير متاحة')}))">` : (l.name?.[0] || 'ع'); }
-async function uploadKafalaPhoto() { if (!selectedPhotoFile) return null; const f = selectedPhotoFile; if (!['image/jpeg','image/png','image/webp'].includes(f.type) || f.size > 5*1024*1024) throw new Error('الصورة يجب أن تكون JPG أو PNG أو WEBP وبحجم لا يزيد عن 5MB'); const ext = f.type === 'image/png' ? 'png' : f.type === 'image/webp' ? 'webp' : 'jpg'; const path = 'kafala/' + crypto.randomUUID() + '.' + ext; const {error} = await _db.storage.from('saahl-kafala-photos').upload(path,f,{contentType:f.type,upsert:false}); if(error) throw new Error('تعذّر رفع الصورة: '+error.message); return _db.storage.from('saahl-kafala-photos').getPublicUrl(path).data.publicUrl; }
-
+let editingKafala = false;
+const kafalaEscape = value => String(value ?? '').replace(/[&<>"']/g, c =>
+  ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]);
+function safeKafalaImageUrl(value) {
+  if (!value) return '';
+  if (value.length <= 700000 && /^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+/]+=*$/.test(value)) return value;
+  try {
+    const url = new URL(value);
+    return url.protocol === 'https:' && url.hostname === 'hkfxikmpfgixrbrboxeb.supabase.co'
+      && url.pathname.startsWith('/storage/v1/object/public/saahl-kafala-photos/') ? url.href : '';
+  } catch { return ''; }
+}
+function kafalaPhotoMarkup(listing) {
+  const photo = safeKafalaImageUrl(listing.photo);
+  return photo ? `<img src="${kafalaEscape(photo)}" alt="صورة العامل">` : kafalaEscape(listing.name?.[0] || 'ع');
+}
 
 // ===== RENDER =====
 let kafalaShowAll = false;
@@ -809,7 +850,7 @@ function renderListings(list) {
     const hash=Array.from(String(l.id)).reduce((acc,ch)=>((acc*31+ch.charCodeAt(0))>>>0),0);
     const color=palettes[hash%palettes.length];
     const photo=safeKafalaImageUrl(l.photo);
-    const photoMarkup=photo ? `<img src="${photo}" alt="صورة العامل" loading="lazy" onerror="this.style.display='none';this.parentElement.textContent='صورة غير متاحة'">` : (l.name?.[0] || 'ع');
+    const photoMarkup=photo ? `<img src="${kafalaEscape(photo)}" alt="صورة العامل" loading="lazy" onerror="this.style.display='none';this.parentElement.textContent='صورة غير متاحة'">` : kafalaEscape(l.name?.[0] || 'ع');
     const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
     const skills=(Array.isArray(l.skills)?l.skills:[]).filter(Boolean);
     return `
@@ -860,14 +901,14 @@ function openDetail(id) {
   currentDetail = l;
   document.getElementById('dm-avatar').innerHTML = kafalaPhotoMarkup(l);
   document.getElementById('dm-name').textContent = l.name;
-  document.getElementById('dm-tags').innerHTML = [l.nat, l.prof, l.emirate, l.status].map(t=>`<span class="dm-tag">${t}</span>`).join('');
+  document.getElementById('dm-tags').innerHTML = [l.nat, l.prof, l.emirate, l.status].map(t=>`<span class="dm-tag">${kafalaEscape(t)}</span>`).join('');
   document.getElementById('dm-grid').innerHTML = [
     {lb:'العمر',v:l.age+' سنة'},{lb:'الجنسية',v:l.nat},
     {lb:'المهنة',v:l.prof},{lb:'سنوات الخبرة',v:l.exp+' سنوات'},
     {lb:'الراتب الشهري',v:l.salary!=null?Number(l.salary).toLocaleString('en-AE')+' درهم':'غير محدد'},{lb:'الديانة',v:l.religion||'غير محددة'},
     {lb:'الإمارة',v:l.emirate},{lb:'الوضع الحالي',v:l.status},
-  ].map(i=>`<div class="dm-item"><div class="dm-item-lbl">${i.lb}</div><div class="dm-item-val">${i.v}</div></div>`).join('');
-  document.getElementById('dm-skills').innerHTML = l.skills.map(s=>`<span class="dm-skill">${s}</span>`).join('');
+  ].map(i=>`<div class="dm-item"><div class="dm-item-lbl">${i.lb}</div><div class="dm-item-val">${kafalaEscape(i.v)}</div></div>`).join('');
+  document.getElementById('dm-skills').innerHTML = l.skills.map(s=>`<span class="dm-skill">${kafalaEscape(s)}</span>`).join('');
   document.getElementById('dm-reason').textContent = l.reason;
   document.getElementById('dm-expiry').textContent = `ينتهي الإعلان: ${l.expiry} — متبقي ${l.daysLeft} يوم`;
   document.getElementById('detailOv').classList.add('open');
@@ -915,14 +956,16 @@ function previewPhoto(input) {
   if (!['image/jpeg','image/png','image/webp'].includes(file.type) || file.size > 5*1024*1024) { alert('اختر صورة JPG أو PNG أو WEBP بحجم لا يتجاوز 5MB'); input.value=''; return; }
   selectedPhotoFile = file;
   const reader = new FileReader();
-  reader.onload = e => {
-    photoData = e.target.result;
-    const img = document.getElementById('photoPreview');
-    img.src = photoData;
-    img.style.display = 'block';
-    document.getElementById('photoPlaceholder').style.display = 'none';
-  };
+  reader.onload = e => { if (selectedPhotoFile === file) showKafalaPhoto(e.target.result); };
   reader.readAsDataURL(file);
+}
+
+function showKafalaPhoto(value) {
+  const img = document.getElementById('photoPreview');
+  if (value) img.src = value;
+  else img.removeAttribute('src');
+  img.style.display = value ? 'block' : 'none';
+  document.getElementById('photoPlaceholder').style.display = value ? 'none' : '';
 }
 
 function calcPrice() {
@@ -957,92 +1000,12 @@ function validateForm() {
   return ok;
 }
 
-function initKafalaCardElement() {
-  if (!window.Stripe) { console.error('Stripe.js لم يُحمَّل'); return; }
-  if (!_kStripe) _kStripe = Stripe(K_STRIPE_PUBLISHABLE_KEY);
-  const elements = _kStripe.elements();
-  _kCardEl = elements.create('card', {
-    style: { base: { fontFamily: 'Tajawal, sans-serif', fontSize: '14px', color: '#111' } },
-    hidePostalCode: true
-  });
-  _kCardEl.mount('#kafala-card-element');
-}
-
 function collectSkills() {
   const chips = Array.from(document.querySelectorAll('#skillsWrap .skill-chip.on')).map(el => el.textContent.trim());
   const extra = document.getElementById('wExtraSkills').value.trim();
   if (extra) chips.push(...extra.split(',').map(s => s.trim()).filter(Boolean));
   return chips;
 }
-
-async function processPayment() {
-  if (!validateForm()) { alert('يرجى إكمال جميع الحقول المطلوبة أولاً'); return; }
-  if (!document.getElementById('agreeTerms').checked) { alert('يرجى الموافقة على الشروط والأحكام'); return; }
-  const days = parseInt(document.getElementById('adDays').value) || 7;
-  const total = days * 30;
-  const btn = document.getElementById('kafala-pay-btn');
-  const msgEl = document.getElementById('kafala-pay-msg');
-  btn.disabled = true;
-  msgEl.textContent = 'جاري حفظ الطلب دون دفع...';
-  try {
-    const startsAt = new Date();
-    const endsAt = new Date(startsAt.getTime() + days * 86400000);
-    const trackingToken = crypto.randomUUID();
-    const workerPhotoUrl = await uploadKafalaPhoto();
-    const { error: insertError } = await _db.from('kafala_ads').insert({
-      tracking_token: trackingToken,
-      worker_photo_url: workerPhotoUrl,
-      worker_name: document.getElementById('wName').value.trim(),
-      nationality: kafalaFieldValue('wNat'),
-      age: parseInt(document.getElementById('wAge').value) || null,
-      profession: kafalaFieldValue('wProf'),
-      experience_years: parseInt(document.getElementById('wExp').value) || 0,
-      monthly_salary: document.getElementById('wSalary').value === '' ? null : Number(document.getElementById('wSalary').value),
-      religion: document.getElementById('wReligion').value || null,
-      current_status: kafalaFieldValue('wStatus'),
-      emirate: document.getElementById('wEmirate').value,
-      skills: collectSkills(),
-      reason: document.getElementById('wReason').value.trim(),
-      contact_phone: document.getElementById('wContact').value.trim(),
-      sponsor_display_name: document.getElementById('sponsorDisplayName').value.trim() || null,
-      ad_days: days,
-      ad_price: total,
-      starts_at: startsAt.toISOString(),
-      ends_at: endsAt.toISOString(),
-      payment_status: 'pending',
-      stripe_session_id: null,
-      is_active: false
-    });
-    if (insertError) throw new Error('تعذّر حفظ طلب الإعلان: ' + insertError.message);
-
-    
-    showSuccess(trackingToken);
-    msgEl.textContent = '';
-  } catch(e) { msgEl.style.color='#b42318'; msgEl.textContent=e.message||'تعذّر إرسال الطلب'; }
-  finally { btn.disabled=false; }
-}
-
-function showSuccess(trackingToken) {
-  document.getElementById('formContent').style.display = 'none';
-  const success = document.getElementById('formSuccess');
-  success.classList.add('show');
-  document.getElementById('adNum').textContent = 'طلب رقم ' + trackingToken.slice(0, 8).toUpperCase();
-  const trackingUrl = new URL(location.href); trackingUrl.searchParams.set('track', trackingToken);
-  const linkEl = document.getElementById('trackingLink'); linkEl.value = trackingUrl.href;
-  document.getElementById('trackingActions').style.display='block';
-  window.scrollTo({top: 0, behavior: 'smooth'});
-}
-
-async function copyKafalaTracking(){
- const url=document.getElementById('trackingLink').value;
- const status=document.getElementById('trackingCopyStatus');
- try{
-  if(navigator.clipboard&&window.isSecureContext){await navigator.clipboard.writeText(url);}
-  else{const input=document.getElementById('trackingLink');input.focus();input.select();if(!document.execCommand('copy'))throw Error('copy failed');}
-  status.textContent='تم نسخ الرابط بنجاح ✓';
- }catch(e){const input=document.getElementById('trackingLink');input.focus();input.select();status.textContent='حدد الرابط وانسخه يدوياً من الحقل أعلاه.';}
-}
-function openKafalaTracking(){const url=document.getElementById('trackingLink').value;if(url)window.location.assign(url);}
 
 // Clear errors on input
 document.querySelectorAll('.inp').forEach(inp => {
@@ -1056,26 +1019,11 @@ document.querySelectorAll('.inp').forEach(inp => {
 // Init
 loadListings();
 calcPrice();
-(async function showTracking(){
- const token = new URLSearchParams(location.search).get('track');
- if(!token || !/^[0-9a-f-]{36}$/i.test(token))return;
- try {
-  const {data,error}=await _db.rpc('kafala_track',{p_token:token});
-  if(error)throw error;
-  const ad=Array.isArray(data)?data[0]:null;
-  if(!ad){alert('لم يتم العثور على الطلب. تحقق من رابط المتابعة.');return;}
-  showPage('form');document.getElementById('formContent').style.display='none';
-  const panel=document.getElementById('formSuccess');panel.classList.add('show');
-  panel.querySelector('.success-sub').textContent='حالة الطلب: '+(ad.is_active?'منشور':ad.review_status==='approved'?'معتمد بانتظار النشر':ad.review_status==='rejected'?'مرفوض':'بانتظار مراجعة الإدارة')+(ad.ends_at&&ad.is_active?' — ينتهي '+new Date(ad.ends_at).toLocaleDateString('en-GB'):'');
-  document.getElementById('adNum').textContent='طلب رقم '+token.slice(0,8).toUpperCase();
-  const input=document.getElementById('trackingLink');input.value=location.href;input.style.display='block';document.getElementById('trackingCopy').style.display='inline-block';
- }catch(e){console.error('Tracking:',e);alert('تعذر تحميل حالة الطلب حالياً');}
-})();
-// Trial mode: card entry disabled; no Stripe payment request.
 </script>
 <script>
 // Normalize Arabic and Persian digits in all form inputs without changing stored data.
 function toEnglishDigits(v){return String(v).replace(/[٠-٩۰-۹]/g,c=>String('٠١٢٣٤٥٦٧٨٩'.indexOf(c)>=0?'٠١٢٣٤٥٦٧٨٩'.indexOf(c):'۰۱۲۳۴۵۶۷۸۹'.indexOf(c)));}
 document.querySelectorAll('input,textarea').forEach(el=>{el.addEventListener('input',()=>{if(el.type!=='file'&&el.type!=='checkbox'){const next=toEnglishDigits(el.value);if(next!==el.value)el.value=next;}})});
-</script></body>
+</script>
+<script src="kafala-owner.js"></script></body>
 </html>
