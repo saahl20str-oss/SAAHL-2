@@ -286,6 +286,25 @@ select.inp{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.
 @media(max-width:600px){.listings-grid{grid-template-columns:1fr}.transfer-poster .poster-top{grid-template-columns:minmax(96px,36%) minmax(0,1fr);gap:10px;padding:12px}.transfer-poster .poster-photo{height:155px}.transfer-poster .poster-heading{font-size:20px}.transfer-poster .poster-sub{font-size:12px}}
 @media(max-width:360px){.transfer-poster .poster-photo{height:135px}.transfer-poster .poster-heading{font-size:18px}.transfer-poster .poster-salary strong{font-size:15px}}
 
+
+/* Compact, calm cards and progressive listing disclosure */
+.listings-grid{grid-template-columns:repeat(auto-fill,minmax(min(100%,270px),1fr));gap:12px}
+.lcard.transfer-poster{border:1px solid #e8e7e3;border-top:3px solid var(--poster);border-radius:12px;box-shadow:0 2px 10px rgba(30,36,40,.035)}
+.transfer-poster .poster-top{grid-template-columns:76px minmax(0,1fr);gap:11px;padding:11px;min-height:0}
+.transfer-poster .poster-photo{height:96px;width:76px;border-radius:9px;background:#f5f3ee}
+.transfer-poster .poster-info{gap:3px}
+.transfer-poster .poster-heading{font-size:16px;line-height:1.3}
+.transfer-poster .poster-sub{font-size:11px;line-height:1.5}
+.transfer-poster .poster-status{font-size:10px;padding:2px 7px}
+.transfer-poster .poster-salary{font-size:11px;padding-top:5px;margin-top:3px;border-color:#eee8dc}
+.transfer-poster .poster-salary strong{font-size:12px}
+.transfer-poster .poster-toggle{width:calc(100% - 22px);margin:0 11px 10px;padding:8px;font-size:12px;background:var(--poster);border-radius:7px}
+.transfer-poster .poster-details{padding:0 11px 11px}
+.kafala-more-wrap{text-align:center;padding:22px 8px 8px}
+.kafala-more-btn{border:1px solid #d6c8ac;border-radius:10px;background:#fff;color:#554a38;padding:11px 25px;font-size:13px;font-weight:800;cursor:pointer}
+.kafala-more-btn:hover{background:#f8f5ef}
+@media(max-width:600px){.listings-grid{grid-template-columns:1fr;gap:10px}.transfer-poster .poster-top{grid-template-columns:76px minmax(0,1fr);padding:10px;gap:10px}.transfer-poster .poster-photo{width:76px;height:96px}.transfer-poster .poster-heading{font-size:16px}.transfer-poster .poster-sub{font-size:11px}}
+
 </style>
 <style>input[type="number" inputmode="numeric"],input[type="tel"],.pay-total-amt,#adNum{font-variant-numeric:lining-nums;direction:ltr;unicode-bidi:plaintext}</style></head>
 <body>
@@ -354,7 +373,7 @@ select.inp{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.
   </div>
 
   <div class="listings-wrap">
-    <div class="listings-grid" id="listingsGrid"></div>
+    <div class="listings-grid" id="listingsGrid"></div><div id="kafalaMoreWrap" class="kafala-more-wrap" hidden><button type="button" class="kafala-more-btn" id="kafalaMoreBtn" onclick="showAllKafalaListings()">إظهار كافة الإعلانات</button></div>
   </div>
 </div>
 
@@ -726,15 +745,24 @@ async function uploadKafalaPhoto() { if (!selectedPhotoFile) return null; const 
 
 
 // ===== RENDER =====
+let kafalaShowAll = false;
+let kafalaFilteredListings = [];
+function showAllKafalaListings(){kafalaShowAll=true;renderListings(kafalaFilteredListings);}
 function renderListings(list) {
+  kafalaFilteredListings=list;
+  const visibleList=kafalaShowAll?list:list.slice(0,6);
+  const moreWrap=document.getElementById("kafalaMoreWrap");
+  if(moreWrap)moreWrap.hidden=kafalaShowAll||list.length<=6;
+  const moreBtn=document.getElementById("kafalaMoreBtn");
+  if(moreBtn)moreBtn.textContent=`إظهار كافة الإعلانات (${list.length})`;
   document.getElementById('listCount').textContent = list.length;
   const grid = document.getElementById('listingsGrid');
   if (!list.length) {
     grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:60px 20px"><div style="font-size:15px;font-weight:700;color:var(--dark);margin-bottom:8px">لا توجد نتائج</div><div style="font-size:13px;color:var(--muted)">جرب تغيير فلاتر البحث</div></div>';
     return;
   }
-  grid.innerHTML = list.map(l => {
-    const palettes=['#31867e','#a57b67','#567c9b','#89734d','#806ba1','#53896d','#ad8352','#557e89'];
+  grid.innerHTML = visibleList.map(l => {
+    const palettes=['#638b83','#8d8272','#71879b','#8a8a76','#857d92','#7a9282','#9b8974','#768b90'];
     const hash=Array.from(String(l.id)).reduce((acc,ch)=>((acc*31+ch.charCodeAt(0))>>>0),0);
     const color=palettes[hash%palettes.length];
     const photo=safeKafalaImageUrl(l.photo);
@@ -768,6 +796,7 @@ function renderListings(list) {
 
 function toggleTransferCard(btn){const details=btn.nextElementSibling;const open=details.hidden;details.hidden=!open;btn.setAttribute('aria-expanded',String(open));btn.innerHTML=open?'إخفاء التفاصيل <span aria-hidden="true">⌃</span>':'عرض التفاصيل <span aria-hidden="true">⌄</span>';}
 function filterListings() {
+  kafalaShowAll=false;
   const q = document.getElementById('searchQ').value.toLowerCase();
   const prof = document.getElementById('fProf').value;
   const status = document.getElementById('fStatus').value;
