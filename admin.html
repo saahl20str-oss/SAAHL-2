@@ -485,10 +485,11 @@ async function loadKf(){
  w.innerHTML=(editError?'<p role="alert">تعذّر تحميل التعديلات. أعد تحميل الصفحة.</p>':'')+'<div style="padding:14px;font-weight:700">طلبات نقل الكفالة: '+aKf.length+' | بانتظار المراجعة: '+pending+' | منتهي: '+expiredCount+'</div><div class="kf-list">'+aKf.map(k=>{
  const edit=editsByAd.get(k.id);
  const expired=isExpired(k);
+ const rejected=!edit&&k.review_status==='rejected'&&!k.is_active;
  const status=expired?'منتهي':edit?'تعديل بانتظار المراجعة':k.review_status==='rejected'?'مرفوض':k.is_active?'منشور':k.review_status==='approved'?'موقوف':'بانتظار المراجعة';
  const remaining=k.is_active&&k.ends_at?Math.max(0,Math.ceil((new Date(k.ends_at)-Date.now())/86400000)):null;
  const details='<div class="kf-meta">الجنسية: '+kfSafe(k.nationality)+' | العمر: '+kfSafe(k.age)+' | الخبرة: '+kfSafe(k.experience_years)+' سنة | المدة: '+kfSafe(k.ad_days)+' يوم</div><div class="kf-meta">المهارات: '+kfSafe((k.skills||[]).join('، ')||'غير محددة')+'</div><div class="kf-meta">سبب النقل: '+kfSafe(k.reason)+'</div><div class="kf-meta">اسم الكفيل: '+kfSafe(k.sponsor_display_name)+' | الهاتف: <span dir="ltr">'+kfSafe(k.contact_phone)+'</span></div><div class="kf-meta">تاريخ الطلب: '+fd(k.created_at)+' | انتهاء العرض: '+(k.is_active?fd(k.ends_at):'يحدد عند النشر')+(remaining!==null?' | المتبقي: '+remaining+' يوم':'')+'</div>';
- const actions=expired?`<p class="kf-meta">انتهت فترة الإعلان وهو غير ظاهر للزوار.</p><button class="btn btn-d btn-s" onclick="deleteExpiredKf('${k.id}',this)">حذف الإعلان</button>`:'<div class="kf-actions">'+(!edit&&!editError&&k.review_status==='pending_review'?'<button class="btn btn-s" onclick="reviewKf(\''+k.id+'\',\'approve\')">اعتماد ونشر</button><button class="btn btn-o btn-s" onclick="reviewKf(\''+k.id+'\',\'reject\')">رفض</button>':'')+(k.is_active?'<button class="btn btn-d btn-s" onclick="reviewKf(\''+k.id+'\',\'stop\')">إيقاف</button>':k.review_status==='approved'?'<button class="btn btn-s" onclick="reviewKf(\''+k.id+'\',\'resume\')">استئناف إن لم تنتهِ المدة</button>':'')+'</div>';
+ const actions=expired?`<p class="kf-meta">انتهت فترة الإعلان وهو غير ظاهر للزوار.</p><button class="btn btn-d btn-s" onclick="deleteKf('${k.id}','expired',this)">حذف الإعلان</button>`:rejected?`<div class="kf-actions"><button class="btn btn-d btn-s" onclick="deleteKf('${k.id}','rejected',this)">حذف الطلب</button></div>`:'<div class="kf-actions">'+(!edit&&!editError&&k.review_status==='pending_review'?'<button class="btn btn-s" onclick="reviewKf(\''+k.id+'\',\'approve\')">اعتماد ونشر</button><button class="btn btn-o btn-s" onclick="reviewKf(\''+k.id+'\',\'reject\')">رفض</button>':'')+(k.is_active?'<button class="btn btn-d btn-s" onclick="reviewKf(\''+k.id+'\',\'stop\')">إيقاف</button>':k.review_status==='approved'?'<button class="btn btn-s" onclick="reviewKf(\''+k.id+'\',\'resume\')">استئناف إن لم تنتهِ المدة</button>':'')+'</div>';
  return '<article class="kf-line"><div class="kf-line-main"><div class="kf-line-name"><strong>'+kfSafe(k.worker_name)+'</strong><small>'+kfSafe(k.profession)+' — '+kfSafe(k.emirate)+'</small></div><span class="bge '+(expired?'expired':k.is_active?'active':'pending')+'">'+status+'</span><span class="kf-line-date">'+fd(k.created_at)+'</span><button type="button" class="btn btn-o btn-s" onclick="this.closest(\'.kf-line\').classList.toggle(\'expanded\')">التفاصيل</button></div><div class="kf-line-detail">'+details+kfReviewFields(k)+actions+(edit&&!expired?kfEditReview(edit):'')+'</div></article>';
  }).join('')+'</div>';
 }
@@ -515,13 +516,14 @@ async function reviewKfEdit(id,revision,approve){
  toast(error?'تعذّر حفظ القرار. أعد مراجعة النسخة الظاهرة.':approve?'تم اعتماد التعديل':'تم رفض التعديل',5000);
  await loadKf();
 }
-async function deleteExpiredKf(id,button){
- if(!confirm('انتهت فترة الإعلان. هل تريد حذفه نهائيًا؟'))return;
+async function deleteKf(id,status,button){
+ const rejected=status==='rejected';
+ if(!confirm(rejected?'هل تريد حذف الطلب المرفوض نهائيًا؟':'انتهت فترة الإعلان. هل تريد حذفه نهائيًا؟'))return;
  button.disabled=true;
  try {
-  const {data,error}=await db.rpc('kafala_delete_expired',{p_id:id});
-  if(error){toast('تعذّر حذف الإعلان');return;}
-  toast(data?'تم حذف الإعلان المنتهي':'الحذف متاح للإعلانات المنتهية فقط');
+  const {data,error}=await db.rpc(rejected?'kafala_delete_rejected':'kafala_delete_expired',{p_id:id});
+  if(error){toast('تعذّر الحذف');return;}
+  toast(data?(rejected?'تم حذف الطلب المرفوض':'تم حذف الإعلان المنتهي'):'تغيّرت حالة الطلب. راجع التفاصيل وحاول مرة أخرى.');
   await loadKf();
  } finally {button.disabled=false;}
 }
