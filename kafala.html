@@ -305,6 +305,25 @@ select.inp{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.
 .kafala-more-btn:hover{background:#f8f5ef}
 @media(max-width:600px){.listings-grid{grid-template-columns:1fr;gap:10px}.transfer-poster .poster-top{grid-template-columns:76px minmax(0,1fr);padding:10px;gap:10px}.transfer-poster .poster-photo{width:76px;height:96px}.transfer-poster .poster-heading{font-size:16px}.transfer-poster .poster-sub{font-size:11px}}
 
+
+/* SAAHL-2: unmistakably lighter cards; accent colors are subtle, not solid fills */
+#listingsGrid{grid-template-columns:repeat(auto-fill,minmax(min(100%,280px),1fr));gap:12px}
+#listingsGrid .transfer-poster{background:#fffdfb;border:1px solid #e8e5df;border-top:3px solid var(--poster);border-radius:12px;box-shadow:0 2px 9px rgba(27,40,45,.045)}
+#listingsGrid .transfer-poster .poster-top{background:#fffdfb!important;color:#23343b!important;grid-template-columns:78px minmax(0,1fr);gap:11px;padding:11px;min-height:0}
+#listingsGrid .transfer-poster .poster-photo{width:78px;height:100px;max-width:78px;border-radius:9px;border:1px solid #e7e3dc;background:#f5f2eb;color:var(--poster);font-size:26px}
+#listingsGrid .transfer-poster .poster-photo img{object-fit:cover;object-position:center 20%}
+#listingsGrid .transfer-poster .poster-heading{font-size:16px;color:#23343b;line-height:1.35}
+#listingsGrid .transfer-poster .poster-sub{font-size:11px;color:#667178;line-height:1.4}
+#listingsGrid .transfer-poster .poster-status{background:#f2f5f3;border:1px solid #e1e8e3;color:#53756d;font-size:10px}
+#listingsGrid .transfer-poster .poster-salary{border-top:1px solid #e9e6df;padding-top:5px;margin-top:3px;font-size:11px;color:#667178}
+#listingsGrid .transfer-poster .poster-salary strong{font-size:12px;color:#253a3a}
+#listingsGrid .transfer-poster .poster-toggle{display:block;background:#edf3f0!important;color:#315d54!important;border:1px solid #dbe8e1!important;border-radius:8px;width:calc(100% - 22px);margin:0 11px 10px;padding:8px;font-size:12px}
+#listingsGrid .transfer-poster .poster-toggle:hover{background:#dfece6!important}
+#listingsGrid .transfer-poster .poster-detail{background:#fbfaf8;border-color:#e9e7e1}
+#listingsGrid .transfer-poster .poster-detail b{color:#527a71}
+#listingsGrid .transfer-poster .lcard-btn{background:#f3f6f4;color:#315d54;border-color:#dbe5df}
+@media(max-width:600px){#listingsGrid{grid-template-columns:1fr}#listingsGrid .transfer-poster .poster-top{grid-template-columns:78px minmax(0,1fr);gap:10px;padding:10px}#listingsGrid .transfer-poster .poster-photo{width:78px;height:100px}#listingsGrid .transfer-poster .poster-heading{font-size:16px}}
+
 </style>
 <style>input[type="number" inputmode="numeric"],input[type="tel"],.pay-total-amt,#adNum{font-variant-numeric:lining-nums;direction:ltr;unicode-bidi:plaintext}</style></head>
 <body>
