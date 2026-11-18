@@ -244,6 +244,26 @@ select.inp{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.
 .transfer-poster .lcard-btn:hover{background:#3b3327}
 @media(max-width:600px){.listings-grid{grid-template-columns:1fr;gap:13px}.transfer-poster .poster-top{min-height:190px;padding:12px;grid-template-columns:40% minmax(0,1fr)}.transfer-poster .poster-photo{height:170px}.transfer-poster .poster-heading{font-size:15px}}
 
+/* Transfer cards: responsive white cards, individual restrained accent colors */
+.listings-grid{grid-template-columns:repeat(auto-fill,minmax(min(100%,340px),1fr));gap:18px}
+.lcard.transfer-poster{overflow:hidden;background:#fff;border:1px solid #e3e6e7;border-top:5px solid var(--poster);border-radius:17px;box-shadow:0 5px 18px #17212b12;display:flex;flex-direction:column}
+.transfer-poster .poster-top{direction:rtl;background:#fff;color:#162339;display:grid;grid-template-columns:112px minmax(0,1fr);gap:14px;padding:15px;min-height:0;align-items:center}
+.transfer-poster .poster-photo{width:112px;height:136px;border:0;border-radius:12px;background:#f1f3f3;color:var(--poster);font-size:40px;overflow:hidden}
+.transfer-poster .poster-photo img{object-fit:cover}
+.transfer-poster .poster-info{gap:6px;justify-content:center}
+.transfer-poster .poster-heading{font-size:21px;color:#162339}
+.transfer-poster .poster-sub{font-size:13px;line-height:1.6;color:#344256}
+.transfer-poster .poster-status{display:inline-block;border-radius:99px;background:#e8f3f0;color:#17675f;padding:2px 8px;font-size:11px;font-weight:700}
+.transfer-poster .poster-salary{font-size:13px;color:#26344a;border-top:1px solid #eee;padding-top:8px;margin-top:4px}
+.transfer-poster .poster-salary strong{font-size:16px}
+.transfer-poster .poster-toggle{margin:0 12px 12px;background:var(--poster);color:white;border:0;border-radius:9px;padding:11px;font-size:14px;font-weight:800;cursor:pointer}
+.transfer-poster .poster-details{padding:0 13px 14px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.transfer-poster .poster-details[hidden]{display:none}
+.transfer-poster .poster-detail{border:1px solid #e4e8e8;border-radius:9px;padding:9px;display:flex;flex-wrap:wrap;gap:5px;font-size:12px;overflow-wrap:anywhere}
+.transfer-poster .poster-detail b{color:#17786d}.transfer-poster .poster-detail.wide{grid-column:1/-1}
+.transfer-poster .poster-expiry{grid-column:1/-1}.transfer-poster .lcard-btn{grid-column:1/-1;background:#17191d;color:#fff;border:0;border-radius:9px;padding:12px;cursor:pointer}
+@media(max-width:600px){.listings-grid{grid-template-columns:1fr}.transfer-poster .poster-top{grid-template-columns:105px minmax(0,1fr);padding:12px;gap:10px}.transfer-poster .poster-photo{width:105px;height:128px}.transfer-poster .poster-heading{font-size:19px}}
+@media(max-width:360px){.transfer-poster .poster-top{grid-template-columns:88px minmax(0,1fr)}.transfer-poster .poster-photo{width:88px;height:112px}.transfer-poster .poster-heading{font-size:17px}}
 </style>
 <style>input[type="number" inputmode="numeric"],input[type="tel"],.pay-total-amt,#adNum{font-variant-numeric:lining-nums;direction:ltr;unicode-bidi:plaintext}</style></head>
 <body>
@@ -396,6 +416,10 @@ select.inp{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.
               <label>سنوات الخبرة</label>
               <input class="inp" type="number" id="wExp" placeholder="3" min="0" max="30">
             </div>
+          </div>
+          <div class="row r2">
+            <div class="field"><label>الراتب الشهري (درهم)</label><input class="inp" id="wSalary" type="number" min="0" max="100000" step="1" inputmode="numeric" placeholder="مثال: 1500"></div>
+            <div class="field"><label>الديانة</label><select class="inp" id="wReligion"><option value="">غير محددة</option><option>مسلمة</option><option>مسيحية</option><option>هندوسية</option><option>بوذية</option><option>أخرى</option></select></div>
           </div>
           <div class="row r2">
             <div class="field">
@@ -651,6 +675,8 @@ async function loadListings() {
         age: r.age || '',
         prof: r.profession || '',
         exp: r.experience_years || 0,
+        salary: r.monthly_salary,
+        religion: r.religion || '',
         status: r.current_status || '',
         emirate: r.emirate || '',
         skills: Array.isArray(r.skills) ? r.skills : [],
@@ -694,29 +720,31 @@ function renderListings(list) {
     const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
     const skills=(Array.isArray(l.skills)?l.skills:[]).filter(Boolean);
     return `
-    <div class="lcard transfer-poster" style="--poster:${color}" onclick="openDetail('${esc(l.id)}')">
+    <article class="lcard transfer-poster" style="--poster:${color}">
       <div class="poster-top">
         <div class="poster-photo">${photoMarkup}</div>
         <div class="poster-info">
           <div class="poster-heading">${esc(l.name)}</div>
-          <span class="poster-label">البيانات الأساسية</span>
-          <div class="poster-fact"><strong>الجنسية:</strong> ${esc(l.nat)}</div>
-          <div class="poster-fact"><strong>المهنة:</strong> ${esc(l.prof)}</div>
-          <div class="poster-fact"><strong>العمر:</strong> ${esc(l.age)} سنة</div>
-          <div class="poster-fact"><strong>الخبرة:</strong> ${esc(l.exp)} سنة</div>
-          <span class="poster-label">الوضع الحالي</span>
-          <div class="poster-fact">${esc(l.status)}</div>
+          <div class="poster-sub">${esc(l.nat)} · ${esc(l.age)} سنة</div>
+          <div class="poster-sub">${esc(l.prof)} <span class="poster-status">${esc(l.status||'نقل كفالة')}</span></div>
+          <div class="poster-salary">الراتب الشهري: <strong>${l.salary!=null?Number(l.salary).toLocaleString('en-AE')+' درهم':'غير محدد'}</strong></div>
         </div>
       </div>
-      <div class="poster-bottom">
-        <div class="poster-skills"><strong>المهارات:</strong> ${skills.length?esc(skills.slice(0,4).join('، '))+(skills.length>4?'، والمزيد…':''):'غير محددة'}</div>
-        <div class="poster-expiry">الإمارة: ${esc(l.emirate||'غير محددة')} · ينتهي الإعلان: ${esc(l.expiry)}</div>
-        <button type="button" class="lcard-btn">عرض التفاصيل والتواصل</button>
+      <button type="button" class="poster-toggle" aria-expanded="false" onclick="toggleTransferCard(this)">عرض التفاصيل <span aria-hidden="true">⌄</span></button>
+      <div class="poster-details" hidden>
+        <div class="poster-detail"><b>الديانة</b><span>${esc(l.religion||'غير محددة')}</span></div>
+        <div class="poster-detail"><b>الخبرة</b><span>${esc(l.exp)} سنوات</span></div>
+        <div class="poster-detail wide"><b>سبب نقل الكفالة</b><span>${esc(l.reason||'غير محدد')}</span></div>
+        <div class="poster-detail wide"><b>المهارات</b><span>${skills.length?esc(skills.join('، ')):'غير محددة'}</span></div>
+        <div class="poster-detail wide"><b>الإمارة</b><span>${esc(l.emirate||'غير محددة')}</span></div>
+        <div class="poster-expiry">ينتهي الإعلان: ${esc(l.expiry)}</div>
+        <button type="button" class="lcard-btn" onclick="openDetail('${esc(l.id)}')">عرض بيانات التواصل والتفاصيل</button>
       </div>
-    </div>`;
+    </article>`;
   }).join('');
 }
 
+function toggleTransferCard(btn){const details=btn.nextElementSibling;const open=details.hidden;details.hidden=!open;btn.setAttribute('aria-expanded',String(open));btn.innerHTML=open?'إخفاء التفاصيل <span aria-hidden="true">⌃</span>':'عرض التفاصيل <span aria-hidden="true">⌄</span>';}
 function filterListings() {
   const q = document.getElementById('searchQ').value.toLowerCase();
   const prof = document.getElementById('fProf').value;
@@ -742,6 +770,7 @@ function openDetail(id) {
   document.getElementById('dm-grid').innerHTML = [
     {lb:'العمر',v:l.age+' سنة'},{lb:'الجنسية',v:l.nat},
     {lb:'المهنة',v:l.prof},{lb:'سنوات الخبرة',v:l.exp+' سنوات'},
+    {lb:'الراتب الشهري',v:l.salary!=null?Number(l.salary).toLocaleString('en-AE')+' درهم':'غير محدد'},{lb:'الديانة',v:l.religion||'غير محددة'},
     {lb:'الإمارة',v:l.emirate},{lb:'الوضع الحالي',v:l.status},
   ].map(i=>`<div class="dm-item"><div class="dm-item-lbl">${i.lb}</div><div class="dm-item-val">${i.v}</div></div>`).join('');
   document.getElementById('dm-skills').innerHTML = l.skills.map(s=>`<span class="dm-skill">${s}</span>`).join('');
@@ -874,6 +903,8 @@ async function processPayment() {
       age: parseInt(document.getElementById('wAge').value) || null,
       profession: kafalaFieldValue('wProf'),
       experience_years: parseInt(document.getElementById('wExp').value) || 0,
+      monthly_salary: document.getElementById('wSalary').value === '' ? null : Number(document.getElementById('wSalary').value),
+      religion: document.getElementById('wReligion').value || null,
       current_status: kafalaFieldValue('wStatus'),
       emirate: document.getElementById('wEmirate').value,
       skills: collectSkills(),
