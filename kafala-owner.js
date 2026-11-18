@@ -15,7 +15,11 @@
   const customFields = new Set(['wNat', 'wProf', 'wStatus']);
   const validPin = value => /^[0-9]{6}$/.test(value);
   const numberFrom = value => toEnglishDigits(value).trim().replace(/[\s-]/g, '').toUpperCase();
+  const validNumber = value => /^(?:[0-9]{8}|[0-9A-F]{16})$/.test(value);
+  const recentKey = 'saahl2-kafala-request-numbers';
   let requestKey;
+  let reservation;
+  let requestNumber;
   let submittedNumber;
   let owner;
   let loginTimer;
@@ -26,12 +30,76 @@
   }
 
   function statusText(active, status, endsAt) {
-    if (active && endsAt && Date.parse(endsAt) <= Date.now()) return 'منتهي';
+    if (status === 'approved' && endsAt && Date.parse(endsAt) <= Date.now()) return 'منتهي';
     if (active) return 'منشور';
     if (status === 'approved') return 'موقوف';
     if (status === 'rejected') return 'مرفوض';
     return 'بانتظار مراجعة الإدارة';
   }
+
+  function savedNumbers() {
+    try {
+      const numbers = JSON.parse(localStorage.getItem(recentKey) || '[]');
+      return Array.isArray(numbers) ? numbers.filter(value => typeof value === 'string' && validNumber(value)) : [];
+    } catch { return []; }
+  }
+
+  function renderSavedNumbers() {
+    const numbers = savedNumbers();
+    el('ownerRecent').hidden = !numbers.length;
+    el('ownerRecentNumbers').replaceChildren(new Option('اختر رقم طلب', ''), ...numbers.map(number => new Option(number, number)));
+    return numbers;
+  }
+
+  function updateSavedNumbers(number, removedNumber) {
+    const numbers = savedNumbers().filter(value => value !== number && value !== removedNumber);
+    if (number) numbers.unshift(number);
+    try { localStorage.setItem(recentKey, JSON.stringify(numbers.slice(0, 12))); } catch { /* Optional browser storage */ }
+    renderSavedNumbers();
+  }
+
+  async function copyNumber(inputId, messageId) {
+    const input = el(inputId);
+    try {
+      await navigator.clipboard.writeText(input.value);
+      message(messageId, 'تم نسخ رقم الطلب.');
+    } catch {
+      input.focus();
+      input.select();
+      message(messageId, 'تم تحديد الرقم. انسخه يدويًا.');
+    }
+  }
+
+  async function reserveNumber() {
+    if (requestNumber) return requestNumber;
+    if (reservation) return reservation;
+    requestKey ||= crypto.randomUUID();
+    el('retryReservedNumber').hidden = true;
+    message('reserveNumberStatus', '');
+    reservation = (async () => {
+      const {data,error} = await _db.rpc('kafala_reserve_number', {p_request:requestKey});
+      if (error || !validNumber(data)) {
+        message('reserveNumberStatus', 'تعذّر تجهيز رقم الطلب.');
+        el('retryReservedNumber').hidden = false;
+        return null;
+      }
+      requestNumber = data;
+      el('reservedNumber').value = data;
+      el('copyReservedNumber').disabled = false;
+      return data;
+    })();
+    try { return await reservation; }
+    finally { reservation = null; }
+  }
+
+  el('retryReservedNumber').onclick = reserveNumber;
+  el('copyReservedNumber').onclick = () => copyNumber('reservedNumber','reserveNumberStatus');
+  el('createOwnerPin').addEventListener('focus', reserveNumber);
+  el('ownerRecentNumbers').onchange = event => {
+    if (!event.target.value) return;
+    el('ownerNumber').value = event.target.value;
+    el('ownerPin').focus();
+  };
 
   function setOwnerForm(editing) {
     editingKafala = editing;
@@ -111,6 +179,10 @@
     const expires = data.ends_at ? ' · تاريخ الانتهاء ' + formatArabicDate(data.ends_at) : '';
     const draft = {pending:' · التعديل بانتظار المراجعة', rejected:' · التعديل مرفوض'}[data.draft_status] || '';
     message('ownerStatus', statusText(data.active, data.status, data.ends_at) + expires + draft);
+    message('ownerNumberInfo', 'رقم طلبك: ' + data.request_number);
+    el('ownerDelete').hidden = !data.expired;
+    el('ownerExpiredNotice').hidden = !data.expired;
+    el('ownerEdit').hidden = Boolean(data.expired);
     const photo = safeKafalaImageUrl(data.fields.worker_photo_url);
     el('ownerPhoto').hidden = !photo;
     if (photo) el('ownerPhoto').src = photo;
@@ -154,11 +226,12 @@
     invalid: 'تحقق من رقم الطلب والرمز السري.',
     locked: 'تم إيقاف المحاولات مؤقتًا. حاول مرة أخرى بعد 15 دقيقة.',
     changed: 'تم تحديث الإعلان منذ فتحه. أغلق الطلب وافتحه مجددًا قبل التعديل.',
+    not_expired: 'الحذف متاح بعد انتهاء فترة الإعلان.',
     invalid_pin: 'أدخل رمزًا سريًا من 6 أرقام.'
   };
 
   async function manage(number, pin, action, options = {}) {
-    const {data, error} = await _db.rpc('kafala_manage', {p_number:number, p_pin:pin, p_action:action, ...options});
+    const {data, error} = await _db.rpc('kafala_manage_request', {p_number:number, p_pin:pin, p_action:action, ...options});
     if (error) throw new Error(action === 'edit'
       ? 'تعذّر حفظ التعديل. تحقق من البيانات وحاول مرة أخرى.'
       : 'تعذّر الاتصال. حاول مرة أخرى.');
@@ -170,7 +243,7 @@
     event.preventDefault();
     const number = numberFrom(el('ownerNumber').value);
     const pin = el('ownerPin').value;
-    if (!/^[0-9A-F]{16}$/.test(number) || !validPin(pin)) return message('ownerMessage', feedback.invalid);
+    if (!validNumber(number) || !validPin(pin)) return message('ownerMessage', feedback.invalid);
     const button = event.submitter;
     const version = viewVersion;
     button.disabled = true;
@@ -179,7 +252,9 @@
       const data = await manage(number, pin, 'open');
       if (version !== viewVersion) return;
       el('ownerPin').value = '';
-      owner = {number, pin, data};
+      owner = {number:data.request_number, pin, data};
+      el('ownerNumber').value = data.request_number;
+      updateSavedNumbers(data.request_number, number);
       clearTimeout(loginTimer);
       loginTimer = setTimeout(() => {
         const showingOwner = el('page-manage').classList.contains('on') || editingKafala;
@@ -193,6 +268,22 @@
   });
 
   el('ownerLogout').onclick = () => closeOwner();
+  el('ownerDelete').onclick = async () => {
+    const session = owner;
+    if (!session || !confirm('انتهت فترة الإعلان. هل تريد حذف الإعلان نهائيًا؟')) return;
+    const button = el('ownerDelete');
+    button.disabled = true;
+    try {
+      await manage(session.number,session.pin,'delete');
+      updateSavedNumbers(null,session.number);
+      if (session !== owner) return;
+      closeOwner('تم حذف الإعلان المنتهي.');
+      el('ownerNumber').value = '';
+      history.replaceState(null,'','#manage');
+    } catch (error) {
+      if (session === owner) message('ownerMessage',error.message);
+    } finally { button.disabled = false; }
+  };
   el('ownerEdit').onclick = () => {
     setOwnerForm(true);
     fillFields(owner.data.fields);
@@ -234,10 +325,14 @@
     if (submittedNumber) {
       submittedNumber = null;
       requestKey = null;
+      requestNumber = null;
+      el('reservedNumber').value = '';
+      el('copyReservedNumber').disabled = true;
       fillFields();
       el('agreeTerms').checked = false;
     }
     showPage('form');
+    reserveNumber();
   };
 
   window.processPayment = async () => {
@@ -265,15 +360,25 @@
         setOwnerForm(false);
         showOwner(data, 'تم إرسال التعديل إلى الإدارة للمراجعة.');
       } else {
-        requestKey ||= crypto.randomUUID();
-        const {data,error} = await _db.rpc('kafala_submit_protected', {p_request:requestKey,p_pin:pin,p_days:days,p_fields:payload});
+        const number = await reserveNumber();
+        if (!number) throw new Error('أعد محاولة تجهيز رقم الطلب قبل الإرسال.');
+        const {data,error} = await _db.rpc('kafala_submit_numbered', {p_request:requestKey,p_number:number,p_pin:pin,p_days:days,p_fields:payload});
+        if (error?.code === 'P4100') {
+          requestNumber = null;
+          el('reservedNumber').value = '';
+          el('copyReservedNumber').disabled = true;
+          await reserveNumber();
+          throw new Error('انتهت صلاحية الرقم السابق. احفظ الرقم الظاهر ثم أرسل الطلب مرة أخرى.');
+        }
         if (error) throw new Error('تعذّر إرسال الطلب. تحقق من البيانات وحاول مرة أخرى.');
         submittedNumber = data;
         el('createOwnerPin').value = '';
         el('createOwnerPinAgain').value = '';
         el('formContent').style.display = 'none';
         el('formSuccess').classList.add('show');
-        message('adNum', 'طلب رقم ' + data.match(/.{4}/g).join('-'));
+        el('adNum').value = data;
+        updateSavedNumbers(data);
+        message('copySuccessNumber','');
         const link = new URL('kafala.html', location.href);
         link.hash = 'manage=' + data;
         el('trackingLink').value = link.href;
@@ -286,12 +391,14 @@
   };
 
   window.copyKafalaTracking = async (numberOnly = false) => {
+    if (numberOnly) return copyNumber('adNum','copySuccessNumber');
     try {
-      await navigator.clipboard.writeText(numberOnly ? submittedNumber : el('trackingLink').value);
-      message('trackingCopyStatus', numberOnly ? 'تم نسخ رقم الطلب.' : 'تم نسخ الرابط.');
+      await navigator.clipboard.writeText(el('trackingLink').value);
+      message('trackingCopyStatus', 'تم نسخ الرابط.');
     } catch {
       const input = el('trackingLink');
-      if (!numberOnly) { input.focus(); input.select(); }
+      input.focus();
+      input.select();
       message('trackingCopyStatus', 'يمكنك تحديد النص ونسخه يدويًا.');
     }
   };
@@ -303,9 +410,11 @@
     if (hash === 'manage' || hash.startsWith('manage=')) {
       const number = numberFrom(hash.slice(7));
       if (!owner || (number && number !== owner.number)) closeOwner();
-      if (/^[0-9A-F]{16}$/.test(number)) el('ownerNumber').value = number;
+      const saved = renderSavedNumbers();
+      const current = validNumber(number) ? number : saved[0];
+      if (current) el('ownerNumber').value = current;
       showPage('manage');
-      if (!owner) (number ? el('ownerPin') : el('ownerNumber')).focus();
+      if (!owner) (current ? el('ownerPin') : el('ownerNumber')).focus();
       return;
     }
     const token = new URLSearchParams(location.search).get('track');

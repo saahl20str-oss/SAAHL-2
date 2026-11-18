@@ -467,26 +467,29 @@ async function loadKf(){
  if(error){w.textContent='تعذر تحميل طلبات نقل الكفالة: '+error.message;const badge=document.getElementById('kf-badge');if(badge)badge.style.display='none';const total=document.getElementById('s-kf');if(total)total.textContent='—';const pendingCard=document.getElementById('s-kf-pending');if(pendingCard)pendingCard.textContent='—';const summary=document.getElementById('ss-kf');if(summary)summary.textContent='تعذر تحميل الإعلانات';return;}
  aKf=data||[];
  const editsByAd=new Map((edits||[]).map(edit=>[edit.ad_id,edit]));
- const pendingCount=aKf.filter(k=>k.review_status==='pending_review'||editsByAd.has(k.id)).length;
+ const isExpired=k=>k.review_status==='approved'&&k.ends_at&&Date.parse(k.ends_at)<=Date.now();
+ const expiredCount=aKf.filter(isExpired).length;
+ const pendingCount=aKf.filter(k=>!isExpired(k)&&(k.review_status==='pending_review'||editsByAd.has(k.id))).length;
  const kfTotal=document.getElementById('s-kf'),kfSummary=document.getElementById('ss-kf'),kfStatus=document.getElementById('ss-kf-status');
  const kfPending=pendingCount;
- const kfPublished=aKf.filter(k=>k.is_active===true).length;
+ const kfPublished=aKf.filter(k=>k.is_active===true&&!isExpired(k)).length;
  const kfRejected=aKf.filter(k=>k.review_status==='rejected').length;
  if(kfTotal)kfTotal.textContent=String(aKf.length);
  const kfPendingCard=document.getElementById('s-kf-pending');if(kfPendingCard)kfPendingCard.textContent=String(kfPending);
  if(kfSummary)kfSummary.textContent=kfPublished+' منشور · '+kfPending+' بانتظار المراجعة';
- if(kfStatus)kfStatus.textContent=kfRejected+' مرفوض · اضغط لعرض الطلبات';
+ if(kfStatus)kfStatus.textContent=kfRejected+' مرفوض · '+expiredCount+' منتهي';
  const badgeAll=document.getElementById('kf-badge');if(badgeAll){badgeAll.textContent=String(kfPending);badgeAll.style.display=kfPending?'inline-flex':'none';}
  if(!aKf.length){w.innerHTML=eh('لا توجد طلبات نقل كفالة');return;}
  const pending=pendingCount;
  const badge=document.getElementById('kf-badge');if(badge){badge.textContent=String(pending);badge.style.display=pending?'inline-flex':'none';}
- w.innerHTML=(editError?'<p role="alert">تعذّر تحميل التعديلات. أعد تحميل الصفحة.</p>':'')+'<div style="padding:14px;font-weight:700">طلبات نقل الكفالة: '+aKf.length+' | بانتظار المراجعة: '+pending+'</div><div class="kf-list">'+aKf.map(k=>{
+ w.innerHTML=(editError?'<p role="alert">تعذّر تحميل التعديلات. أعد تحميل الصفحة.</p>':'')+'<div style="padding:14px;font-weight:700">طلبات نقل الكفالة: '+aKf.length+' | بانتظار المراجعة: '+pending+' | منتهي: '+expiredCount+'</div><div class="kf-list">'+aKf.map(k=>{
  const edit=editsByAd.get(k.id);
- const status=edit?'تعديل بانتظار المراجعة':k.review_status==='rejected'?'مرفوض':k.is_active?'منشور':k.review_status==='approved'?'موقوف':'بانتظار المراجعة';
+ const expired=isExpired(k);
+ const status=expired?'منتهي':edit?'تعديل بانتظار المراجعة':k.review_status==='rejected'?'مرفوض':k.is_active?'منشور':k.review_status==='approved'?'موقوف':'بانتظار المراجعة';
  const remaining=k.is_active&&k.ends_at?Math.max(0,Math.ceil((new Date(k.ends_at)-Date.now())/86400000)):null;
  const details='<div class="kf-meta">الجنسية: '+kfSafe(k.nationality)+' | العمر: '+kfSafe(k.age)+' | الخبرة: '+kfSafe(k.experience_years)+' سنة | المدة: '+kfSafe(k.ad_days)+' يوم</div><div class="kf-meta">المهارات: '+kfSafe((k.skills||[]).join('، ')||'غير محددة')+'</div><div class="kf-meta">سبب النقل: '+kfSafe(k.reason)+'</div><div class="kf-meta">اسم الكفيل: '+kfSafe(k.sponsor_display_name)+' | الهاتف: <span dir="ltr">'+kfSafe(k.contact_phone)+'</span></div><div class="kf-meta">تاريخ الطلب: '+fd(k.created_at)+' | انتهاء العرض: '+(k.is_active?fd(k.ends_at):'يحدد عند النشر')+(remaining!==null?' | المتبقي: '+remaining+' يوم':'')+'</div>';
- const actions='<div class="kf-actions">'+(!edit&&!editError&&k.review_status==='pending_review'?'<button class="btn btn-s" onclick="reviewKf(\''+k.id+'\',\'approve\')">اعتماد ونشر</button><button class="btn btn-o btn-s" onclick="reviewKf(\''+k.id+'\',\'reject\')">رفض</button>':'')+(k.is_active?'<button class="btn btn-d btn-s" onclick="reviewKf(\''+k.id+'\',\'stop\')">إيقاف</button>':k.review_status==='approved'?'<button class="btn btn-s" onclick="reviewKf(\''+k.id+'\',\'resume\')">استئناف إن لم تنتهِ المدة</button>':'')+'</div>';
- return '<article class="kf-line"><div class="kf-line-main"><div class="kf-line-name"><strong>'+kfSafe(k.worker_name)+'</strong><small>'+kfSafe(k.profession)+' — '+kfSafe(k.emirate)+'</small></div><span class="bge '+(k.is_active?'active':'pending')+'">'+status+'</span><span class="kf-line-date">'+fd(k.created_at)+'</span><button type="button" class="btn btn-o btn-s" onclick="this.closest(\'.kf-line\').classList.toggle(\'expanded\')">التفاصيل</button></div><div class="kf-line-detail">'+details+kfReviewFields(k)+actions+(edit?kfEditReview(edit):'')+'</div></article>';
+ const actions=expired?`<p class="kf-meta">انتهت فترة الإعلان وهو غير ظاهر للزوار.</p><button class="btn btn-d btn-s" onclick="deleteExpiredKf('${k.id}',this)">حذف الإعلان</button>`:'<div class="kf-actions">'+(!edit&&!editError&&k.review_status==='pending_review'?'<button class="btn btn-s" onclick="reviewKf(\''+k.id+'\',\'approve\')">اعتماد ونشر</button><button class="btn btn-o btn-s" onclick="reviewKf(\''+k.id+'\',\'reject\')">رفض</button>':'')+(k.is_active?'<button class="btn btn-d btn-s" onclick="reviewKf(\''+k.id+'\',\'stop\')">إيقاف</button>':k.review_status==='approved'?'<button class="btn btn-s" onclick="reviewKf(\''+k.id+'\',\'resume\')">استئناف إن لم تنتهِ المدة</button>':'')+'</div>';
+ return '<article class="kf-line"><div class="kf-line-main"><div class="kf-line-name"><strong>'+kfSafe(k.worker_name)+'</strong><small>'+kfSafe(k.profession)+' — '+kfSafe(k.emirate)+'</small></div><span class="bge '+(expired?'expired':k.is_active?'active':'pending')+'">'+status+'</span><span class="kf-line-date">'+fd(k.created_at)+'</span><button type="button" class="btn btn-o btn-s" onclick="this.closest(\'.kf-line\').classList.toggle(\'expanded\')">التفاصيل</button></div><div class="kf-line-detail">'+details+kfReviewFields(k)+actions+(edit&&!expired?kfEditReview(edit):'')+'</div></article>';
  }).join('')+'</div>';
 }
 function kfReviewFields(ad, full=false){
@@ -511,6 +514,16 @@ async function reviewKfEdit(id,revision,approve){
  const {error}=await db.rpc('kafala_review_edit',{p_id:id,p_revision:revision,p_approve:approve});
  toast(error?'تعذّر حفظ القرار. أعد مراجعة النسخة الظاهرة.':approve?'تم اعتماد التعديل':'تم رفض التعديل',5000);
  await loadKf();
+}
+async function deleteExpiredKf(id,button){
+ if(!confirm('انتهت فترة الإعلان. هل تريد حذفه نهائيًا؟'))return;
+ button.disabled=true;
+ try {
+  const {data,error}=await db.rpc('kafala_delete_expired',{p_id:id});
+  if(error){toast('تعذّر حذف الإعلان');return;}
+  toast(data?'تم حذف الإعلان المنتهي':'الحذف متاح للإعلانات المنتهية فقط');
+  await loadKf();
+ } finally {button.disabled=false;}
 }
 async function reviewKf(id,action){
  const label={approve:'الموافقة ونشر الإعلان',reject:'رفض الإعلان',stop:'إيقاف الإعلان',resume:'استئناف الإعلان'}[action];
