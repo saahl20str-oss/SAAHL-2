@@ -24,3 +24,9 @@ jobs:
       - run: npx playwright install --with-deps chromium
       - run: node --check kafala-owner.js
       - run: node tests/mobile-smoke.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: saahl2-mobile-previews
+          path: mobile-preview/
+          if-no-files-found: ignore
