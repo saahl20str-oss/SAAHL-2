@@ -32,3 +32,5 @@ img{height:auto}
   html{scroll-behavior:auto}
   *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
 }
+.saahl-install-btn{position:fixed;z-index:700;left:max(12px,env(safe-area-inset-left));bottom:max(14px,env(safe-area-inset-bottom));background:#111218;color:#fff;border:2px solid #c9a84c;border-radius:14px;padding:12px 18px;min-height:46px;font:700 15px Tahoma,Arial,sans-serif;box-shadow:0 6px 20px #0003;cursor:pointer;touch-action:manipulation}
+.saahl-install-btn[hidden]{display:none!important}
