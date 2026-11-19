@@ -1,0 +1,34 @@
+/* SAAHL-2 mobile enhancement layer, 2026-11-19.
+   Non-destructive: loaded after each page's existing styles. */
+html{max-width:100%;text-size-adjust:100%;-webkit-text-size-adjust:100%}
+body{max-width:100%;min-width:0}
+img,video,canvas,svg{max-width:100%}
+img{height:auto}
+:where(main,section,article,.panel,.card,.fcard,.field,.filters,.worker,.lcard,.transfer-poster,.owner-card,.ct,.main){min-width:0}
+:where(input,select,textarea){max-width:100%;font-size:max(16px,1em)}
+:where(button,.btn,.nav-link,.lcard-btn,.owner-button){touch-action:manipulation}
+:where(a,button,input,select,textarea):focus-visible{outline:3px solid #a8873a;outline-offset:3px}
+:where(.grid,.filters,.worker-grid,.workers-grid,.listings-grid,.sg,.cr,.row,.form-row,.cv-data)>*{min-width:0}
+:where(.panel,.card,.fcard,.owner-card,.worker,.transfer-poster){overflow-wrap:anywhere}
+:where(.table-wrap,.table-responsive,.responsive-table){max-width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch}
+@media(max-width:600px){
+  :where(main,.main,.ct,.listings-wrap){max-width:100%;padding-inline:12px}
+  :where(.panel,.card,.fcard){padding:clamp(12px,3.5vw,20px)}
+  :where(.grid,.worker-grid,.workers-grid,.office-results,.office-worker-list){grid-template-columns:minmax(0,1fr)}
+  :where(.form-row,.row.r2,.row.r3){grid-template-columns:minmax(0,1fr)}
+  :where(.nav-r,.tb-r,.office-toolbar,.office-navbar,.results-toolbar){min-width:0;flex-wrap:wrap}
+  :where(.hero h1,.lh-title,.office-hero h1){overflow-wrap:normal;text-wrap:balance}
+  :where(.modal,.detail-modal,.cv-dialog){max-width:calc(100vw - 16px)}
+  :where(.owner-number-row,.owner-actions,.ad-card-actions){flex-wrap:wrap}
+  :where(.owner-number-row,.owner-actions,.ad-card-actions)>*{min-width:0}
+  :where(.filters input,.filters select,.field input,.field select){width:100%}
+}
+@media(max-width:359px){
+  :where(.filters,.cv-data,.sg){grid-template-columns:minmax(0,1fr)}
+  :where(.hero h1,.lh-title){font-size:clamp(22px,7vw,30px)}
+  :where(.nav-link,.nav-action,.tbtn){padding-inline:8px}
+}
+@media(prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+}
