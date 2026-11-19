@@ -11,7 +11,8 @@
 
   const locationHash = new URLSearchParams(location.hash.slice(1));
   const recovery = locationHash.get('type') === 'recovery' && Boolean(locationHash.get('access_token'));
-  const failedLink = locationHash.has('error') || new URLSearchParams(location.search).has('error');
+  const query = new URLSearchParams(location.search);
+  const failedLink = locationHash.has('error') || query.has('error') || query.get('error_code') === 'otp_expired';
   const client = window.supabase.createClient(
     'https://hkfxikmpfgixrbrboxeb.supabase.co',
     'sb_publishable_OcWY5nY_-b2odLqQxsu2Kw_iQ4YswBz',
@@ -33,7 +34,7 @@
         redirectTo:new URL('./reset-password.html',location.href).href
       });
       if (error && error.status !== 404) throw error;
-      feedback('إذا كان البريد مسجلًا لدينا، راجع صندوق الوارد والرسائل غير المرغوب فيها.');
+      feedback('إذا كان البريد مسجلًا لدينا، افتح أحدث رسالة لاستعادة كلمة المرور. إذا جمع Gmail الرسائل في محادثة واحدة، اضغط «…» أسفل الرسالة الأحدث لإظهار رابطها.');
     } catch (error) {
       feedback(error?.status === 429 ? 'أُرسلت طلبات كثيرة. انتظر قليلًا قبل المحاولة.' : 'تعذّر إرسال رابط الاستعادة الآن. حاول لاحقًا.');
     } finally { button.disabled = false; }

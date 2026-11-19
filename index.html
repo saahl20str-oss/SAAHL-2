@@ -1,6 +1,14 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
+<script>
+(() => {
+  const response = new URLSearchParams(location.hash.slice(1));
+  if (response.get('error') === 'access_denied' && response.get('error_code') === 'otp_expired') {
+    location.replace(new URL('./reset-password.html?error_code=otp_expired', location.href).href);
+  }
+})();
+</script>
 <script src="https://js.stripe.com/v3/"></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
