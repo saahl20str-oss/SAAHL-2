@@ -9,3 +9,6 @@
 .saahl-install-guide button{min-height:44px;padding:8px 14px;border:0;border-radius:8px;background:#19283b;color:white;cursor:pointer;font:inherit}
 #mobNav [data-saahl-install] .saahl-install-btn{width:100%}
 #pg-settings [data-saahl-install]{margin-top:12px}
+
+.saahl-install-guide-actions{display:flex;gap:8px;flex-wrap:wrap}
+.saahl-install-guide-actions [hidden]{display:none}
