@@ -181,10 +181,26 @@ body.admin-menu-open{overflow:hidden}
 #le-err{display:none;white-space:normal;overflow-wrap:anywhere;line-height:1.8;margin-top:12px;color:#b91c1c;font-size:13px;font-weight:600;text-align:center}
 .kf-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr));gap:12px;padding:14px}.kf-review{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:16px;min-width:0;overflow-wrap:anywhere}.kf-top,.kf-actions{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}.kf-meta{font-size:12px;color:var(--muted);line-height:1.9;margin-top:7px}.kf-actions{justify-content:flex-start;margin-top:12px}@media(max-width:600px){.kf-grid{padding:10px;grid-template-columns:minmax(0,1fr)}}
 .kf-list{padding:0 14px 14px;display:grid;gap:8px}.kf-line{border:1px solid var(--border);background:var(--white);border-radius:10px;min-width:0;overflow:hidden}.kf-line-main{display:flex;align-items:center;gap:12px;padding:11px 14px;flex-wrap:wrap}.kf-line-name{flex:1;min-width:140px;display:flex;flex-direction:column;gap:3px}.kf-line-name small,.kf-line-date{color:var(--muted);font-size:12px}.kf-line-detail{display:none;border-top:1px solid var(--border);padding:12px 14px}.kf-line.expanded .kf-line-detail{display:block}@media(max-width:600px){.kf-line-main{gap:8px}.kf-line-date{width:100%;order:4}.kf-list{padding:0 8px 10px}}
+
+/* Compact admin advertisements: cards do not stretch across the entire desktop */
+#pg-ads #ads-wrap{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,340px),1fr));gap:12px;align-items:start}
+#pg-ads #ads-wrap>.saahl-ad-card{margin:0!important;width:100%;min-width:0;max-width:100%;height:auto;padding:14px;gap:10px}
+#pg-ads .ad-card-content{align-items:flex-start;gap:11px}
+#pg-ads .ad-card-info{min-width:0}
+#pg-ads .ad-card-info .ad-detail-line{font-size:12px;line-height:1.65}
+#pg-ads .ad-worker-photo{width:84px;height:105px;object-fit:cover;flex-shrink:0}
+#pg-ads .ad-card-actions{margin-top:0;justify-content:flex-start;gap:7px;padding-top:9px}
+#pg-ads .ad-card-actions .btn{min-height:36px}
+@media(max-width:650px){#pg-ads #ads-wrap{grid-template-columns:minmax(0,1fr)}#pg-ads .ad-worker-photo{width:78px;height:96px}}
+#pg-notifications .nt-entry{padding:12px 14px;border:1px solid var(--border);border-radius:11px;background:var(--white);margin:0 0 8px}
+#pg-notifications .nt-entry strong{display:block;font-size:13px}
+#pg-notifications .nt-entry p{font-size:12px;line-height:1.7;white-space:pre-wrap;margin:5px 0}
+#pg-notifications .nt-entry small{font-size:11px;color:var(--muted)}
+
 </style>
 
 <!-- Mobile-first enhancement; isolated from existing application logic -->
-<link rel="stylesheet" href="./mobile-first.css?v=20261119">
+<link rel="stylesheet" href="./mobile-first.css?v=20261119c">
 <link rel="manifest" href="./manifest.webmanifest">
 <meta name="theme-color" content="#111218">
 <link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png">
@@ -308,7 +324,7 @@ body.admin-menu-open{overflow:hidden}
         <input type="text" class="si2" id="nt-ti" placeholder="مثال: تحديث جديد في المنصة">
         <label style="font-size:12px;font-weight:600;color:var(--muted);display:block;margin-bottom:6px">نص الإشعار</label>
         <textarea class="si2" id="nt-bo" placeholder="اكتب نص الإشعار هنا..." style="min-height:80px;resize:vertical"></textarea>
-        <button class="svb" onclick="sendNotif()">📤 إرسال الإشعار</button>
+        <button class="svb" id="nt-send" onclick="sendNotif()">📤 إرسال الإشعار</button>
       </div>
       <div class="cd"><div class="ch"><span class="ct2">الإشعارات المرسلة</span></div><div id="nt-wrap"><div class="es"><div class="ei">🔔</div><p>لا توجد إشعارات مرسلة بعد</p></div></div></div>
     </div>
@@ -366,7 +382,7 @@ const fd=d=>{if(!d)return'—';return new Date(d).toLocaleDateString('ar-AE',{ye
 const eh=m=>`<div class="es"><div class="ei">📭</div><p>${m}<br><small>ستظهر هنا عند أول تسجيل</small></p></div>`;
 function toast(m,d=2500){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),d);}
 function toggleAdminMenu(force){const open=typeof force==='boolean'?force:!document.body.classList.contains('admin-menu-open');document.body.classList.toggle('admin-menu-open',open);const btn=document.querySelector('.mobile-admin-menu');if(btn)btn.setAttribute('aria-expanded',String(open));}
-function navTo(id){toggleAdminMenu(false);document.querySelectorAll('.pg').forEach(p=>p.classList.remove('active'));document.querySelectorAll('.ni').forEach(n=>n.classList.remove('active'));document.getElementById('pg-'+id).classList.add('active');document.querySelector('[data-p='+id+']')?.classList.add('active');}
+function navTo(id){toggleAdminMenu(false);document.querySelectorAll('.pg').forEach(p=>p.classList.remove('active'));document.querySelectorAll('.ni').forEach(n=>n.classList.remove('active'));document.getElementById('pg-'+id).classList.add('active');document.querySelector('[data-p='+id+']')?.classList.add('active');if(id==='notifications')loadNotif();}
 function toggleDark(){isDark=!isDark;document.body.classList.toggle('dark',isDark);localStorage.setItem('saahl_dark',isDark?'1':'0');const cb=document.getElementById('dk-cb');if(cb)cb.checked=isDark;document.getElementById('dkb').textContent=isDark?'☀️':'🌙';}
 function toggleAdminPassword(){const el=document.getElementById('le-pass'),eye=document.getElementById('le-eye');const visible=el.type==='password';el.type=visible?'text':'password';eye.setAttribute('aria-label',visible?'إخفاء كلمة المرور':'إظهار كلمة المرور');eye.title=eye.getAttribute('aria-label');eye.style.color=visible?'var(--teal)':'var(--muted)';}
 let adminAuthBusy=false;
@@ -634,7 +650,40 @@ async function delAd(id){
  toast('تم حذف الإعلان من '+placement+' بنجاح');
  await loadAds();
 }
-async function sendNotif(){const to=document.getElementById('nt-to').value;const ti=document.getElementById('nt-ti').value.trim();const bo=document.getElementById('nt-bo').value.trim();if(!ti||!bo){toast('أدخل العنوان والنص');return;}try{await db.from('notifications').insert({target:to,title:ti,body:bo,sent_at:new Date().toISOString()});}catch(e){}toast('تم إرسال الإشعار ✓ 📤');document.getElementById('nt-ti').value='';document.getElementById('nt-bo').value='';}
+async function loadNotif(){
+ const wrap=document.getElementById('nt-wrap');
+ if(!wrap)return;
+ const {data,error}=await db.from('notifications').select('id,target,title,body,sent_at').order('sent_at',{ascending:false}).limit(50);
+ if(error){wrap.textContent='تعذّر تحميل سجل الإشعارات: '+error.message;return;}
+ wrap.replaceChildren();
+ if(!data?.length){wrap.textContent='لا توجد إشعارات مرسلة بعد';return;}
+ for(const n of data){
+  const card=document.createElement('article');card.className='nt-entry';
+  const title=document.createElement('strong');title.textContent=n.title;
+  const body=document.createElement('p');body.textContent=n.body;
+  const meta=document.createElement('small');meta.textContent=({all:'الجميع',offices:'المكاتب',sponsors:'الكفلاء'}[n.target]||n.target)+' · '+fd(n.sent_at);
+  card.append(title,body,meta);wrap.append(card);
+ }
+}
+async function sendNotif(){
+ const to=document.getElementById('nt-to').value;
+ const ti=document.getElementById('nt-ti').value.trim();
+ const bo=document.getElementById('nt-bo').value.trim();
+ const btn=document.getElementById('nt-send');
+ if(!ti||!bo){toast('أدخل العنوان والنص');return;}
+ if(ti.length>160||bo.length>4000){toast('عنوان أو نص الإشعار أطول من المسموح');return;}
+ if(btn){btn.disabled=true;btn.textContent='جارٍ الحفظ…';}
+ try{
+  const {data,error}=await db.from('notifications').insert({target:to,title:ti,body:bo}).select('id').single();
+  if(error)throw error;
+  if(!data?.id)throw Error('لم تؤكد قاعدة البيانات الحفظ');
+  toast('تم حفظ الإشعار وإتاحته للمستلمين ✓',4000);
+  document.getElementById('nt-ti').value='';
+  document.getElementById('nt-bo').value='';
+  await loadNotif();
+ }catch(e){toast('فشل إرسال الإشعار: '+(e.message||'تحقق من الاتصال والصلاحيات'),6000);}
+ finally{if(btn){btn.disabled=false;btn.textContent='📤 إرسال الإشعار';}}
+}
 async function changePw(){
   const p1=document.getElementById('np1').value;
   const p2=document.getElementById('np2').value;
@@ -655,6 +704,6 @@ function buildP(){const ctx=document.getElementById('pieChart');if(!ctx)return;i
 </script>
 
 <script>if('serviceWorker' in navigator){window.addEventListener('load',()=>{navigator.serviceWorker.register('./sw.js').catch(()=>{});});}</script>
-<script defer src="./pwa-install.js?v=20261119"></script>
+<script defer src="./pwa-install.js?v=20261119c"></script>
 </body>
 </html>

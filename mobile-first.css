@@ -39,3 +39,21 @@ img{height:auto}
 .saahl-ios-install-info strong{display:block;font-size:16px}
 .saahl-ios-install-info p{margin:8px 0 12px}
 .saahl-ios-install-info button{padding:9px 20px;border:0;border-radius:9px;background:#111218;color:#fff;min-height:42px;font:inherit}
+
+/* Install is a normal navigation/settings action, never a floating bottom overlay. */
+.saahl-install-btn{position:static!important;inset:auto!important;left:auto!important;bottom:auto!important;box-shadow:none!important;min-height:40px;padding:8px 12px;font-size:12px;white-space:nowrap;max-width:100%;display:inline-flex;align-items:center;justify-content:center;margin:4px 0}
+.saahl-install-label{font-size:13px;font-weight:700;margin:12px 0 6px}
+@media(max-width:480px){.saahl-install-btn{font-size:11px;min-height:38px;padding:7px 10px}}
+
+/* Compact member notification bell and inbox */
+.saahl-inbox-trigger{position:static;border:1px solid #c9a84c;border-radius:9px;padding:8px 12px;background:#fff8e6;color:#211e18;font:700 12px Tahoma,Arial,sans-serif;cursor:pointer;white-space:nowrap;min-height:40px}
+.saahl-inbox-panel{position:fixed;z-index:1500;top:70px;left:12px;width:min(400px,calc(100vw - 24px));max-height:min(70vh,590px);overflow:auto;padding:15px;background:#fff;border:1px solid #d9d3c2;border-radius:15px;box-shadow:0 16px 50px #0002;direction:rtl;color:#222;font-family:Tahoma,Arial,sans-serif}
+.saahl-inbox-panel[hidden]{display:none!important}
+.saahl-inbox-controls{display:flex;gap:8px;align-items:center;margin-bottom:13px}
+.saahl-inbox-controls strong{margin-inline-end:auto;font-size:14px}
+.saahl-inbox-controls button{font:12px Tahoma,Arial,sans-serif;background:#f6f3ec;border:1px solid #ddd4c4;border-radius:8px;padding:8px;cursor:pointer;color:#222}
+.saahl-inbox-items{font-size:13px;line-height:1.75}
+.saahl-inbox-entry{border-top:1px solid #e8e4df;padding:12px 0;overflow-wrap:anywhere}
+.saahl-inbox-entry strong{font-size:13px}
+.saahl-inbox-entry p{white-space:pre-wrap;font-size:12px;margin:4px 0 6px}
+.saahl-inbox-entry small{color:#746c60}

@@ -43,7 +43,19 @@
         try { await prompt.prompt(); await prompt.userChoice; }
         catch { /* Only the browser can confirm installation. */ }
       });
-      document.body.append(button);
+      const isAdmin=!!document.getElementById('pg-settings');
+      const host=isAdmin
+        ? document.querySelector('#pg-settings .cd')
+        : (document.querySelector('.nav-actions,.office-navbar nav,.site-header nav,.topbar,.nav-r,header nav,header') || document.querySelector('footer'));
+      if(host){
+        if(isAdmin){
+          const label=document.createElement('p');
+          label.className='saahl-install-label';
+          label.textContent='تثبيت ساهل 2 على جهازك';
+          host.append(label);
+        }
+        host.append(button);
+      } else document.body.append(button);
     }
     button.textContent = pendingPrompt ? 'تثبيت ساهل 2' : 'إضافة ساهل 2 للشاشة';
     button.hidden = false;
