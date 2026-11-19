@@ -32,6 +32,26 @@ try {
       finally{await ctx.close();}
     }
   }
+  // Read-only guest workflow: ensure published transfer listings finish loading.
+  total++;
+  const guest=await browser.newContext({viewport:{width:390,height:844},locale:'ar-AE'});
+  const page=await guest.newPage();
+  try {
+    await page.goto(ORIGIN+'kafala.html',{waitUntil:'domcontentloaded',timeout:30000});
+    await page.waitForFunction(() => {
+      const grid=document.getElementById('listingsGrid');
+      return grid && !grid.textContent.includes('جاري تحميل الإعلانات');
+    },{timeout:18000});
+    const summary=await page.evaluate(()=>({
+      cards:document.querySelectorAll('#listingsGrid .transfer-poster').length,
+      countText:document.getElementById('listingsGrid')?.textContent?.slice(0,150) || '',
+      pending:document.getElementById('listingsGrid')?.textContent?.includes('جاري تحميل الإعلانات') || false
+    }));
+    const ok=!summary.pending && summary.cards>0;
+    if(!ok)fail++;
+    console.log(JSON.stringify({test:'public transfer ad loading',cards:summary.cards,ok}));
+  } catch(e){fail++;console.log(JSON.stringify({test:'public transfer ad loading',ok:false,error:String(e).slice(0,230)}));}
+  finally{await guest.close();}
   for(const asset of ['manifest.webmanifest','sw.js','mobile-first.css','pwa-install.js','saahl-pwa-icon.svg','saahl-pwa-192.png','saahl-pwa-512.png','apple-touch-icon.png']) {
     total++;
     try {
