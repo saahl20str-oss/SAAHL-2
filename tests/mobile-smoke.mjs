@@ -44,8 +44,7 @@ try {
  });
  const iosPage=await iphone.newPage();
  await iosPage.goto('http://127.0.0.1:8765/index.html',{waitUntil:'domcontentloaded'});
- await iosPage.getByRole('button',{name:'القائمة',exact:true}).click();
- const install=iosPage.locator('#mobNav .saahl-install-btn');
+ const install=iosPage.locator('#mainNav .nav-login + .nav-install .saahl-install-btn');
  await install.waitFor({state:'visible'});
  await install.click();
  const iosPanel=await iosPage.locator('#saahl-ios-install-info').isVisible();

@@ -696,6 +696,31 @@ footer{
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="ساهل 2">
 <link rel="stylesheet" href="./pwa-install.css?v=1">
+<style>
+#mainNav .nav-actions{flex:none}
+#mainNav .nav-login,#mainNav .nav-cta,#mainNav .nav-logo{white-space:nowrap}
+#mainNav .nav-install .saahl-install-btn{min-height:40px;font-family:inherit}
+@media (max-width:1100px){
+  #mainNav{padding-inline:3%}
+  #mainNav .nav-center{gap:14px}
+  #mainNav .nav-actions{gap:8px}
+}
+@media (max-width:850px){
+  #mainNav{gap:6px}
+  #mainNav .nav-center,#mainNav .nav-cta,#mainNav .lang-wrap{display:none}
+  #mainNav .nav-actions{margin-inline-start:auto}
+  #mainNav .nav-login{display:inline-flex;align-items:center;min-height:44px;padding:6px 9px}
+  #mainNav .nav-install .saahl-install-btn{padding-inline:8px;min-height:44px}
+  #mainNav .nav-burger{display:flex;flex:none;padding:10px 5px;min-height:44px;justify-content:center}
+}
+@media (max-width:390px){
+  #mainNav .nav-actions{gap:5px}
+  #mainNav .nav-logo{gap:5px}
+  #mainNav .nav-logo img{height:30px}
+  #mainNav .nav-logo-text{font-size:16px}
+  #mainNav .nav-login,#mainNav .nav-install .saahl-install-btn{font-size:11px;padding-inline:6px}
+}
+</style>
 <script defer src="./pwa-install.js?v=20261119d"></script>
 </head>
 
@@ -1045,6 +1070,7 @@ async function submitAdvertise(){
       </div>
     </div>
     <a href="office.html?switch=1" class="nav-login" data-t="n5">تسجيل الدخول</a>
+    <div class="nav-install" data-saahl-install></div>
     <a href="#types" class="nav-cta" data-t="n6">ابدأ الآن</a>
   </div>
   <button class="nav-burger" onclick="toggleMob()" id="burger" aria-label="القائمة" aria-controls="mobNav">
@@ -1219,7 +1245,6 @@ window.addEventListener('load',loadSpotlight);
   <a href="#features" onclick="closeMob()" data-t="n3">المميزات <span>←</span></a>
   <a href="kafala.html" data-t="n4">نقل كفالة <span>←</span></a>
   <a href="kafala.html#manage" data-t="manage_ad">إدارة إعلاني</a>
-  <div data-saahl-install></div>
   <div class="mob-nav-btns">
     <a href="office.html" style="border:1.5px solid #E8E8E8;border-radius:10px;padding:13px;text-align:center;font-weight:700" data-t="n5">تسجيل الدخول</a>
     <a href="#types" onclick="closeMob()" style="background:#C9A84C;color:#fff;border-radius:10px;padding:13px;text-align:center;font-weight:700" data-t="n6">ابدأ الآن</a>
@@ -1488,7 +1513,6 @@ window.addEventListener('load',loadSpotlight);
       <h4 data-t="fh2">المنصة</h4>
       <a href="#how" data-t="fl4">كيف تعمل</a>
       <a href="office.html" data-t="fl5">تسجيل الدخول</a>
-      <div data-saahl-install></div>
       <span class="footer-note">العقود والإجراءات لدى المكتب المختص</span>
       <span class="footer-note">لا حجز أو عربون عبر المنصة</span>
     </div>
