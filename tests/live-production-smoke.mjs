@@ -21,9 +21,10 @@ try {
           mobileCss:!!document.querySelector('link[href*="mobile-first.css"]'),
           manifest:!!document.querySelector('link[rel="manifest"]'),
           installJs:!!document.querySelector('script[src*="pwa-install.js"]'),
+          appleIcon:!!document.querySelector('link[rel="apple-touch-icon"]'),
           title:document.title
         }));
-        const ok=response?.status()===200 && m.overflow<=2 && m.dir==='rtl' && m.mobileCss && m.manifest && m.installJs;
+        const ok=response?.status()===200 && m.overflow<=2 && m.dir==='rtl' && m.mobileCss && m.manifest && m.installJs && m.appleIcon;
         if(!ok)fail++;
         console.log(JSON.stringify({path,width,http:response?.status(),...m,ok}));
         if(width===390||width===1280)await p.screenshot({path:`production-previews/${path.replace('.html','')}-${width}.png`,fullPage:true});
@@ -31,14 +32,14 @@ try {
       finally{await ctx.close();}
     }
   }
-  for(const asset of ['manifest.webmanifest','sw.js','mobile-first.css','pwa-install.js','saahl-pwa-icon.svg']) {
+  for(const asset of ['manifest.webmanifest','sw.js','mobile-first.css','pwa-install.js','saahl-pwa-icon.svg','saahl-pwa-192.png','saahl-pwa-512.png','apple-touch-icon.png']) {
     total++;
     try {
       const response=await fetch(ORIGIN+asset,{redirect:'follow'});
       let valid=response.ok;
       if(asset==='manifest.webmanifest'){
         const manifest=await response.json();
-        valid=valid&&manifest.display==='standalone'&&manifest.start_url==='./index.html'&&manifest.icons.length>0;
+        valid=valid&&manifest.display==='standalone'&&manifest.start_url==='./index.html'&&manifest.icons.some(i=>i.src.includes('192.png')) && manifest.icons.some(i=>i.src.includes('512.png'));
       }
       if(!valid)fail++;
       console.log(JSON.stringify({asset,http:response.status,ok:valid}));
