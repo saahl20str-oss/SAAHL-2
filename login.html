@@ -149,7 +149,7 @@ body{font-family:'Segoe UI',Tahoma,Arial,sans-serif;background:var(--dark);color
           </div>
           <span class="err-txt" id="e-loginPass">يرجى إدخال كلمة المرور</span>
         </div>
-        <div class="forgot-link"><a onclick="showForgot()">نسيت كلمة المرور؟</a></div>
+        <div class="forgot-link"><a href="./reset-password.html">نسيت كلمة المرور؟</a></div>
         <button class="submit-btn" id="loginBtn" onclick="doLogin()">
           تسجيل الدخول
         </button>
@@ -395,7 +395,7 @@ async function doForgot() {
   }
   try {
     const { error } = await db.auth.resetPasswordForEmail(email, {
-      redirectTo: window.location.origin + '/reset-password.html'
+      redirectTo: new URL('./reset-password.html', window.location.href).href
     });
     if (error) throw error;
     showAlert('تم إرسال رابط إعادة التعيين — تحقق من بريدك', 'success');
