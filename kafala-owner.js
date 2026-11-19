@@ -142,21 +142,37 @@
   }
 
   async function readPhoto() {
-    const image = await createImageBitmap(selectedPhotoFile);
+    let image, bitmap, photoUrl;
     try {
+      if (typeof createImageBitmap === 'function') {
+        try { bitmap = await createImageBitmap(selectedPhotoFile); } catch { /* Use Safari-safe fallback */ }
+      }
+      if (bitmap) {
+        image = bitmap;
+      } else {
+        photoUrl = URL.createObjectURL(selectedPhotoFile);
+        image = new Image();
+        await new Promise((resolve, reject) => {
+          image.onload = resolve;
+          image.onerror = reject;
+          image.src = photoUrl;
+        });
+      }
       const canvas = document.createElement('canvas');
       const scale = Math.min(1, 1000 / Math.max(image.width, image.height));
       canvas.width = Math.max(1, Math.round(image.width * scale));
       canvas.height = Math.max(1, Math.round(image.height * scale));
       const context = canvas.getContext('2d', {alpha: false});
+      if (!context) throw new Error('Canvas unavailable');
       context.drawImage(image, 0, 0, canvas.width, canvas.height);
       const photo = canvas.toDataURL('image/jpeg', 0.82);
-      if (!safeKafalaImageUrl(photo)) throw new Error();
+      if (!safeKafalaImageUrl(photo)) throw new Error('Invalid image');
       return photo;
     } catch {
       throw new Error('تعذّرت معالجة الصورة. اختر صورة أخرى.');
     } finally {
-      image.close();
+      if (bitmap) bitmap.close();
+      if (photoUrl) URL.revokeObjectURL(photoUrl);
     }
   }
 
@@ -191,8 +207,14 @@
     el('ownerDraftNotice').hidden = !draft;
     el('ownerNumberInfo').value = data.request_number;
     message('ownerCopyStatus', '');
-    el('ownerDelete').hidden = !data.expired;
-    el('ownerExpiredNotice').hidden = !data.expired;
+    const rejectedDeletion = data.status === 'rejected' && !data.active && data.draft_status !== 'pending';
+    const canDelete = Boolean(data.expired || rejectedDeletion);
+    el('ownerDelete').hidden = !canDelete;
+    el('ownerDelete').textContent = rejectedDeletion ? 'حذف الطلب المرفوض' : 'حذف الإعلان المنتهي';
+    el('ownerExpiredNotice').hidden = !canDelete;
+    el('ownerExpiredNotice').textContent = rejectedDeletion
+      ? 'تم رفض الإعلان ولم يُنشر. يمكنك حذفه نهائيًا من هنا.'
+      : 'انتهت فترة الإعلان وهو غير ظاهر للزوار. يمكنك حذفه من هنا.';
     el('ownerEdit').hidden = Boolean(data.expired);
     const photo = safeKafalaImageUrl(ad.worker_photo_url);
     el('ownerPhotoFrame').hidden = !photo;
@@ -246,6 +268,7 @@
     locked: 'تم إيقاف المحاولات مؤقتًا. حاول مرة أخرى بعد 15 دقيقة.',
     changed: 'تم تحديث الإعلان منذ فتحه. أغلق الطلب وافتحه مجددًا قبل التعديل.',
     not_expired: 'الحذف متاح بعد انتهاء فترة الإعلان.',
+    not_deletable: 'الحذف متاح للطلب المرفوض أو الإعلان المنتهي فقط، وبعد انتهاء أي مراجعة معلّقة.',
     invalid_pin: 'أدخل رمزًا سريًا من 6 أرقام.'
   };
 
@@ -254,7 +277,7 @@
     if (error) throw new Error(action === 'edit'
       ? 'تعذّر حفظ التعديل. تحقق من البيانات وحاول مرة أخرى.'
       : 'تعذّر الاتصال. حاول مرة أخرى.');
-    if (data.error) throw new Error(feedback[data.error]);
+    if (data.error) throw new Error(feedback[data.error] || 'تعذّر إتمام العملية. حاول مرة أخرى.');
     return data;
   }
 
@@ -289,14 +312,27 @@
   el('ownerLogout').onclick = () => closeOwner();
   el('ownerDelete').onclick = async () => {
     const session = owner;
-    if (!session || !confirm('انتهت فترة الإعلان. هل تريد حذف الإعلان نهائيًا؟')) return;
+    if (!session) return;
+    const rejected = session.data.status === 'rejected' && !session.data.active;
+    if (!confirm(rejected
+      ? 'تم رفض طلبك. هل تريد حذفه نهائيًا؟ لا يمكن التراجع عن الحذف.'
+      : 'انتهت فترة الإعلان. هل تريد حذف الإعلان نهائيًا؟ لا يمكن التراجع عن الحذف.')) return;
     const button = el('ownerDelete');
     button.disabled = true;
     try {
-      await manage(session.number,session.pin,'delete');
+      if (rejected) {
+        const {data, error} = await _db.rpc('kafala_delete_rejected_owner', {
+          p_number: session.number, p_pin: session.pin
+        });
+        if (error) throw new Error('تعذّر حذف الطلب المرفوض. حاول مرة أخرى.');
+        if (data?.error) throw new Error(feedback[data.error] || 'لا يمكن حذف هذا الطلب حاليًا.');
+        if (!data?.deleted) throw new Error('لم يتم تأكيد الحذف.');
+      } else {
+        await manage(session.number,session.pin,'delete');
+      }
       updateSavedNumbers(null,session.number);
       if (session !== owner) return;
-      closeOwner('تم حذف الإعلان المنتهي.');
+      closeOwner(rejected ? 'تم حذف الطلب المرفوض.' : 'تم حذف الإعلان المنتهي.');
       el('ownerNumber').value = '';
       history.replaceState(null,'','#manage');
     } catch (error) {

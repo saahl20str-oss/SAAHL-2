@@ -687,6 +687,11 @@ footer{
 @keyframes saahlMobileReveal{from{opacity:.15;transform:translateX(-18px)}to{opacity:1;transform:translateX(0)}}\n.saahl-mobile-ad-controls{display:none}
 @media(max-width:700px){#ad-strip{display:flex!important;align-items:center;flex-wrap:wrap;gap:5px!important;padding:7px 9px!important}#ad-strip .saahl-ad-viewport{order:2;flex:1 1 100%;width:100%;background:#25262b;border-radius:9px;padding:8px;min-height:48px;overflow:hidden}#ad-strip .saahl-ad-cta{order:0;margin-inline-start:auto}#ad-strip .saahl-ad-unit{width:100%;gap:8px;align-items:center}#ad-strip .saahl-ad-unit strong{max-width:none;flex:1;font-size:13px;overflow:hidden;text-overflow:ellipsis}#ad-strip .saahl-ad-unit .saahl-ad-open{flex-shrink:0}.saahl-mobile-ad-controls{display:flex;align-items:center;justify-content:center;gap:12px;order:1;color:#ddbc62;font-size:12px}.saahl-mobile-ad-controls button{border:1px solid #a98b46;background:transparent;color:#f5d98b;border-radius:7px;width:28px;height:28px;font-size:19px;cursor:pointer}}
 </style>
+
+<!-- Mobile-first enhancement; isolated from existing application logic -->
+<link rel="stylesheet" href="./mobile-first.css?v=20261119">
+<link rel="manifest" href="./manifest.webmanifest">
+<meta name="theme-color" content="#111218">
 </head>
 
 <body>
@@ -1619,5 +1624,8 @@ function applySaahlStats(){
 }
 applySaahlStats();
 </script>
+
+<script>if('serviceWorker' in navigator){window.addEventListener('load',()=>{navigator.serviceWorker.register('./sw.js').catch(()=>{});});}</script>
+<script defer src="./pwa-install.js?v=20261119"></script>
 </body>
 </html>
