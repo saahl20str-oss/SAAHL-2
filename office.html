@@ -50,6 +50,15 @@ main{max-width:760px;margin:0 auto 65px;padding:0 18px}
 .upload-preview{min-height:135px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px;background:#f8f6f0;border:1px dashed #d9c99f;border-radius:13px;margin:10px 0;color:#847861;padding:12px;text-align:center}.upload-preview img{max-width:100%;max-height:230px;object-fit:contain;border-radius:10px}.photo-tools{display:flex;flex-direction:column;align-items:stretch;gap:8px;margin:8px 0}.photo-tools button{font-size:13px}.photo-tools button:disabled{opacity:.55;cursor:not-allowed}
 .logo-upload-field{grid-column:1/-1;background:#fbf9f4;border:1px solid #e6dcc8;border-radius:15px;padding:18px}.office-logo-preview{height:128px;display:flex;align-items:center;justify-content:center;background:#fff;border:1px dashed #d8c79f;border-radius:12px;margin:10px 0;color:#8c7b5b}.office-logo-preview img{max-height:110px;max-width:230px;object-fit:contain}.logo-upload-field input[type=file]{background:#fff}.office-ownership-notice{background:#fff7e9;border:1px solid #e6cb8e;border-radius:12px;padding:15px;margin:12px 0;color:#6e511a;line-height:1.9}.office-ownership-notice.hidden{display:none}.office-hero-clean{background:linear-gradient(110deg,#f7f2e6,#fff)!important;color:#252923!important;border:1px solid #e7d9ba!important;box-shadow:none!important;min-height:0!important;padding:30px 35px!important}.office-hero-clean h1{color:#272b27!important;font-size:clamp(23px,3vw,34px)!important}.office-hero-clean p{color:#6b665d!important}.office-hero-clean .hero-kicker{color:#a78135!important}.office-navbar .office-logo{overflow:hidden;display:flex;align-items:center;justify-content:center;min-width:43px;width:43px;height:43px;border-radius:12px;background:#fff}.office-navbar .office-logo img{width:100%;height:100%;object-fit:contain}.office-worker-filters{display:flex;align-items:end;gap:12px;flex-wrap:wrap;margin:18px 0}.office-worker-filters label{display:grid;gap:6px;flex:1;min-width:180px;font-size:13px}.office-worker-filters input,.office-worker-filters select{width:100%;padding:11px;border:1px solid #e4d9c8;border-radius:10px;background:white}.office-worker-pages{display:flex;justify-content:center;align-items:center;gap:12px;margin:22px 0}.office-worker-pages button{padding:10px 16px}.office-worker-pages button:disabled{opacity:.4;cursor:not-allowed}.spotlight-action{background:#f9f0d9!important;color:#73551e!important;border:1px solid #d9b65e!important}
 .new-office-welcome{background:#f1f8f0;border:1px solid #bad7b4;color:#2c6335;padding:17px 22px;border-radius:13px;line-height:1.9;margin:14px 0}.new-office-welcome.hidden{display:none}
+
+/* Office announcement dialog shown automatically at account opening */
+.saahl2-office-notice-overlay{position:fixed;inset:0;z-index:9999;display:grid;place-items:center;padding:18px;background:rgba(10,14,20,.70);direction:rtl}
+.saahl2-office-notice{background:#fff;border:1px solid #dfd5bf;border-radius:20px;box-shadow:0 25px 80px #0005;padding:clamp(20px,5vw,32px);width:min(480px,100%);max-height:90vh;overflow:auto;color:#171820;text-align:right}
+.saahl2-office-notice-label{font-size:12px;color:#896a22;font-weight:800;letter-spacing:.2px;margin-bottom:12px}
+.saahl2-office-notice h2{font-size:clamp(19px,4.8vw,25px);margin:0 0 14px;line-height:1.5;color:#171820}
+.saahl2-office-notice p{white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.9;font-size:15px;color:#333;margin:0 0 14px}
+.saahl2-office-notice small{display:block;color:#776e60;font-size:12px;margin-bottom:18px}
+.saahl2-office-notice-close{width:100%;margin:0;min-height:46px;background:#c9a84c;color:#171820;border:0;border-radius:11px;cursor:pointer;font:800 15px Tajawal,Tahoma,Arial,sans-serif}
 </style><script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <!-- Mobile-first enhancement; isolated from existing application logic -->
 <link rel="stylesheet" href="./mobile-first.css?v=20261119c">
@@ -77,7 +86,48 @@ $('showPass').onchange=()=>{$('password').type=$('showPass').checked?'text':'pas
 const mode=signup=>{$('tabLogin').classList.toggle('active',!signup);$('tabSignup').classList.toggle('active',signup);show('login',!signup);show('signup',signup)};
 $('tabLogin').onclick=()=>mode(false);$('tabSignup').onclick=()=>mode(true);
 let workerPage=1,allOfficeWorkers=[];function officeView(){show('officeForm',!office);show('officeHome',!!office);show('workerEditor',false);if(office){$('officeTitle').textContent=office.name;$('navOfficeName').textContent=office.name;show('navSettings',true);show('navLogout',true);$('settingsName').value=office.name;$('settingsPhone').value=office.phone||'';$('settingsEmirate').value=office.emirate||'أبوظبي';$('settingsLicense').value=office.license_number||'';$('settingsWhatsapp').value=office.whatsapp||'';$('settingsDescription').value=office.description||'';$('settingsEmail').value=user?.email||'';updateOfficeLogoPreview();const navLogo=$('navOfficeLogo');navLogo.replaceChildren();if(office.logo_url){const img=document.createElement('img');img.src=office.logo_url;img.alt='شعار المكتب';img.className='office-logo-large';navLogo.append(img)}else navLogo.textContent='✦';const welcomeBox=$('newOfficeWelcome');const welcomeKey='saahl2-office-welcome-'+office.id;if(office.status==='approved'&&!localStorage.getItem(welcomeKey)){welcomeBox.textContent='أهلاً وسهلاً بمكتب '+office.name+' في ساهل 2! يسعدنا انضمامكم. يمكنكم الآن إضافة العاملات وتحديث صورهن وحالة توفرهن، والتواصل مع العملاء بكل سهولة.';welcomeBox.classList.remove('hidden');localStorage.setItem(welcomeKey,'1')}else welcomeBox.classList.add('hidden');const labels={pending:'بانتظار اعتماد الإدارة',approved:'مكتب معتمد',rejected:'طلب الاعتماد مرفوض',suspended:'المكتب موقوف'};$('officeStatus').textContent='حالة المكتب: '+(labels[office.status]||office.status);$('officeStatus').className=office.status==='approved'?'success':'pending-note';loadWorkers()}else{$('officeTitle').textContent='استكمال تسجيل المكتب';$('officeStatus').textContent='أدخل بيانات المكتب لإرسال طلب الاعتماد'}}
-async function init(){if(new URLSearchParams(location.search).has('switch')){const {error:logoutError}=await db.auth.signOut();if(logoutError){message('تعذر تبديل الحساب: '+logoutError.message,true);return;}user=null;office=null;history.replaceState(null,'',location.pathname);show('auth',true);show('dashboard',false);show('welcome',true)}let {data,error}=await db.auth.getUser();if(error)console.warn(error);user=data?.user||null;show('auth',!user);show('dashboard',!!user);show('welcome',!user);if(!user){$('navOfficeName').textContent='مكتب الاستقدام';show('navSettings',false);show('navLogout',false);return;}let r=await db.from('offices').select('*').eq('owner_id',user.id).maybeSingle();if(r.error){message('تعذر تحميل بيانات المكتب: '+r.error.message,true);return}office=r.data;officeView()}
+
+/* SAAHL-2 announcements appear when the office account opens.
+   No top-bar button, no push notifications, no personal message content in localStorage. */
+let officeAnnouncementOpen=false;
+async function showOfficeAnnouncements(accountId){
+ if(!accountId||!office||office.owner_id!==accountId||officeAnnouncementOpen)return;
+ const key='saahl2-office-read-notices:'+accountId;
+ let dismissed=[];
+ try{const saved=JSON.parse(localStorage.getItem(key)||'[]');if(Array.isArray(saved))dismissed=saved.filter(id=>typeof id==='string').slice(-200);}catch{}
+ const {data,error}=await db.from('notifications').select('id,title,body,sent_at').in('target',['all','offices']).order('sent_at',{ascending:true}).limit(100);
+ if(error){console.warn('SAAHL-2 notices unavailable:',error.message);return;}
+ const queue=(data||[]).filter(n=>!dismissed.includes(n.id));
+ if(!queue.length)return;
+ officeAnnouncementOpen=true;
+ let pos=0;
+ const overlay=document.createElement('div');overlay.className='saahl2-office-notice-overlay';
+ overlay.setAttribute('role','presentation');
+ const box=document.createElement('section');box.className='saahl2-office-notice';
+ box.setAttribute('role','dialog');box.setAttribute('aria-modal','true');box.setAttribute('aria-label','إشعار من إدارة ساهل 2');
+ const label=document.createElement('div');label.className='saahl2-office-notice-label';label.textContent='إشعار من إدارة ساهل 2';
+ const title=document.createElement('h2');
+ const message=document.createElement('p');
+ const date=document.createElement('small');
+ const close=document.createElement('button');close.type='button';close.textContent='إغلاق';
+ close.className='saahl2-office-notice-close';
+ function next(){
+  if(pos>=queue.length){overlay.remove();officeAnnouncementOpen=false;return;}
+  const n=queue[pos];title.textContent=n.title;message.textContent=n.body;
+  date.textContent=new Date(n.sent_at).toLocaleString('ar-AE',{dateStyle:'medium',timeStyle:'short'});
+  close.textContent=pos<queue.length-1?'إغلاق وعرض الإشعار التالي':'إغلاق';
+  close.focus();
+ }
+ close.onclick=()=>{
+  const n=queue[pos++];dismissed.push(n.id);
+  try{localStorage.setItem(key,JSON.stringify(dismissed.slice(-200)));}catch{}
+  next();
+ };
+ box.append(label,title,message,date,close);overlay.append(box);document.body.append(overlay);
+ next();
+}
+
+async function init(){if(new URLSearchParams(location.search).has('switch')){const {error:logoutError}=await db.auth.signOut();if(logoutError){message('تعذر تبديل الحساب: '+logoutError.message,true);return;}user=null;office=null;history.replaceState(null,'',location.pathname);show('auth',true);show('dashboard',false);show('welcome',true)}let {data,error}=await db.auth.getUser();if(error)console.warn(error);user=data?.user||null;show('auth',!user);show('dashboard',!!user);show('welcome',!user);if(!user){$('navOfficeName').textContent='مكتب الاستقدام';show('navSettings',false);show('navLogout',false);return;}let r=await db.from('offices').select('*').eq('owner_id',user.id).maybeSingle();if(r.error){message('تعذر تحميل بيانات المكتب: '+r.error.message,true);return}office=r.data;officeView();if(office)await showOfficeAnnouncements(user.id)}
 $('showPass').addEventListener('change',()=>{$('password').type=$('showPass').checked?'text':'password'});
 const validEmail=()=>/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v('email'));
 $('signup').onclick=async()=>{if(!validEmail()||v('password').length<8)return message('أدخل بريداً إلكترونياً صحيحاً وكلمة مرور من 8 أحرف على الأقل',true);let {error}=await db.auth.signUp({email:v('email'),password:v('password'),options:{data:{role:'OFFICE'}}});if(error)return message(error.message,true);message('تم إنشاء الحساب. تحقق من البريد ثم سجل الدخول.');await init()};
@@ -137,5 +187,4 @@ if(new URLSearchParams(location.search).get('register')==='1')mode(true);init();
 </script>
 <script>if('serviceWorker' in navigator){window.addEventListener('load',()=>{navigator.serviceWorker.register('./sw.js').catch(()=>{});});}</script>
 <script defer src="./pwa-install.js?v=20261119c"></script>
-<script defer src="./notifications-inbox.js?v=20261119"></script>
 </body></html>

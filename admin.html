@@ -197,6 +197,15 @@ body.admin-menu-open{overflow:hidden}
 #pg-notifications .nt-entry p{font-size:12px;line-height:1.7;white-space:pre-wrap;margin:5px 0}
 #pg-notifications .nt-entry small{font-size:11px;color:var(--muted)}
 
+
+/* SAAHL-2 safe worker preview inside the admin panel */
+.saahl2-preview-overlay{position:fixed;inset:0;background:rgba(12,17,22,.65);z-index:9999;display:grid;place-items:center;padding:16px;direction:rtl}
+.saahl2-preview-dialog{background:var(--white,#fff);color:var(--text,#171717);border-radius:16px;padding:18px;width:min(480px,100%);max-height:88vh;overflow:auto;box-shadow:0 20px 65px #0005;display:flex;flex-direction:column;gap:13px}
+.saahl2-preview-heading{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.saahl2-preview-heading strong{font-size:17px}
+.saahl2-preview-photo{object-fit:contain;max-height:280px;width:100%;border-radius:10px;background:#f4f3ef}
+.saahl2-preview-data{font-size:13px;line-height:1.95;overflow-wrap:anywhere}
+.saahl2-preview-data .ad-detail-line{padding-block:3px;border-bottom:1px solid var(--border,#eee)}
 </style>
 
 <!-- Mobile-first enhancement; isolated from existing application logic -->
@@ -574,6 +583,31 @@ function saahlAdLine(text,className){
  node.textContent=text;
  return node;
 }
+function showSaahl2WorkerPreview(ad,parsed){
+ // Always show the existing SAAHL-2 advertisement data, never navigate to SAAHL main.
+ const existing=document.getElementById('saahl2-worker-preview');
+ if(existing)existing.remove();
+ const overlay=document.createElement('div');overlay.id='saahl2-worker-preview';overlay.className='saahl2-preview-overlay';
+ overlay.setAttribute('role','presentation');
+ const dialog=document.createElement('section');dialog.className='saahl2-preview-dialog';
+ dialog.setAttribute('role','dialog');dialog.setAttribute('aria-modal','true');dialog.setAttribute('aria-label','تفاصيل العاملة');
+ const head=document.createElement('div');head.className='saahl2-preview-heading';
+ const heading=document.createElement('strong');heading.textContent=ad.ad_topic||'تفاصيل العاملة';
+ const close=document.createElement('button');close.type='button';close.textContent='إغلاق';close.className='btn btn-s';
+ head.append(heading,close);dialog.append(head);
+ if(parsed.photo){const img=document.createElement('img');img.src=parsed.photo;img.alt='صورة العاملة';img.loading='lazy';img.className='saahl2-preview-photo';dialog.append(img);}
+ const info=document.createElement('div');info.className='saahl2-preview-data';
+ info.append(saahlAdLine('المعلن: '+(ad.advertiser_name||'—')));
+ parsed.parts.forEach(part=>info.append(saahlAdLine(part)));
+ if(ad.phone)info.append(saahlAdLine('الهاتف: '+ad.phone));
+ dialog.append(info);overlay.append(dialog);document.body.append(overlay);
+ const dismiss=()=>{overlay.remove();document.removeEventListener('keydown',onKey);};
+ const onKey=e=>{if(e.key==='Escape')dismiss();};
+ document.addEventListener('keydown',onKey);
+ close.addEventListener('click',dismiss);
+ overlay.addEventListener('click',e=>{if(e.target===overlay)dismiss();});
+ close.focus();
+}
 async function loadAds(){
  const w=document.getElementById('ads-wrap');
  const {data,error}=await db.from('strip_ads').select('*').order('created_at',{ascending:false});
@@ -612,9 +646,11 @@ async function loadAds(){
   if(a.phone)info.append(saahlAdLine('الهاتف: '+a.phone,'ad-phone'));
   content.append(info);
   const controls=document.createElement('div');controls.className='ad-card-actions';
-  if(parsed.worker){
-   const view=document.createElement('a');view.href=parsed.worker;view.target='_blank';view.rel='noopener noreferrer';
-   view.className='btn btn-s ad-view-link';view.textContent='عرض العاملة';controls.append(view);
+  if(parsed.worker || parsed.photo || parsed.parts.length){
+   const view=document.createElement('button');
+   view.type='button';view.className='btn btn-s ad-view-link';view.textContent='عرض العاملة';
+   view.onclick=()=>showSaahl2WorkerPreview(a,parsed);
+   controls.append(view);
   }
   if(a.status==='pending'){
    const approve=document.createElement('button');approve.className='btn btn-p btn-s';approve.textContent='موافقة ونشر';
