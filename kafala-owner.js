@@ -142,21 +142,37 @@
   }
 
   async function readPhoto() {
-    const image = await createImageBitmap(selectedPhotoFile);
+    let image, bitmap, photoUrl;
     try {
+      if (typeof createImageBitmap === 'function') {
+        try { bitmap = await createImageBitmap(selectedPhotoFile); } catch { /* Use Safari-safe fallback */ }
+      }
+      if (bitmap) {
+        image = bitmap;
+      } else {
+        photoUrl = URL.createObjectURL(selectedPhotoFile);
+        image = new Image();
+        await new Promise((resolve, reject) => {
+          image.onload = resolve;
+          image.onerror = reject;
+          image.src = photoUrl;
+        });
+      }
       const canvas = document.createElement('canvas');
       const scale = Math.min(1, 1000 / Math.max(image.width, image.height));
       canvas.width = Math.max(1, Math.round(image.width * scale));
       canvas.height = Math.max(1, Math.round(image.height * scale));
       const context = canvas.getContext('2d', {alpha: false});
+      if (!context) throw new Error('Canvas unavailable');
       context.drawImage(image, 0, 0, canvas.width, canvas.height);
       const photo = canvas.toDataURL('image/jpeg', 0.82);
-      if (!safeKafalaImageUrl(photo)) throw new Error();
+      if (!safeKafalaImageUrl(photo)) throw new Error('Invalid image');
       return photo;
     } catch {
       throw new Error('تعذّرت معالجة الصورة. اختر صورة أخرى.');
     } finally {
-      image.close();
+      if (bitmap) bitmap.close();
+      if (photoUrl) URL.revokeObjectURL(photoUrl);
     }
   }
 
