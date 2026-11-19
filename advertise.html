@@ -190,6 +190,11 @@ body{font-family:'Tajawal',Arial,sans-serif;background:var(--bg);color:var(--tex
 .home-btn{background:#c9a84c;color:#171717;font-family:inherit;font-weight:800}
 @media(max-width:600px){.topbar{height:66px;padding:0 14px}.brand-name{font-size:19px}.hero{padding:36px 16px 55px}.hero p{font-size:14px}.hero-badge{font-size:11px;padding:6px 10px}.main{padding:0 12px}.steps{gap:3px}.step{font-size:11px}.step-line{width:17px}.card{padding:19px}.card-title{font-size:18px}}
 </style>
+
+<!-- Mobile-first enhancement; isolated from existing application logic -->
+<link rel="stylesheet" href="./mobile-first.css?v=20261119">
+<link rel="manifest" href="./manifest.webmanifest">
+<meta name="theme-color" content="#111218">
 </head>
 <body>
 
@@ -429,5 +434,7 @@ async function submitAd(){
   }
 }
 </script>
+
+<script>if('serviceWorker' in navigator){window.addEventListener('load',()=>{navigator.serviceWorker.register('./sw.js').catch(()=>{});});}</script>
 </body>
 </html>
