@@ -304,7 +304,16 @@
     const button = el('ownerDelete');
     button.disabled = true;
     try {
-      await manage(session.number,session.pin,'delete');
+      if (rejected) {
+        const {data, error} = await _db.rpc('kafala_delete_rejected_owner', {
+          p_number: session.number, p_pin: session.pin
+        });
+        if (error) throw new Error('تعذّر حذف الطلب المرفوض. حاول مرة أخرى.');
+        if (data?.error) throw new Error(feedback[data.error] || 'لا يمكن حذف هذا الطلب حاليًا.');
+        if (!data?.deleted) throw new Error('لم يتم تأكيد الحذف.');
+      } else {
+        await manage(session.number,session.pin,'delete');
+      }
       updateSavedNumbers(null,session.number);
       if (session !== owner) return;
       closeOwner(rejected ? 'تم حذف الطلب المرفوض.' : 'تم حذف الإعلان المنتهي.');
