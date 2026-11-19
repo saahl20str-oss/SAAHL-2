@@ -3,7 +3,7 @@
  const rootUrl='https://hkfxikmpfgixrbrboxeb.supabase.co';
  const publicKey='sb_publishable_OcWY5nY_-b2odLqQxsu2Kw_iQ4YswBz';
  if(!window.supabase?.createClient)return;
- const db=window.supabase.createClient(rootUrl,publicKey,{auth:{storageKey:'supabase-auth-token'}});
+ const db=window.supabase.createClient(rootUrl,publicKey);
  let panel,trigger,items=[];
  const formatDate=v=>{try{return new Date(v).toLocaleString('ar-AE',{dateStyle:'medium',timeStyle:'short'});}catch{return '';}};
  async function refresh(){
@@ -50,5 +50,6 @@
   }catch{/* Do not expose private notifications to guests. */}
  }
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start,{once:true});else start();
+ db.auth.onAuthStateChange((event,session)=>{if(session?.user){mount();}else if(trigger){trigger.remove();panel?.remove();trigger=null;panel=null;}});
  window.addEventListener('pageshow',start);
 })();
