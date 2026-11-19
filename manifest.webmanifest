@@ -1,0 +1,21 @@
+{
+  "id": "./",
+  "name": "ساهل 2 | منصة العاملات ونقل الكفالة",
+  "short_name": "ساهل 2",
+  "description": "منصة ساهل 2 للبحث والتواصل وإدارة الإعلانات",
+  "lang": "ar",
+  "dir": "rtl",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f7f5f0",
+  "theme_color": "#111218",
+  "icons": [
+    {
+      "src": "./saahl-pwa-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
