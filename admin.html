@@ -198,23 +198,19 @@ body.admin-menu-open{overflow:hidden}
 #pg-notifications .nt-entry small{font-size:11px;color:var(--muted)}
 
 
-/* SAAHL-2 safe worker preview inside the admin panel */
-.saahl2-preview-overlay{position:fixed;inset:0;background:rgba(12,17,22,.65);z-index:9999;display:grid;place-items:center;padding:16px;direction:rtl}
-.saahl2-preview-dialog{background:var(--white,#fff);color:var(--text,#171717);border-radius:16px;padding:18px;width:min(480px,100%);max-height:88vh;overflow:auto;box-shadow:0 20px 65px #0005;display:flex;flex-direction:column;gap:13px}
-.saahl2-preview-heading{display:flex;align-items:center;justify-content:space-between;gap:12px}
-.saahl2-preview-heading strong{font-size:17px}
-.saahl2-preview-photo{object-fit:contain;max-height:280px;width:100%;border-radius:10px;background:#f4f3ef}
-.saahl2-preview-data{font-size:13px;line-height:1.95;overflow-wrap:anywhere}
-.saahl2-preview-data .ad-detail-line{padding-block:3px;border-bottom:1px solid var(--border,#eee)}
 </style>
 
 <!-- Mobile-first enhancement; isolated from existing application logic -->
-<link rel="stylesheet" href="./mobile-first.css?v=20261119c">
+<link rel="stylesheet" href="./mobile-first.css?v=20261119d">
+<link rel="stylesheet" href="./admin-worker-preview.css?v=1">
+<script defer src="./admin-worker-preview.js?v=1"></script>
 <link rel="manifest" href="./manifest.webmanifest">
 <meta name="theme-color" content="#111218">
 <link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="ساهل 2">
+<link rel="stylesheet" href="./pwa-install.css?v=1">
+<script defer src="./pwa-install.js?v=20261119d"></script>
 </head>
 <body>
 
@@ -340,6 +336,7 @@ body.admin-menu-open{overflow:hidden}
 
     <div id="pg-settings" class="pg">
       <div class="pt">الإعدادات</div>
+      <div class="cd"><div class="ct2">التطبيق على هذا الجهاز</div><div data-saahl-install></div></div>
       <div class="cd">
         <div class="ct2" style="margin-bottom:18px">🎨 المظهر</div>
         <div class="sti">
@@ -571,10 +568,10 @@ function saahlAdDetails(raw){
  const text=String(raw||'');
  const links=text.match(/https?:\/\/[^\s|<>"]+/gi)||[];
  const cleanUrl=u=>u.replace(/[،؛,.)]+$/,'');
- const photo=links.map(cleanUrl).find(u=>/^https:\/\/[^/]+\.supabase\.co\/storage\/v1\/object\/public\/[^?#]+\.(jpg|jpeg|png|webp)(?:[?#]|$)/i.test(u))||'';
+ const photo=links.map(cleanUrl).find(u=>/^https:\/\/hkfxikmpfgixrbrboxeb\.supabase\.co\/storage\/v1\/object\/public\/[^?#]+\.(jpg|jpeg|png|webp)(?:[?#]|$)/i.test(u))||'';
  const worker=links.map(cleanUrl).find(u=>/^https:\/\/saahl20str-oss\.github\.io\/SAAHL-2\/search\.html\?/i.test(u))||'';
  const parts=text.split('|').map(p=>p.trim()).filter(Boolean).filter(p=>!(/https?:\/\//i.test(p)));
- const safe=parts.map(p=>p.replace(/\b[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\b/gi,'').replace(/(?:صورة العاملة|رابط العاملة|رابط|worker)\s*[:：]?\s*$/gi,'').trim()).filter(p=>p&&p!=='—');
+ const safe=parts.filter(p=>!/^([0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12})$/i.test(p)).map(p=>p.replace(/(?:صورة العاملة|رابط العاملة|رابط|worker)\s*[:：]?\s*$/gi,'').trim()).filter(p=>p&&p!=='—');
  return {photo,worker,parts:safe};
 }
 function saahlAdLine(text,className){
@@ -584,29 +581,7 @@ function saahlAdLine(text,className){
  return node;
 }
 function showSaahl2WorkerPreview(ad,parsed){
- // Always show the existing SAAHL-2 advertisement data, never navigate to SAAHL main.
- const existing=document.getElementById('saahl2-worker-preview');
- if(existing)existing.remove();
- const overlay=document.createElement('div');overlay.id='saahl2-worker-preview';overlay.className='saahl2-preview-overlay';
- overlay.setAttribute('role','presentation');
- const dialog=document.createElement('section');dialog.className='saahl2-preview-dialog';
- dialog.setAttribute('role','dialog');dialog.setAttribute('aria-modal','true');dialog.setAttribute('aria-label','تفاصيل العاملة');
- const head=document.createElement('div');head.className='saahl2-preview-heading';
- const heading=document.createElement('strong');heading.textContent=ad.ad_topic||'تفاصيل العاملة';
- const close=document.createElement('button');close.type='button';close.textContent='إغلاق';close.className='btn btn-s';
- head.append(heading,close);dialog.append(head);
- if(parsed.photo){const img=document.createElement('img');img.src=parsed.photo;img.alt='صورة العاملة';img.loading='lazy';img.className='saahl2-preview-photo';dialog.append(img);}
- const info=document.createElement('div');info.className='saahl2-preview-data';
- info.append(saahlAdLine('المعلن: '+(ad.advertiser_name||'—')));
- parsed.parts.forEach(part=>info.append(saahlAdLine(part)));
- if(ad.phone)info.append(saahlAdLine('الهاتف: '+ad.phone));
- dialog.append(info);overlay.append(dialog);document.body.append(overlay);
- const dismiss=()=>{overlay.remove();document.removeEventListener('keydown',onKey);};
- const onKey=e=>{if(e.key==='Escape')dismiss();};
- document.addEventListener('keydown',onKey);
- close.addEventListener('click',dismiss);
- overlay.addEventListener('click',e=>{if(e.target===overlay)dismiss();});
- close.focus();
+ return window.SaahlWorkerCard.open(ad,parsed,db,SU);
 }
 async function loadAds(){
  const w=document.getElementById('ads-wrap');
@@ -646,7 +621,7 @@ async function loadAds(){
   if(a.phone)info.append(saahlAdLine('الهاتف: '+a.phone,'ad-phone'));
   content.append(info);
   const controls=document.createElement('div');controls.className='ad-card-actions';
-  if(parsed.worker || parsed.photo || parsed.parts.length){
+  if(a.worker_id || a.worker_photo_url || parsed.worker || parsed.photo || parsed.parts.length){
    const view=document.createElement('button');
    view.type='button';view.className='btn btn-s ad-view-link';view.textContent='عرض العاملة';
    view.onclick=()=>showSaahl2WorkerPreview(a,parsed);
@@ -739,7 +714,5 @@ function buildR(){const ctx=document.getElementById('revChart');if(!ctx)return;i
 function buildP(){const ctx=document.getElementById('pieChart');if(!ctx)return;if(pC)pC.destroy();let s=0,b=0,k=0,a=0;aPy.forEach(p=>{if(p.type==='subscription')s+=p.amount||0;else if(p.type==='booking')b+=p.amount||0;else if(p.type==='kafala_ad')k+=p.amount||0;else if(p.type==='strip_ad')a+=p.amount||0;});const tot=s+b+k+a;const dt=tot===0?[1,1,1,1]:[s,b,k,a];pC=new Chart(ctx,{type:'doughnut',data:{labels:['اشتراك مكاتب','عمولة حجز','إعلان كفالة','إعلان شريط'],datasets:[{data:dt,backgroundColor:['#0f766e','#3b82f6','#f59e0b','#7c3aed'],borderWidth:0,hoverOffset:4}]},options:{responsive:true,maintainAspectRatio:false,cutout:'72%',plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>tot===0?' لا توجد بيانات':` ${c.label}: ${c.raw.toLocaleString()} AED`}}}}});}
 </script>
 
-<script>if('serviceWorker' in navigator){window.addEventListener('load',()=>{navigator.serviceWorker.register('./sw.js').catch(()=>{});});}</script>
-<script defer src="./pwa-install.js?v=20261119c"></script>
 </body>
 </html>

@@ -1,0 +1,26 @@
+.saahl-worker-dialog{width:min(740px,calc(100% - 24px));max-width:none;max-height:calc(100vh - 28px);max-height:calc(100dvh - 28px);margin:auto;padding:0;border:0;border-radius:20px;overflow:auto;background:#fffefa;color:#19283b;box-shadow:0 24px 85px #15203355;overscroll-behavior:contain;text-align:start}
+.saahl-worker-dialog::backdrop{background:#121d32aa}
+.saahl-worker-header{position:sticky;top:0;z-index:1;display:flex;align-items:center;justify-content:space-between;gap:12px;background:#18273d;color:#fff;padding:14px clamp(14px,4vw,24px);border-bottom:3px solid #c9a84c}
+.saahl-worker-header h2{min-width:0;overflow-wrap:anywhere;font-size:clamp(17px,4vw,23px);line-height:1.4;margin:0}
+.saahl-worker-close{font-family:inherit;font-weight:700;font-size:13px;background:#ffffff14;color:#fff;border:1px solid #ffffff60;border-radius:9px;padding:8px 12px;min-height:44px;flex:none;cursor:pointer}
+.saahl-worker-close:focus-visible{outline:2px solid #f5d786;outline-offset:2px}
+.saahl-worker-body{padding:clamp(12px,4vw,24px)}
+.saahl-worker-hero{display:grid;grid-template-columns:minmax(120px,1fr) minmax(0,1.7fr);gap:16px;align-items:start}
+.saahl-worker-media{aspect-ratio:4/4.4;max-height:285px;display:grid;place-items:center;overflow:hidden;border-radius:14px;background:#eeebe3;line-height:1.4;color:#645e53;font-size:13px;text-align:center}
+.saahl-worker-media img{width:100%;height:100%;object-fit:contain;min-height:0}
+.saahl-worker-overview{min-width:0;padding:2px 0 0}
+.saahl-worker-overview h3{font-size:clamp(18px,4vw,24px);line-height:1.3;overflow-wrap:anywhere;margin:0 0 8px}
+.saahl-worker-status{display:inline-block;color:#6b5016;background:#f8efd8;border-radius:20px;padding:4px 10px;margin-bottom:9px;font-size:12px;font-weight:700}
+.saahl-worker-facts,.saahl-worker-contacts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:0}
+.saahl-worker-facts>div,.saahl-worker-contacts>div{min-width:0;border-radius:10px;background:#f2f4f7;padding:8px 11px}
+.saahl-worker-facts>div{background:#f7f1e3;border:1px solid #ebe0c3}
+.saahl-worker-dialog dt{font-size:12px;color:#526174}
+.saahl-worker-dialog dd{margin:2px 0 0;font-size:14px;line-height:1.45;font-weight:700;overflow-wrap:anywhere;text-align:start}
+.saahl-worker-dialog dd[dir="ltr"]{text-align:right}
+.saahl-worker-section{font-size:15px;margin:17px 0 8px}
+.saahl-worker-note{overflow-wrap:anywhere;white-space:pre-wrap;background:#f5f4f0;border-radius:9px;padding:9px 11px;margin:8px 0 0}
+@media(max-width:510px){
+  .saahl-worker-hero{grid-template-columns:minmax(0,1fr);gap:12px}
+  .saahl-worker-media{width:min(100%,220px);max-height:205px;justify-self:center}
+  .saahl-worker-facts>div,.saahl-worker-contacts>div{padding:7px 9px}
+}

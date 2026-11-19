@@ -689,12 +689,14 @@ footer{
 </style>
 
 <!-- Mobile-first enhancement; isolated from existing application logic -->
-<link rel="stylesheet" href="./mobile-first.css?v=20261119c">
+<link rel="stylesheet" href="./mobile-first.css?v=20261119d">
 <link rel="manifest" href="./manifest.webmanifest">
 <meta name="theme-color" content="#111218">
 <link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="ساهل 2">
+<link rel="stylesheet" href="./pwa-install.css?v=1">
+<script defer src="./pwa-install.js?v=20261119d"></script>
 </head>
 
 <body>
@@ -1045,7 +1047,7 @@ async function submitAdvertise(){
     <a href="office.html?switch=1" class="nav-login" data-t="n5">تسجيل الدخول</a>
     <a href="#types" class="nav-cta" data-t="n6">ابدأ الآن</a>
   </div>
-  <button class="nav-burger" onclick="toggleMob()" id="burger">
+  <button class="nav-burger" onclick="toggleMob()" id="burger" aria-label="القائمة" aria-controls="mobNav">
     <span></span><span></span><span></span>
   </button>
 </nav>
@@ -1217,6 +1219,7 @@ window.addEventListener('load',loadSpotlight);
   <a href="#features" onclick="closeMob()" data-t="n3">المميزات <span>←</span></a>
   <a href="kafala.html" data-t="n4">نقل كفالة <span>←</span></a>
   <a href="kafala.html#manage" data-t="manage_ad">إدارة إعلاني</a>
+  <div data-saahl-install></div>
   <div class="mob-nav-btns">
     <a href="office.html" style="border:1.5px solid #E8E8E8;border-radius:10px;padding:13px;text-align:center;font-weight:700" data-t="n5">تسجيل الدخول</a>
     <a href="#types" onclick="closeMob()" style="background:#C9A84C;color:#fff;border-radius:10px;padding:13px;text-align:center;font-weight:700" data-t="n6">ابدأ الآن</a>
@@ -1485,6 +1488,7 @@ window.addEventListener('load',loadSpotlight);
       <h4 data-t="fh2">المنصة</h4>
       <a href="#how" data-t="fl4">كيف تعمل</a>
       <a href="office.html" data-t="fl5">تسجيل الدخول</a>
+      <div data-saahl-install></div>
       <span class="footer-note">العقود والإجراءات لدى المكتب المختص</span>
       <span class="footer-note">لا حجز أو عربون عبر المنصة</span>
     </div>
@@ -1628,7 +1632,5 @@ function applySaahlStats(){
 applySaahlStats();
 </script>
 
-<script>if('serviceWorker' in navigator){window.addEventListener('load',()=>{navigator.serviceWorker.register('./sw.js').catch(()=>{});});}</script>
-<script defer src="./pwa-install.js?v=20261119c"></script>
 </body>
 </html>

@@ -44,13 +44,44 @@ try {
  });
  const iosPage=await iphone.newPage();
  await iosPage.goto('http://127.0.0.1:8765/index.html',{waitUntil:'domcontentloaded'});
- const install=iosPage.locator('.saahl-install-btn');
+ await iosPage.getByRole('button',{name:'القائمة',exact:true}).click();
+ const install=iosPage.locator('#mobNav .saahl-install-btn');
  await install.waitFor({state:'visible'});
  await install.click();
  const iosPanel=await iosPage.locator('#saahl-ios-install-info').isVisible();
  checks++; if(!iosPanel)fails++;
  console.log(JSON.stringify({test:'iOS Safari home-screen guidance',pass:iosPanel}));
  await iphone.close();
+ for(const width of [320,390,1280]){
+   const ctx=await browser.newContext({viewport:{width,height:844}});
+   await ctx.route('**/*supabase-js@2*',route=>route.fulfill({
+     contentType:'application/javascript',
+     body:'window.supabase={createClient:()=>({auth:{getSession:async()=>({data:{session:null}})}})};'
+   }));
+   const page=await ctx.newPage();
+   await page.goto('http://127.0.0.1:8765/admin.html',{waitUntil:'domcontentloaded'});
+   await page.evaluate(async()=>{
+      const result={office_id:'12345678-4321-4321-4321-123456789abc',name:'مكتب نموذجي',emirate:'دبي',display_name:'عاملة تجريبية',nationality:'كينيا',worker_number:'W-77',age:29,experience_years:3};
+      const chain={select:()=>chain,eq:()=>chain,maybeSingle:async()=>({data:result})};
+      await window.SaahlWorkerCard.open({
+        ad_topic:'إعلان تجريبي',advertiser_name:'معلن تجريبي',status:'pending',phone:'0500000000',
+        worker_id:'87654321-4321-4321-4321-123456789abc',office_id:result.office_id,
+        worker_photo_url:'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAoCAIAAABrb60CAAAALElEQVR4nGPcOj2JgRqAiSqmjBo0atCoQaMGjRo0atCoQaMGjRo0atCwMAgA+nsB/oHiI1YAAAAASUVORK5CYII='
+      },{parts:['تفاصيل محفوظة'],photo:''},{from:()=>chain},location.origin);
+   });
+   const dialog=page.getByRole('dialog',{name:'إعلان تجريبي'});
+   const good=await dialog.evaluate(element=>({
+     fits:element.scrollWidth===element.clientWidth&&element.getBoundingClientRect().width<=innerWidth,
+     photo:getComputedStyle(element.querySelector('img')).objectFit==='contain',
+     text:element.textContent.includes('مكتب نموذجي')&&element.textContent.includes('W-77')&&element.textContent.includes('تفاصيل محفوظة')
+   }));
+   await dialog.getByRole('button',{name:'إغلاق'}).click();
+   const closed=await dialog.isHidden();
+   checks++;
+   if(!Object.values(good).every(Boolean)||!closed)fails++;
+   console.log(JSON.stringify({width,workerPreview:{...good,closed}}));
+   await ctx.close();
+ }
  for(const asset of ['saahl-pwa-192.png','saahl-pwa-512.png','apple-touch-icon.png']){
    const ctx=await browser.newContext();
    const tab=await ctx.newPage();

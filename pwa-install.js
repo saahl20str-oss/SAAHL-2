@@ -1,75 +1,131 @@
-/* SAAHL-2: install only on eligible devices. iOS Safari shows manual instructions. */
 (() => {
-  let pendingPrompt = null;
-  let button = null;
+  const directory = new URL('./', document.currentScript.src);
+  const mode = matchMedia('(display-mode: standalone)');
   const ua = navigator.userAgent || '';
-  const standalone = () => matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
-  const isIOS = /iPad|iPhone|iPod/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-  const isSafari = /Safari/.test(ua) && !/CriOS|FxiOS|EdgiOS|OPiOS/.test(ua);
-  function hide() { if (button) button.hidden = true; }
-  function showInstructions() {
-    const old = document.getElementById('saahl-ios-install-info');
-    if (old) { old.remove(); return; }
-    const panel = document.createElement('aside');
-    panel.id = 'saahl-ios-install-info';
-    panel.className = 'saahl-ios-install-info';
-    panel.setAttribute('role', 'dialog');
-    panel.setAttribute('aria-label', 'طريقة تثبيت تطبيق ساهل 2');
-    const heading = document.createElement('strong');
-    heading.textContent = 'تثبيت ساهل 2 على iPhone';
-    const text = document.createElement('p');
-    text.textContent = 'في Safari اضغط زر المشاركة، ثم اختر «إضافة إلى الشاشة الرئيسية» واضغط «إضافة».';
+  const ios = /iPhone|iPad|iPod/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  const android = /Android/.test(ua);
+  const edge = /Edg(?:A|iOS)?\//.test(ua);
+  const chrome = /(?:Chrome|CriOS)\//.test(ua) && !edge;
+  const safari = /Version\/[\d.]+.*Safari\//.test(ua) && !/CriOS|FxiOS|EdgiOS|OPiOS/.test(ua);
+  const buttons = [];
+  let pendingPrompt;
+  let installed = false;
+  let busy = false;
+  let guide;
+
+  const isInstalled = () => installed || mode.matches || navigator.standalone === true;
+
+  function instructions() {
+    if (ios) return safari
+      ? 'في Safari افتح «المشاركة»، ثم اختر «إضافة إلى الشاشة الرئيسية». فعّل «فتح كتطبيق ويب» إذا ظهر، ثم اضغط «إضافة».'
+      : 'افتح هذه الصفحة في Safari. من «المشاركة» اختر «إضافة إلى الشاشة الرئيسية»، ثم اضغط «إضافة».';
+    if (edge && !android) return 'في Edge افتح قائمة ⋯، ثم «التطبيقات» واختر «تثبيت هذا الموقع كتطبيق». قد يظهر خيار التثبيت في شريط العنوان.';
+    if (android) return 'افتح قائمة ⋮ في المتصفح، واختر «تثبيت التطبيق» أو «إضافة إلى الشاشة الرئيسية» بحسب الخيار المتاح.';
+    if (chrome) return 'في Chrome اضغط رمز التثبيت في شريط العنوان، أو افتح قائمة ⋮ ثم «البث والحفظ والمشاركة» واختر «تثبيت الصفحة كتطبيق» إذا ظهر.';
+    if (safari) return 'في Safari على Mac، افتح «المشاركة» أو قائمة «ملف»، ثم اختر «إضافة إلى Dock». إذا لم يظهر الخيار، جرّب Chrome أو Edge.';
+    return 'ابحث في قائمة المتصفح عن «تثبيت التطبيق» أو «إضافة إلى الشاشة الرئيسية». إذا لم يظهر الخيار، افتح الرابط في Chrome أو Edge، أو في Safari على iPhone وiPad.';
+  }
+
+  function refresh() {
+    const complete = isInstalled();
+    for (const button of buttons) {
+      button.disabled = complete || busy;
+      button.textContent = complete ? 'ساهل-2 مثبت' : busy ? 'جارٍ التثبيت…' : 'تثبيت ساهل-2';
+    }
+  }
+
+  function showGuide(opener) {
+    if (guide?.open) return;
+    guide = document.createElement('dialog');
+    guide.id = 'saahl-ios-install-info';
+    guide.className = 'saahl-install-guide';
+    guide.dir = 'rtl';
+    guide.setAttribute('aria-labelledby', 'saahl-install-guide-title');
+    const title = document.createElement('h2');
+    title.id = 'saahl-install-guide-title';
+    title.textContent = 'تثبيت ساهل-2';
+    const steps = document.createElement('p');
+    steps.textContent = instructions();
     const close = document.createElement('button');
     close.type = 'button';
     close.textContent = 'إغلاق';
-    close.addEventListener('click', () => { panel.remove(); button?.focus(); });
-    panel.append(heading, text, close);
-    document.body.append(panel);
+    close.addEventListener('click', () => guide.close());
+    guide.addEventListener('close', event => {
+      event.currentTarget.remove();
+      if (guide === event.currentTarget) guide = null;
+      opener.focus();
+    }, {once:true});
+    guide.append(title, steps, close);
+    document.body.append(guide);
+    guide.showModal();
     close.focus();
   }
-  function show() {
-    if (standalone()) return;
-    if (!pendingPrompt && !(isIOS && isSafari)) return;
-    if (!button) {
-      button = document.createElement('button');
-      button.type = 'button';
-      button.className = 'saahl-install-btn';
-      button.setAttribute('aria-label', 'تثبيت تطبيق ساهل 2 على الجهاز');
-      button.addEventListener('click', async () => {
-        if (!pendingPrompt) { showInstructions(); return; }
-        const prompt = pendingPrompt;
-        pendingPrompt = null;
-        hide();
-        try { await prompt.prompt(); await prompt.userChoice; }
-        catch { /* Only the browser can confirm installation. */ }
-      });
-      const isAdmin=!!document.getElementById('pg-settings');
-      const host=isAdmin
-        ? document.querySelector('#pg-settings .cd')
-        : (document.querySelector('.nav-actions,.office-navbar nav,.site-header nav,.topbar,.nav-r,header nav,header') || document.querySelector('footer'));
-      if(host){
-        if(isAdmin){
-          const label=document.createElement('p');
-          label.className='saahl-install-label';
-          label.textContent='تثبيت ساهل 2 على جهازك';
-          host.append(label);
-        }
-        host.append(button);
-      } else document.body.append(button);
+
+  async function requestInstall(event) {
+    if (isInstalled() || busy) return;
+    const opener = event.currentTarget;
+    if (!pendingPrompt) return showGuide(opener);
+    const prompt = pendingPrompt;
+    pendingPrompt = null;
+    busy = true;
+    refresh();
+    try {
+      const result = await prompt.prompt();
+      const choice = result?.outcome ? result : await prompt.userChoice;
+      if (choice?.outcome === 'accepted') installed = true;
+    } catch {
+      if (!isInstalled()) showGuide(opener);
+    } finally {
+      busy = false;
+      refresh();
     }
-    button.textContent = pendingPrompt ? 'تثبيت ساهل 2' : 'إضافة ساهل 2 للشاشة';
-    button.hidden = false;
   }
+
   window.addEventListener('beforeinstallprompt', event => {
-    if (standalone()) return;
+    if (isInstalled()) return;
     event.preventDefault();
     pendingPrompt = event;
-    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded',show,{once:true});
-    else show();
+    refresh();
   });
-  window.addEventListener('appinstalled', () => { pendingPrompt=null; hide(); });
-  if (isIOS && isSafari && !standalone()) {
-    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded',show,{once:true});
-    else show();
+  window.addEventListener('appinstalled', () => {
+    installed = true;
+    pendingPrompt = null;
+    if (guide?.open) guide.close();
+    refresh();
+  });
+  mode.addEventListener?.('change', refresh);
+
+  function init() {
+    const hosts = [...document.querySelectorAll('[data-saahl-install]')];
+    if (!hosts.length) {
+      const host = document.querySelector('#pg-settings .cd');
+      if (host) hosts.push(host);
+      else {
+        const section = document.createElement('div');
+        section.className = 'saahl-install-section';
+        (document.querySelector('footer') || document.body).append(section);
+        hosts.push(section);
+      }
+    }
+    for (const host of hosts) {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'saahl-install-btn';
+      button.addEventListener('click', requestInstall);
+      host.append(button);
+      buttons.push(button);
+    }
+    refresh();
+
+    if ('serviceWorker' in navigator && window.isSecureContext) {
+      const worker = new URL('./sw.js', directory);
+      if (worker.origin === location.origin) {
+        navigator.serviceWorker.register(worker.href, {scope:directory.pathname})
+          .catch(error => console.warn('تعذّر تسجيل خدمة تثبيت ساهل-2', error.message));
+      }
+    }
   }
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init, {once:true});
+  else init();
 })();

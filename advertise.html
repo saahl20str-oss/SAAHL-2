@@ -192,12 +192,14 @@ body{font-family:'Tajawal',Arial,sans-serif;background:var(--bg);color:var(--tex
 </style>
 
 <!-- Mobile-first enhancement; isolated from existing application logic -->
-<link rel="stylesheet" href="./mobile-first.css?v=20261119c">
+<link rel="stylesheet" href="./mobile-first.css?v=20261119d">
 <link rel="manifest" href="./manifest.webmanifest">
 <meta name="theme-color" content="#111218">
 <link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="ساهل 2">
+<link rel="stylesheet" href="./pwa-install.css?v=1">
+<script defer src="./pwa-install.js?v=20261119d"></script>
 </head>
 <body>
 
@@ -438,7 +440,5 @@ async function submitAd(){
 }
 </script>
 
-<script>if('serviceWorker' in navigator){window.addEventListener('load',()=>{navigator.serviceWorker.register('./sw.js').catch(()=>{});});}</script>
-<script defer src="./pwa-install.js?v=20261119c"></script>
 </body>
 </html>
