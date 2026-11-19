@@ -12,9 +12,9 @@ try {
   let deployed=false;
   for(let attempt=1;attempt<=12;attempt++) {
     try {
-      const r=await page.goto(origin+'manifest.webmanifest?release=20261119',{waitUntil:'domcontentloaded',timeout:20000});
-      const value=await page.evaluate(()=>document.body.innerText);
-      if(r?.status()===200 && value.includes('ساهل 2')){deployed=true;break;}
+      const r=await context.request.get(origin+'manifest.webmanifest?release=20261119',{timeout:20000});
+      const value=await r.text();
+      if(r.status()===200 && value.includes('ساهل 2')){deployed=true;break;}
     } catch(e){ console.log('Deployment pending',String(e).slice(0,120)); }
     await wait(10000);
   }
