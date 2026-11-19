@@ -7,6 +7,7 @@ on:
       - 'manifest.webmanifest'
       - 'sw.js'
       - 'kafala-owner.js'
+      - 'pwa-install.js'
       - 'saahl-pwa-icon.svg'
       - 'tests/**'
       - '.github/workflows/mobile-smoke.yml'
@@ -23,6 +24,7 @@ jobs:
       - run: npm install --no-save playwright
       - run: npx playwright install --with-deps chromium
       - run: node --check kafala-owner.js
+      - run: node --check pwa-install.js
       - run: node tests/mobile-smoke.mjs
       - uses: actions/upload-artifact@v4
         if: always()
