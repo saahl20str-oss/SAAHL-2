@@ -20,7 +20,7 @@
     if (ios) return safari
       ? 'في Safari افتح «المشاركة»، ثم اختر «إضافة إلى الشاشة الرئيسية». فعّل «فتح كتطبيق ويب» إذا ظهر، ثم اضغط «إضافة».'
       : 'افتح هذه الصفحة في Safari. من «المشاركة» اختر «إضافة إلى الشاشة الرئيسية»، ثم اضغط «إضافة».';
-    if (edge && !android) return 'إذا ظهر رمز تثبيت التطبيق في شريط العنوان فاضغطه. أو افتح ⋯ ثم «المزيد من الأدوات» ← «التطبيقات» ← «تثبيت هذا الموقع كتطبيق». إذا غاب الخيار، جرّب نافذة Edge عادية خارج InPrivate.';
+    if (edge && !android) return 'اضغط رمز التثبيت في شريط العنوان إن ظهر. للتثبيت من زر ساهل-2 مباشرة، حدّث Edge إلى الإصدار 158 أو أحدث. يمكنك أيضًا التثبيت من ⋯ ← المزيد من الأدوات ← التطبيقات.';
     if (android) return 'افتح قائمة ⋮ في المتصفح، واختر «تثبيت التطبيق» أو «إضافة إلى الشاشة الرئيسية» بحسب الخيار المتاح.';
     if (chrome) return 'في Chrome اضغط رمز التثبيت في شريط العنوان، أو افتح قائمة ⋮ ثم «البث والحفظ والمشاركة» واختر «تثبيت الصفحة كتطبيق» إذا ظهر.';
     if (safari) return 'في Safari على Mac، افتح «المشاركة» أو قائمة «ملف»، ثم اختر «إضافة إلى Dock». إذا لم يظهر الخيار، جرّب Chrome أو Edge.';
@@ -80,18 +80,23 @@
   async function requestInstall(event) {
     if (isInstalled() || busy) return;
     const opener = event.currentTarget;
-    if (!pendingPrompt) return showGuide(opener);
+    const nativeInstall = opener !== guideAction && typeof navigator.install === 'function';
+    if (!nativeInstall && !pendingPrompt) return showGuide(opener);
     const prompt = pendingPrompt;
-    pendingPrompt = null;
+    if (!nativeInstall) pendingPrompt = null;
     busy = true;
     refresh();
     try {
-      const result = await prompt.prompt();
-      const choice = result?.outcome ? result : await prompt.userChoice;
-      if (choice?.outcome === 'accepted') {
-        installed = true;
-        if (guide?.open) guide.close();
+      if (nativeInstall) {
+        await navigator.install();
+      } else {
+        const result = await prompt.prompt();
+        const choice = result?.outcome ? result : await prompt.userChoice;
+        if (choice?.outcome !== 'accepted') return;
       }
+      installed = true;
+      pendingPrompt = null;
+      if (guide?.open) guide.close();
     } catch {
       if (!isInstalled()) showGuide(opener);
     } finally {
