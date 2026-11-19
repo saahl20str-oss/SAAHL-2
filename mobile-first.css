@@ -39,3 +39,8 @@ img{height:auto}
 .saahl-ios-install-info strong{display:block;font-size:16px}
 .saahl-ios-install-info p{margin:8px 0 12px}
 .saahl-ios-install-info button{padding:9px 20px;border:0;border-radius:9px;background:#111218;color:#fff;min-height:42px;font:inherit}
+
+/* Install is a normal navigation/settings action, never a floating bottom overlay. */
+.saahl-install-btn{position:static!important;inset:auto!important;left:auto!important;bottom:auto!important;box-shadow:none!important;min-height:40px;padding:8px 12px;font-size:12px;white-space:nowrap;max-width:100%;display:inline-flex;align-items:center;justify-content:center;margin:4px 0}
+.saahl-install-label{font-size:13px;font-weight:700;margin:12px 0 6px}
+@media(max-width:480px){.saahl-install-btn{font-size:11px;min-height:38px;padding:7px 10px}}
