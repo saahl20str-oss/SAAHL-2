@@ -410,12 +410,11 @@ nav.scrolled{box-shadow:0 4px 32px rgba(0,0,0,.08)}
 .type-ico svg,.feat-item-ico svg,.feat-card-ico svg{width:22px;height:22px;display:block}
 .type-ico,.feat-item-ico,.feat-card-ico{color:var(--gold)}
 .stat-panel{
-  grid-column:span 2;
-  display:grid;grid-template-columns:1fr 1fr;gap:18px;
+  display:grid;gap:18px;
 }
 .stat-wide-card{
   background:#fff;border:1.5px solid var(--border);border-radius:20px;
-  padding:28px;display:grid;grid-template-columns:110px 1px 1fr;align-items:center;gap:28px;
+  padding:24px;display:grid;grid-template-columns:auto minmax(0,1fr);align-items:center;gap:22px;
   box-shadow:0 10px 34px rgba(0,0,0,.045);
   transition:all .3s ease;position:relative;overflow:hidden;
 }
@@ -424,12 +423,20 @@ nav.scrolled{box-shadow:0 4px 32px rgba(0,0,0,.08)}
 .stat-wide-card:hover::before{opacity:1}
 .stat-wide-icon{width:96px;height:96px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:var(--gold-xl);border:1px solid rgba(201,168,76,.22);color:var(--gold);position:relative;z-index:1}
 .stat-wide-icon svg{width:54px;height:54px;display:block}
-.stat-wide-line{height:86px;background:var(--border);position:relative;z-index:1}
+.stat-wide-copy{min-width:0;overflow-wrap:anywhere}
 .stat-wide-num{font-size:42px;font-weight:900;color:var(--gold);line-height:1;margin-bottom:6px;position:relative;z-index:1}
-.stat-wide-lbl{font-size:15px;color:var(--dark);font-weight:800;margin-bottom:6px;position:relative;z-index:1}
+.stat-wide-lbl{font-size:19px;color:var(--dark);font-weight:800;margin-bottom:6px;position:relative;z-index:1}
 .stat-wide-desc{font-size:13px;color:var(--muted);line-height:1.6;position:relative;z-index:1}
-@media(max-width:900px){.stat-panel{grid-column:span 1;grid-template-columns:1fr}.stat-wide-card{grid-template-columns:82px 1px 1fr;padding:22px;gap:18px}.stat-wide-icon{width:76px;height:76px}.stat-wide-icon svg{width:42px;height:42px}.stat-wide-num{font-size:34px}}
-@media(max-width:480px){.stat-wide-card{grid-template-columns:1fr;text-align:center}.stat-wide-line{display:none}.stat-wide-icon{margin:auto}}
+@media(max-width:900px){
+  .stat-wide-card{padding:18px;gap:16px}
+  .stat-wide-icon{width:64px;height:64px}
+  .stat-wide-icon svg{width:34px;height:34px}
+}
+@media(max-width:480px){
+  .stat-wide-card{padding:15px;gap:12px}
+  .stat-wide-icon{width:48px;height:48px}
+  .stat-wide-icon svg{width:28px;height:28px}
+}
 
 
 .type-body{padding:24px}
@@ -491,8 +498,7 @@ nav.scrolled{box-shadow:0 4px 32px rgba(0,0,0,.08)}
 .feat-item-desc{font-size:13px;color:var(--muted);line-height:1.6}
 
 .features-right{
-  display:grid;grid-template-columns:1fr 1fr;
-  gap:14px;
+  min-width:0;
 }
 .feat-card{
   background:#fff;border:1.5px solid var(--border);
@@ -644,7 +650,6 @@ footer{
 /* RESPONSIVE */
 @media(max-width:1024px){
   .features-layout{grid-template-columns:1fr;gap:48px}
-  .features-right{grid-template-columns:repeat(4,1fr)}
 }
 @media(max-width:768px){
   nav .nav-center,.nav-actions .nav-login,.nav-actions .nav-cta{display:none}
@@ -657,13 +662,11 @@ footer{
   .steps-timeline{grid-template-columns:1fr;gap:40px}
   .steps-timeline::before{display:none}
   .types-grid{grid-template-columns:1fr;gap:16px}
-  .features-right{grid-template-columns:1fr 1fr}
   .footer-grid{grid-template-columns:1fr;gap:32px}
   .section{padding:64px 5%}
   .hero{padding:100px 5% 64px}
 }
 @media(max-width:480px){
-  .features-right{grid-template-columns:1fr 1fr}
   .feat-card{padding:18px}
   .hero-title{letter-spacing:-1px}
 }
@@ -1465,9 +1468,8 @@ window.addEventListener('load',loadSpotlight);
           <div class="stat-wide-icon" aria-hidden="true">
             <svg viewBox="0 0 64 64" fill="none"><path d="M32 8l24 10v16c0 16-10 28-24 32-14-4-24-16-24-32V18l24-10z" stroke="currentColor" stroke-width="4"/><path d="M22 32l7 7 13-15" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></svg>
           </div>
-          <div class="stat-wide-line"></div>
-          <div>
-            <div class="stat-wide-lbl" style="font-size:19px" data-t="fc1">رقم الترخيص إلزامي</div>
+          <div class="stat-wide-copy">
+            <div class="stat-wide-lbl" data-t="fc1">رقم الترخيص إلزامي</div>
             <p class="stat-wide-desc" data-t="fc1d">يُطلب من كل مكتب عند التسجيل قبل ظهوره على المنصة</p>
           </div>
         </div>
@@ -1475,9 +1477,8 @@ window.addEventListener('load',loadSpotlight);
           <div class="stat-wide-icon" aria-hidden="true">
             <svg viewBox="0 0 64 64" fill="none"><circle cx="32" cy="30" r="12" stroke="currentColor" stroke-width="4"/><path d="M27 30l4 4 8-8" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/><path d="M20 54c2-9 22-9 24 0" stroke="currentColor" stroke-width="4" stroke-linecap="round"/></svg>
           </div>
-          <div class="stat-wide-line"></div>
-          <div>
-            <div class="stat-wide-lbl" style="font-size:19px" data-t="fc2">اختيار دون حجز</div>
+          <div class="stat-wide-copy">
+            <div class="stat-wide-lbl" data-t="fc2">اختيار دون حجز</div>
             <p class="stat-wide-desc" data-t="fc2d">اختر العاملة وراجع تفاصيلها ثم تواصل مباشرة مع المكتب</p>
           </div>
         </div>
