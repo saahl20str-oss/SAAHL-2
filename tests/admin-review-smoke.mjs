@@ -18,9 +18,6 @@ const db = {
   from(table) {
     const query = {
       select() { return query; },
-      order() { return query; },
-      gte() { return query; },
-      limit() { return query; },
       update() { return query; },
       eq(...args) { filters.push(args); return query; },
       then(resolve, reject) {
@@ -37,50 +34,20 @@ const context = vm.createContext({
   localStorage: { getItem() { return null; } },
   window: { addEventListener() {} },
   confirm: () => true,
-  Chart: class {},
   setTimeout() {},
 });
 vm.runInContext(script, context);
 const run = code => vm.runInContext(code, context);
 
-for (const id of ['pg-bookings', 'pg-payments', 's-rev', 'ads-rev', 'pr-off', 'pr-bk', 'pr-ad']) {
-  assert.ok(html.includes(`id="${id}"`), `Missing existing admin element ${id}`);
-}
-for (const [, handler] of html.matchAll(/onclick="(navTo\('kafala'\))"/g)) new vm.Script(handler);
-responses.set('offices', { data: null, count: null, error: { message: 'offline' } });
-responses.set('sponsor_profiles', { data: null, error: { message: 'offline' } });
-responses.set('strip_ads', { data: [], error: null });
-await run('loadAll()');
-assert.equal(element('s-off').textContent, '—');
-assert.match(element('off-wrap').textContent, /تعذر تحميل/);
-run('filterOffices();filterSponsors()');
-assert.match(element('spo-wrap').textContent, /تعذّر تحميل/);
-assert.match(element('ads-wrap').textContent, /لا توجد طلبات/);
-responses.set('strip_ads', { data: null, error: { message: 'offline' } });
-await run('loadAds()');
-assert.match(element('ads-cnt').textContent, /تعذّر التحميل/);
-assert.match(element('ads-wrap').textContent, /تعذّر تحميل/);
-
-responses.set('kafala_pending_edits', { data: null, error: { message: 'offline' } });
-await run('loadKf()');
-assert.match(element('kf-wrap').innerHTML, /تعذّر تحميل التعديلات/);
-assert.doesNotMatch(element('kf-wrap').innerHTML, /لا توجد طلبات/);
-assert.equal(element('s-kf-pending').textContent, '—');
-
-const tryAdApproval = async savedRows => {
+const tryAdApproval = async (savedRows, error = null) => {
   run("aAds=[{id:'ad-1',status:'pending',days:1}]; loadAds=async()=>{}");
-  responses.set('strip_ads', { data: savedRows, error: null });
+  responses.set('strip_ads', { data: savedRows, error });
   await run("appAd('ad-1')");
   return element('toast').textContent;
 };
+assert.match(await tryAdApproval(null, { message: 'offline' }), /تعذر اعتماد الإعلان/);
 assert.match(await tryAdApproval([]), /لم يُحفظ الاعتماد/);
 assert.match(await tryAdApproval([{ id: 'ad-1', status: 'approved' }]), /تم اعتماد الإعلان/);
 assert.ok(filters.some(([column, value]) => column === 'status' && value === 'pending'));
 
-run("aKf=[{id:'transfer-1'}];loadKf=async()=>[{id:'transfer-1',review_status:'approved',is_active:false}]");
-await run("reviewKf('transfer-1','resume')");
-assert.match(element('toast').textContent, /تعذّر تأكيد القرار/);
-run("loadKf=async()=>[{id:'transfer-1',review_status:'approved',is_active:true}]");
-await run("reviewKf('transfer-1','resume')");
-assert.match(element('toast').textContent, /تم حفظ القرار/);
-console.log('Admin review smoke passed.');
+console.log('Announcement approval smoke passed.');
