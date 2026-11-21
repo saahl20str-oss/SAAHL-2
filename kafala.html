@@ -357,6 +357,8 @@ select.inp{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.
 .dm-avatar{overflow:hidden}
 .dm-contact .dm-contact-btn{background:#a6ecc2;color:#102b1c;margin:0;min-height:44px}
 .dm-contact p{font-size:13px;color:#fff;line-height:1.6;margin-top:8px}
+.dm-contact [hidden]{display:none}
+.transfer-contact-unavailable{grid-column:1/-1;font-size:12px;color:var(--muted);margin:0}
 #dm-contact-status:empty{display:none}
 .terms-card a{text-decoration:underline}
 </style>
@@ -767,7 +769,7 @@ select.inp{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.
       <div class="dm-grid" id="dm-grid"></div>
       <div class="dm-contact">
         <button type="button" class="dm-contact-btn" id="dm-contact-whatsapp">تواصل مع المعلن عبر واتساب</button>
-        <p>يفتح الزر محادثة المعلن برسالة جاهزة ويجهّز بطاقة العامل. الصق البطاقة في المحادثة أو أرفق الصورة المحفوظة، ثم اضغط إرسال.</p>
+        <p id="dm-contact-help">يفتح الزر محادثة المعلن برسالة جاهزة ويجهّز بطاقة العامل. الصق البطاقة في المحادثة أو أرفق الصورة المحفوظة، ثم اضغط إرسال.</p>
         <p id="dm-contact-status" role="status" tabindex="-1"></p>
       </div>
       <div class="dm-expiry-note" id="dm-expiry"></div>
@@ -796,7 +798,11 @@ async function loadListings() {
   const grid = document.getElementById('listingsGrid');
   grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:60px 20px;color:var(--muted)">جاري تحميل الإعلانات...</div>';
   try {
-    const {data,error} = await _db.rpc('saahl2_public_transfer_profiles');
+    let {data,error} = await _db.rpc('saahl2_public_transfer_profiles_with_availability');
+    // The previous listing API remains compatible while the new function is being deployed.
+    if (error && ['PGRST202','42883'].includes(error.code)) {
+      ({data,error} = await _db.rpc('saahl2_public_transfer_profiles'));
+    }
     if (error) throw error;
     listings = (data || []).map(row => ({
       id:row.id, name:'إعلان ' + row.id.slice(0,8).toUpperCase(),
@@ -804,6 +810,7 @@ async function loadListings() {
       emirate:row.emirate || '', salary:row.monthly_salary,
       nationality:row.nationality || '', skills:Array.isArray(row.skills) ? row.skills : [],
       photo:safeKafalaImageUrl(row.worker_photo_url),
+      whatsappAvailable:row.whatsapp_available,
       expiry:formatArabicDate(row.ends_at),
       daysLeft:Math.max(0, Math.ceil((new Date(row.ends_at) - Date.now()) / 86400000))
     }));
@@ -870,8 +877,9 @@ function renderListings(list) {
         <div class="poster-detail"><b>الخبرة</b><span>${esc(l.exp)} سنوات</span></div>
         ${l.nationality?`<div class="poster-detail"><b>الجنسية</b><span>${esc(l.nationality)}</span></div>`:''}
         ${l.skills.length?`<div class="poster-detail wide"><b>المهارات</b><span>${esc(l.skills.join('، '))}</span></div>`:''}
+        ${l.whatsappAvailable===false?'<p class="transfer-contact-unavailable">واتساب غير مفعّل لهذا الإعلان.</p>':''}
         <div class="poster-expiry">ينتهي الإعلان: ${esc(l.expiry)}</div>
-        <button type="button" class="lcard-btn" onclick="openDetail('${esc(l.id)}')">بطاقة الاستفسار والتواصل</button>
+        <button type="button" class="lcard-btn" onclick="openDetail('${esc(l.id)}')">${l.whatsappAvailable===false?'عرض بطاقة الإعلان':'بطاقة الاستفسار والتواصل'}</button>
       </div>
     </article>`;
   }).join('');
@@ -914,8 +922,7 @@ function openDetail(id) {
     ...(l.nationality ? [{lb:'الجنسية',v:l.nationality}] : []),
     ...(l.skills.length ? [{lb:'المهارات',v:l.skills.join('، ')}] : []),
   ].map(i=>`<div class="dm-item"><div class="dm-item-lbl">${i.lb}</div><div class="dm-item-val">${kafalaEscape(i.v)}</div></div>`).join('');
-  document.getElementById('dm-contact-status').textContent = '';
-  whatsappButton.disabled = false;
+  showTransferContactState(l);
   document.getElementById('dm-expiry').textContent = `ينتهي الإعلان: ${l.expiry} — متبقي ${l.daysLeft} يوم`;
   document.getElementById('detailOv').classList.add('open');
   document.body.style.overflow = 'hidden';
@@ -931,6 +938,15 @@ function closeDetail(e) {
 
 const whatsappButton = document.getElementById('dm-contact-whatsapp');
 const contactStatus = document.getElementById('dm-contact-status');
+const contactHelp = document.getElementById('dm-contact-help');
+
+function showTransferContactState(ad) {
+  const unavailable = ad.whatsappAvailable === false;
+  whatsappButton.hidden = unavailable;
+  whatsappButton.disabled = unavailable;
+  contactHelp.hidden = unavailable;
+  contactStatus.textContent = unavailable ? 'واتساب غير مفعّل لهذا الإعلان.' : '';
+}
 
 function openLinkedTransfer() {
   const match = location.hash.match(/^#ad=([0-9a-f-]{36})$/i);
@@ -950,7 +966,7 @@ window.addEventListener('hashchange',openLinkedTransfer);
 
 whatsappButton.addEventListener('click', async () => {
   const ad = currentDetail;
-  if (!ad) return;
+  if (!ad || ad.whatsappAvailable === false) return;
   whatsappButton.disabled = true;
   contactStatus.textContent = 'جارٍ تجهيز البطاقة وفتح واتساب…';
   try {
@@ -962,7 +978,8 @@ whatsappButton.addEventListener('click', async () => {
     const [number] = await Promise.all([destination,preparation]);
     if (currentDetail !== ad) return;
     if (!number) {
-      contactStatus.textContent = 'واتساب غير مفعّل لهذا الإعلان.';
+      ad.whatsappAvailable = false;
+      showTransferContactState(ad);
       return;
     }
     contactStatus.textContent = '';
@@ -970,7 +987,7 @@ whatsappButton.addEventListener('click', async () => {
   } catch {
     if (currentDetail === ad) contactStatus.textContent = 'تعذّر فتح واتساب. حاول مرة أخرى.';
   } finally {
-    if (currentDetail === ad) whatsappButton.disabled = false;
+    if (currentDetail === ad && ad.whatsappAvailable !== false) whatsappButton.disabled = false;
   }
 });
 

@@ -12,8 +12,8 @@ const photo = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAw
 const base = {profession:'عامل بناء',emirate:'أبوظبي',age:35,experience_years:6,monthly_salary:1200,
   ends_at:new Date(Date.now()+86400000).toISOString()};
 const rows = [
-  {...base,id:firstId,nationality:'الهند',skills:['أعمال السباكة'],worker_photo_url:photo},
-  {...base,id:secondId}
+  {...base,id:firstId,nationality:'الهند',skills:['أعمال السباكة'],worker_photo_url:photo,whatsapp_available:true},
+  {...base,id:secondId,whatsapp_available:false}
 ];
 
 try {
@@ -24,7 +24,11 @@ try {
     await page.route('**/*supabase-js@2*',route=>route.fulfill({contentType:'application/javascript',body:`
       window.requests = [];
       window.supabase = {createClient:()=>({async rpc(name,args) {
-        if (name==='saahl2_public_transfer_profiles') return {data:${JSON.stringify(rows)}};
+        const legacy = new URLSearchParams(location.search).has('legacy');
+        if (name==='saahl2_public_transfer_profiles_with_availability') return legacy
+          ? {error:{code:'PGRST202'}} : {data:${JSON.stringify(rows)}};
+        if (name==='saahl2_public_transfer_profiles' && legacy)
+          return {data:${JSON.stringify(rows.map(({whatsapp_available,...row})=>row))}};
         if (name==='saahl2_transfer_whatsapp') {
           window.requests.push(args);
           return {data: args.p_ad === '${firstId}' ? '971500000001' : null};
@@ -42,9 +46,10 @@ try {
     await cards.first().locator('img').evaluate(img=>img.decode());
     assert.equal(await cards.nth(1).locator('img').count(),0);
     assert.equal(await cards.nth(1).locator('.poster-top').evaluate(el=>getComputedStyle(el).gridTemplateColumns.split(' ').length),1);
-    const open = async card => {
+    const open = async (card, available = true) => {
       await card.getByRole('button',{name:'عرض التفاصيل'}).click();
-      await card.getByRole('button',{name:'بطاقة الاستفسار والتواصل'}).click();
+      if (!available) assert.ok(await card.getByText('واتساب غير مفعّل لهذا الإعلان.').isVisible());
+      await card.getByRole('button',{name:available ? 'بطاقة الاستفسار والتواصل' : 'عرض بطاقة الإعلان'}).click();
     };
     const modal = page.locator('#detailOv');
     await open(cards.first());
@@ -54,15 +59,24 @@ try {
     assert.doesNotMatch(await modal.innerText(),/الإبلاغ عن الإعلان/);
     assert.equal(await modal.locator('.dm-contact button').count(),1);
     await modal.locator('.dm-close').click();
-    await open(cards.nth(1));
+    await open(cards.nth(1),false);
     assert.equal(await modal.locator('#dm-avatar img').count(),0);
     assert.doesNotMatch(await modal.innerText(),/الهند|أعمال السباكة/);
     const whatsappButton = modal.getByRole('button',{name:'تواصل مع المعلن عبر واتساب'});
+    assert.equal(await whatsappButton.isVisible(),false);
+    assert.ok(await modal.getByText('واتساب غير مفعّل لهذا الإعلان.').isVisible());
+    assert.deepEqual(await page.evaluate(()=>window.requests),[]);
+
+    await page.goto(site+'kafala.html?legacy=1#ad='+secondId);
+    await modal.getByText('إعلان 11223345',{exact:true}).waitFor();
+    assert.ok(await whatsappButton.isVisible());
     await whatsappButton.click();
     await modal.getByText('واتساب غير مفعّل لهذا الإعلان.').waitFor();
-    assert.equal(page.url(),site+'kafala.html');
+    assert.equal(await whatsappButton.isVisible(),false);
+
     await page.goto(site+'kafala.html#ad='+firstId);
     await modal.getByText('إعلان 11223344',{exact:true}).waitFor();
+    assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1));
     const destination = page.waitForRequest(url => url.url().startsWith('https://wa.me/'));
     const download = page.waitForEvent('download');
     await whatsappButton.click();
@@ -77,7 +91,6 @@ try {
     assert.match(url.searchParams.get('text'),/11223344/);
     assert.match(url.searchParams.get('text'),new RegExp(firstId));
     assert.match(url.searchParams.get('text'),/أعمال السباكة/);
-    assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1));
     assert.deepEqual(errors,[]);
     await page.close();
   }
