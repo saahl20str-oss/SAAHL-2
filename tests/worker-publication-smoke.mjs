@@ -89,6 +89,7 @@ try{
   const context=await browser.newContext({viewport:{width:390,height:844},locale:'ar-AE'});
   await context.route('**/*supabase-js@2*',route=>route.fulfill({contentType:'application/javascript',body:testSdk}));
   await context.route('https://fonts.googleapis.com/**',route=>route.abort());
+  await context.route('https://example.com/approved.png',route=>route.fulfill({path:'saahl-logo.png',contentType:'image/png'}));
   const office=await context.newPage();
   await office.goto(root+'office.html');
   const legacy=office.locator('.worker-card').filter({hasText:'ملف محفوظ'});
@@ -162,9 +163,31 @@ try{
   assert.ok(await signupButton.isEnabled());
   await noOverflow(signup);
 
+  const profilePhoto=legacy.getByRole('img',{name:'صورة العاملة'});
+  await profilePhoto.scrollIntoViewIfNeeded();
+  await profilePhoto.waitFor();
+  assert.equal(await profilePhoto.evaluate(img=>getComputedStyle(img).objectFit),'contain');
+  for(const width of [320,390,1280]){
+    await office.setViewportSize({width,height:844});
+    await noOverflow(office);
+    for(const button of await legacy.getByRole('button').all()){
+      assert.ok((await button.boundingBox()).height>=44,'Office card control is too short');
+    }
+  }
+  await legacy.getByRole('button',{name:'عرض السيرة الذاتية'}).click();
+  await office.locator('#cvModal').waitFor();
+  await office.locator('#closeCV').click();
+  await legacy.getByRole('button',{name:'تعديل البيانات'}).click();
+  assert.equal(await office.locator('#workerName').inputValue(),'ملف محفوظ');
+  await office.locator('#cancelWorker').click();
+  await legacy.getByRole('combobox',{name:'حالة التوفر'}).selectOption('unavailable');
+  await legacy.getByText('غير منشورة في البحث').waitFor();
+  await legacy.getByRole('combobox',{name:'حالة التوفر'}).selectOption('available');
+  await legacy.getByText('منشورة في بحث الكفيل').waitFor();
+
   await office.setViewportSize({width:1280,height:800});
   await noOverflow(office);
-  console.log('Office attestation, required checkbox, optional photo, existing profile, public search, card comparison and signup feedback passed (320px, 390px and desktop).');
+  console.log('Office attestation, required checkbox, optional photo, existing profile, public search, card comparison, office card controls and signup feedback passed (320px, 390px and desktop).');
   await context.close();
 }finally{
   await browser.close();
