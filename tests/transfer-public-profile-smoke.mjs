@@ -33,7 +33,7 @@ try {
       }})};
     `}));
     await page.route('https://fonts.googleapis.com/**',route=>route.abort());
-    await page.addInitScript(() => Object.defineProperty(navigator,'share',{value:undefined}));
+    await page.addInitScript(() => Object.defineProperty(navigator,'clipboard',{value:undefined}));
     await page.route('https://wa.me/**',route=>route.fulfill({contentType:'text/plain',body:'WhatsApp test stub'}));
     await page.goto(site+'kafala.html', {waitUntil:'domcontentloaded'});
     const cards = page.locator('.transfer-poster');
@@ -52,13 +52,7 @@ try {
     assert.match(await modal.innerText(),/الهند/);
     assert.match(await modal.innerText(),/أعمال السباكة/);
     assert.doesNotMatch(await modal.innerText(),/الإبلاغ عن الإعلان/);
-    const download = page.waitForEvent('download');
-    await modal.getByRole('button',{name:'احفظ بطاقة الاستفسار'}).click();
-    const card = await download;
-    assert.match(card.suggestedFilename(),/11223344[.]png$/);
-    const png = await readFile(await card.path());
-    assert.equal(png.readUInt32BE(16),800);
-    assert.equal(png.readUInt32BE(20),1006);
+    assert.equal(await modal.locator('.dm-contact button').count(),1);
     await modal.locator('.dm-close').click();
     await open(cards.nth(1));
     assert.equal(await modal.locator('#dm-avatar img').count(),0);
@@ -70,7 +64,13 @@ try {
     await page.goto(site+'kafala.html#ad='+firstId);
     await modal.getByText('إعلان 11223344',{exact:true}).waitFor();
     const destination = page.waitForRequest(url => url.url().startsWith('https://wa.me/'));
+    const download = page.waitForEvent('download');
     await whatsappButton.click();
+    const attachment = await download;
+    assert.match(attachment.suggestedFilename(),/11223344[.]png$/);
+    const png = await readFile(await attachment.path());
+    assert.equal(png.readUInt32BE(16),800);
+    assert.equal(png.readUInt32BE(20),1006);
     const url = new URL((await destination).url());
     assert.equal(url.pathname,'/971500000001');
     assert.match(url.searchParams.get('text'),/أرغب|أود الاستفسار/);

@@ -356,7 +356,6 @@ select.inp{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.
 #listingsGrid .poster-top img,.dm-avatar img{width:100%;height:100%;object-fit:cover}
 .dm-avatar{overflow:hidden}
 .dm-contact .dm-contact-btn{background:#a6ecc2;color:#102b1c;margin:0;min-height:44px}
-.dm-contact .dm-card-btn{background:#f8efdc;color:#2d251a;margin-top:8px}
 .dm-contact p{font-size:13px;color:#fff;line-height:1.6;margin-top:8px}
 #dm-contact-status:empty{display:none}
 .terms-card a{text-decoration:underline}
@@ -768,8 +767,7 @@ select.inp{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.
       <div class="dm-grid" id="dm-grid"></div>
       <div class="dm-contact">
         <button type="button" class="dm-contact-btn" id="dm-contact-whatsapp">تواصل مع المعلن عبر واتساب</button>
-        <button type="button" class="dm-contact-btn dm-card-btn" id="dm-contact-card">احفظ بطاقة الاستفسار</button>
-        <p>يفتح واتساب برسالة جاهزة. يمكنك أيضًا إرفاق بطاقة الاستفسار كصورة في محادثة المعلن.</p>
+        <p>يفتح الزر محادثة المعلن برسالة جاهزة ويجهّز بطاقة العامل. الصق البطاقة في المحادثة أو أرفق الصورة المحفوظة، ثم اضغط إرسال.</p>
         <p id="dm-contact-status" role="status" tabindex="-1"></p>
       </div>
       <div class="dm-expiry-note" id="dm-expiry"></div>
@@ -777,7 +775,7 @@ select.inp{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.
   </div>
 </div>
 
-<script src="kafala-whatsapp.js?v=1"></script>
+<script src="kafala-whatsapp.js?v=2"></script>
 <script>
 // ===== SUPABASE =====
 const K_SUPABASE_URL = 'https://hkfxikmpfgixrbrboxeb.supabase.co';
@@ -918,7 +916,6 @@ function openDetail(id) {
   ].map(i=>`<div class="dm-item"><div class="dm-item-lbl">${i.lb}</div><div class="dm-item-val">${kafalaEscape(i.v)}</div></div>`).join('');
   document.getElementById('dm-contact-status').textContent = '';
   whatsappButton.disabled = false;
-  cardButton.disabled = false;
   document.getElementById('dm-expiry').textContent = `ينتهي الإعلان: ${l.expiry} — متبقي ${l.daysLeft} يوم`;
   document.getElementById('detailOv').classList.add('open');
   document.body.style.overflow = 'hidden';
@@ -933,8 +930,6 @@ function closeDetail(e) {
 }
 
 const whatsappButton = document.getElementById('dm-contact-whatsapp');
-const cardButton = document.getElementById('dm-contact-card');
-if (navigator.canShare && navigator.share) cardButton.textContent = 'مشاركة بطاقة الاستفسار';
 const contactStatus = document.getElementById('dm-contact-status');
 
 function openLinkedTransfer() {
@@ -957,53 +952,25 @@ whatsappButton.addEventListener('click', async () => {
   const ad = currentDetail;
   if (!ad) return;
   whatsappButton.disabled = true;
-  contactStatus.textContent = 'جارٍ فتح واتساب…';
+  contactStatus.textContent = 'جارٍ تجهيز البطاقة وفتح واتساب…';
   try {
-    const {data,error} = await _db.rpc('saahl2_transfer_whatsapp',{p_ad:ad.id});
+    const destination = _db.rpc('saahl2_transfer_whatsapp',{p_ad:ad.id}).then(({data,error}) => {
+      if (error) throw error;
+      return typeof data === 'string' && /^[1-9]\d{7,14}$/.test(data) ? data : null;
+    });
+    const preparation = prepareTransferInquiryCard(ad,destination,() => currentDetail === ad);
+    const [number] = await Promise.all([destination,preparation]);
     if (currentDetail !== ad) return;
-    if (error) throw error;
-    if (typeof data !== 'string' || !/^[1-9]\d{7,14}$/.test(data)) {
+    if (!number) {
       contactStatus.textContent = 'واتساب غير مفعّل لهذا الإعلان.';
       return;
     }
     contactStatus.textContent = '';
-    window.location.assign(transferWhatsAppUrl(ad,data));
+    window.location.assign(transferWhatsAppUrl(ad,number));
   } catch {
     if (currentDetail === ad) contactStatus.textContent = 'تعذّر فتح واتساب. حاول مرة أخرى.';
   } finally {
     if (currentDetail === ad) whatsappButton.disabled = false;
-  }
-});
-
-cardButton.addEventListener('click', async () => {
-  const ad = currentDetail;
-  if (!ad) return;
-  cardButton.disabled = true;
-  try {
-    const blob = await renderTransferInquiryCard(ad);
-    if (currentDetail !== ad) return;
-    const name = 'saahl-inquiry-' + ad.id.slice(0,8) + '.png';
-    const file = new File([blob],name,{type:'image/png'});
-    if (navigator.share && navigator.canShare?.({files:[file]})) {
-      try {
-        await navigator.share({files:[file],title:'استفسار عن عامل | ساهل ٢'});
-        return;
-      } catch (error) {
-        if (error.name === 'AbortError' || currentDetail !== ad) return;
-      }
-    }
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(blob);
-    link.download = name;
-    document.body.append(link);
-    link.click();
-    link.remove();
-    setTimeout(() => URL.revokeObjectURL(link.href),30000);
-    contactStatus.textContent = 'احفظ الصورة ثم أرفقها في محادثة واتساب مع المعلن.';
-  } catch {
-    if (currentDetail === ad) contactStatus.textContent = 'تعذّر تجهيز البطاقة. حاول مرة أخرى.';
-  } finally {
-    if (currentDetail === ad) cardButton.disabled = false;
   }
 });
 

@@ -85,3 +85,41 @@ async function renderTransferInquiryCard(ad) {
     blob => blob ? resolve(blob) : reject(new Error('Card unavailable')), 'image/png'
   ));
 }
+
+async function prepareTransferInquiryCard(ad, destination, isCurrent) {
+  const card = destination.then(async number => {
+    if (!number || !isCurrent()) return null;
+    const blob = await renderTransferInquiryCard(ad);
+    return isCurrent() ? blob : null;
+  }).catch(() => null);
+
+  // The clipboard request must start within the visitor's click, before the lookup finishes.
+  if (navigator.clipboard?.write && typeof ClipboardItem !== 'undefined') {
+    try {
+      const image = card.then(blob => {
+        if (!blob || !isCurrent()) throw new Error('Card unavailable');
+        return blob;
+      });
+      // The browser may reject the write before consuming the image promise.
+      image.catch(() => {});
+      await navigator.clipboard.write([new ClipboardItem({'image/png':image})]);
+      return;
+    } catch {
+      // Use the original card as a downloadable attachment when clipboard access fails.
+    }
+  }
+  const blob = await card;
+  if (!blob || !isCurrent()) return;
+  try {
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.href = url;
+    link.download = 'saahl-inquiry-' + ad.id.slice(0,8) + '.png';
+    document.body.append(link);
+    link.click();
+    link.remove();
+    setTimeout(() => URL.revokeObjectURL(url),30000);
+  } catch {
+    // The text and direct listing link still work if the browser blocks the attachment.
+  }
+}
