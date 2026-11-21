@@ -103,17 +103,26 @@ try {
      await page.goto(stripOrigin+'/index.html');
      const details=page.getByRole('button',{name:'عرض التفاصيل',exact:true});
      await details.waitFor();
-     const motion=await page.locator('.saahl-ad-message').evaluate(async message=>{
-       const animation=message.getAnimations().find(item=>item.animationName==='saahl-ad-glide');
+     const motion=await page.locator('.saahl-ad-rail').evaluate(async rail=>{
+       const animation=rail.getAnimations().find(item=>item.animationName==='saahl-ad-marquee');
        if(!animation)return false;
        animation.pause();
        await animation.ready;
+       const duration=animation.effect.getComputedTiming().duration;
        const details=document.getElementById('saahl-ad-open');
-       animation.currentTime=0;
-       const start=message.getBoundingClientRect().x;
+       const bounds=rail.parentElement.getBoundingClientRect();
+       const [original,repeat]=rail.children;
+       const x=time=>{animation.currentTime=time;return rail.getBoundingClientRect().x;};
+       const start=x(0);
        const buttonStart=details.getBoundingClientRect().x;
-       animation.currentTime=4000;
-       const outcome=Math.abs(message.getBoundingClientRect().x-start)>5 &&
+       const repeatStart=repeat.getBoundingClientRect().left;
+       const quarter=x(duration/4);
+       const middle=x(duration/2);
+       const final=x(duration-10);
+       const originalEnd=original.getBoundingClientRect().left;
+       const outcome=quarter>start+5 && middle>quarter+5 && final>middle+5 &&
+         Math.abs((quarter-start)/(duration/4000)-40)<2 &&
+         Math.abs(repeatStart-bounds.left)<2 && Math.abs(originalEnd-repeatStart)<2 &&
          details.getBoundingClientRect().x===buttonStart;
        animation.play();
        return outcome;
