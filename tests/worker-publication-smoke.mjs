@@ -17,8 +17,15 @@ window.supabase={createClient:(_url,_key,options)=>{
     display_name:'ملف محفوظ',nationality:'الهند',age:31,status:'available',photo_url:'https://example.com/approved.png',publication_consent_at:null}]));
   const set=rows=>{localStorage.workerFixture=JSON.stringify(rows);};
   const success=data=>({data,error:null});
+  const testingSignup=new URLSearchParams(location.search).has('testSignup');
   return {
-    auth:{getUser:async()=>success({user:{id:'owner'}})},
+    auth:{
+      getUser:async()=>success({user:testingSignup?null:{id:'owner'}}),
+      async signUp(){
+        await new Promise(resolve=>setTimeout(resolve,400));
+        return {data:null,error:{status:500,message:'Error sending confirmation email'}};
+      }
+    },
     storage:{from:()=>({upload:async()=>success({}),remove:async()=>success({}),
       createSignedUrl:async()=>success({signedUrl:location.origin+'/saahl-logo.png'}),
       download:async()=>success(new Blob(['test'],{type:'image/png'}))
@@ -127,9 +134,37 @@ try{
   await market.getByText('مكتب تجربة',{exact:true}).waitFor();
   assert.equal(await market.locator('.office-count strong').textContent(),'2');
   assert.equal(await office.evaluate(()=>JSON.parse(localStorage.workerFixture).find(w=>w.display_name==='ملف محفوظ').photo_url),'https://example.com/approved.png');
+  await market.getByRole('button',{name:'عرض عاملات المكتب'}).click();
+  const checkboxes=market.getByRole('checkbox',{name:'مقارنة',exact:true});
+  await checkboxes.first().waitFor();
+  assert.equal(await checkboxes.count(),2);
+  await checkboxes.first().check();
+  await checkboxes.last().check();
+  assert.ok(await market.locator('#compareBtn').isEnabled());
+  for(const width of [320,390,760,1280]){
+    await market.setViewportSize({width,height:844});
+    await noOverflow(market);
+    const checkbox=await checkboxes.first().boundingBox();
+    const label=await market.locator('.cmp-label span').first().boundingBox();
+    assert.equal(checkbox.width,16);
+    assert.ok(label.height<25,'Compare text wraps on a profile card');
+  }
+
+  const signup=await context.newPage();
+  await signup.goto(root+'office.html?register=1&testSignup=1');
+  await signup.locator('#email').fill('office-fixture@example.com');
+  await signup.locator('#password').fill('Synthetic-password-2026');
+  for(const id of ['officeTerms','officePrivacyRead','officePrivacyConsent']) await signup.locator('#'+id).check();
+  const signupButton=signup.locator('#signup');
+  await signupButton.click();
+  assert.ok(await signupButton.isDisabled());
+  await signup.getByText('خدمة البريد غير متاحة حاليًا', {exact:false}).waitFor();
+  assert.ok(await signupButton.isEnabled());
+  await noOverflow(signup);
+
   await office.setViewportSize({width:1280,height:800});
   await noOverflow(office);
-  console.log('Office attestation, required checkbox, optional photo, existing profile and public search passed (320px, 390px and desktop).');
+  console.log('Office attestation, required checkbox, optional photo, existing profile, public search, card comparison and signup feedback passed (320px, 390px and desktop).');
   await context.close();
 }finally{
   await browser.close();
