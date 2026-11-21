@@ -17,7 +17,10 @@ window.supabase={createClient:(_url,_key,options)=>{
     display_name:'ملف محفوظ',nationality:'الهند',age:31,status:'available',photo_url:'https://example.com/approved.png',publication_consent_at:null}]));
   const set=rows=>{localStorage.workerFixture=JSON.stringify(rows);};
   const success=data=>({data,error:null});
-  const testingSignup=new URLSearchParams(location.search).has('testSignup');
+  const testParams=new URLSearchParams(location.search);
+  const testingSignup=testParams.has('testSignup');
+  const testingLicense=testParams.has('testLicense');
+  let pendingOffice=null;
   return {
     auth:{
       getUser:async()=>success({user:testingSignup?null:{id:'owner'}}),
@@ -26,14 +29,26 @@ window.supabase={createClient:(_url,_key,options)=>{
         return {data:null,error:{status:500,message:'Error sending confirmation email'}};
       }
     },
-    storage:{from:()=>({upload:async()=>success({}),remove:async()=>success({}),
+    storage:{from:bucket=>({upload:async(path,file,options)=>{
+      if(bucket!=='saahl2-office-licenses')return success({});
+      if(path!==officeId+'/license'||file.type!=='application/pdf'||options.upsert!==false)throw Error('Invalid private license upload');
+      window.licenseUploadAttempts=(window.licenseUploadAttempts||0)+1;
+      if(window.licenseUploadAttempts===1)return {error:{message:'temporary upload failure'}};
+      return success({});
+    },remove:async()=>success({}),
       createSignedUrl:async()=>success({signedUrl:location.origin+'/saahl-logo.png'}),
       download:async()=>success(new Blob(['test'],{type:'image/png'}))
     })},
     from(table){
       let filters={}, needsConsent=false, payload, mode='read';
       const result=()=>{
-        if(table==='offices') return success([office]);
+        if(table==='offices'){
+          if(testingLicense){
+            if(mode==='insert')pendingOffice={id:officeId,...payload};
+            return success(pendingOffice?[pendingOffice]:[]);
+          }
+          return success([office]);
+        }
         if(table!=='workers') return success([]);
         let rows=get();
         if(mode==='insert'){
@@ -162,6 +177,29 @@ try{
   await signup.getByText('خدمة البريد غير متاحة حاليًا', {exact:false}).waitFor();
   assert.ok(await signupButton.isEnabled());
   await noOverflow(signup);
+
+  for(const withFile of [false,true]){
+    const registration=await context.newPage();
+    await registration.goto(root+'office.html?testLicense=1');
+    for(const [id,value] of Object.entries({name:'مكتب تجريبي',license:'TEST-123',licenseIssuer:'جهة تجريبية',phone:'0500000010'})){
+      await registration.locator('#'+id).fill(value);
+    }
+    for(const checkbox of await registration.locator('#officeForm input[type=checkbox]').all())await checkbox.check();
+    assert.ok(await registration.getByLabel('إرفاق نسخة الرخصة (اختياري)',{exact:true}).isVisible());
+    const pdf={name:'license.pdf',mimeType:'application/pdf',buffer:Buffer.from('%PDF-1.4')};
+    if(withFile)await registration.locator('#officeLicenseFile').setInputFiles(pdf);
+    await registration.locator('#saveOffice').click();
+    await registration.getByText('حالة المكتب: بانتظار اعتماد الإدارة',{exact:true}).waitFor();
+    await noOverflow(registration);
+    assert.equal(await registration.evaluate(()=>window.licenseUploadAttempts||0),withFile?1:0);
+    if(withFile){
+      await registration.getByText('تعذّر رفع نسخة الرخصة.',{exact:false}).waitFor();
+      await registration.locator('#pendingLicenseFile').setInputFiles(pdf);
+      await registration.locator('#attachPendingLicense').click();
+      await registration.locator('#pendingLicenseFeedback').getByText('أُرفقت نسخة الرخصة بطلب الاعتماد.').waitFor();
+    }
+    await registration.close();
+  }
 
   const profilePhoto=legacy.getByRole('img',{name:'صورة العاملة'});
   await profilePhoto.scrollIntoViewIfNeeded();

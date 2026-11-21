@@ -483,9 +483,32 @@ function renderOff(data){const w=document.getElementById('off-wrap');w.replaceCh
  const verify=document.createElement('button');
  verify.type='button';verify.className='btn btn-o btn-s';verify.textContent='توثيق الرخصة';verify.onclick=()=>verifyOffice(o.id);
  const instructions=document.createElement('a');instructions.href='legal.html#verification';instructions.textContent='خطوات المطابقة';
- actions.append(info,verify,instructions);
+ const attachment=document.createElement('button');
+ attachment.type='button';attachment.className='btn btn-o btn-s';attachment.textContent='تنزيل نسخة الرخصة';
+ attachment.onclick=()=>downloadOfficeLicense(o.id,attachment);
+ actions.append(info,verify,instructions,attachment);
  for(const [status,label] of [['approved','اعتماد'],['rejected','رفض'],['suspended','إيقاف']]){if(o.status===status)continue;const btn=document.createElement('button');btn.className='btn btn-s '+(status==='approved'?'btn-o':'btn-d');btn.textContent=label;btn.onclick=()=>togOff(o.id,status,o.name);actions.append(btn)}row.append(actions);body.append(row)}table.append(body);const scroll=document.createElement('div');scroll.className='tw';scroll.append(table);w.append(scroll)}
 function filterOffices(){const q=document.getElementById('off-s').value.toLowerCase(),status=document.getElementById('off-st').value;renderOff(aOff.filter(o=>(!q||o.name.toLowerCase().includes(q))&&(!status||(status==='active'?o.status==='approved':status==='pending'?o.status==='pending':o.status===status))))}
+async function downloadOfficeLicense(id,button){
+ button.disabled=true;
+ try{
+  const {data,error}=await db.storage.from('saahl2-office-licenses').download(id+'/license');
+  if(error){
+   if(Number(error.statusCode||error.status)===404||error.error==='not_found'){toast('لم تُرفق نسخة رخصة بهذا الطلب.');return;}
+   throw error;
+  }
+  const extension={'application/pdf':'pdf','image/jpeg':'jpg','image/png':'png'}[data.type];
+  const url=URL.createObjectURL(data);
+  const link=document.createElement('a');
+  link.href=url;link.download='office-license-'+id+(extension?'.'+extension:'');
+  document.body.append(link);link.click();link.remove();
+  setTimeout(()=>URL.revokeObjectURL(url),30000);
+ }catch{
+  toast('تعذّر تنزيل نسخة الرخصة. حاول مجددًا.');
+ }finally{
+  button.disabled=false;
+ }
+}
 async function verifyOffice(id){
  const office=aOff.find(item=>item.id===id);
  if(!office)return;
