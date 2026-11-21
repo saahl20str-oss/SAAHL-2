@@ -352,7 +352,16 @@ select.inp{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.
 
 #kafalaAgree label{display:flex;gap:8px;align-items:flex-start;margin:12px 0;line-height:1.65}
 #kafalaAgree input{width:18px;height:18px;flex:none}
-.dm-contact a{display:block;background:#f8efdc;color:#2d251a;text-align:center;border-radius:9px;padding:11px;margin:8px 0;font-weight:800}
+#listingsGrid .poster-top.no-photo{grid-template-columns:minmax(0,1fr)}
+#listingsGrid .poster-top img,.dm-avatar img{width:100%;height:100%;object-fit:cover}
+.dm-avatar{overflow:hidden}
+.dm-contact .dm-contact-btn{background:#f8efdc;color:#2d251a;margin:0}
+.dm-contact form{display:grid;gap:8px;color:#fff}
+.dm-contact form[hidden],.dm-contact button[hidden]{display:none}
+.dm-contact label,.dm-contact p{font-size:13px}
+.dm-contact textarea{resize:vertical}
+.dm-contact .inp{font-size:16px}
+#dm-contact-status:empty{display:none}
 .terms-card a{text-decoration:underline}
 </style>
 <style>#page-form [hidden],#page-manage [hidden]{display:none!important}input[type="number" inputmode="numeric"],input[type="tel"],.pay-total-amt,#adNum{font-variant-numeric:lining-nums;direction:ltr;unicode-bidi:plaintext}</style>
@@ -495,7 +504,7 @@ select.inp{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.
       <div class="fcard">
         <div class="fcard-head">
           <div class="fcard-title">الصورة الشخصية</div>
-          <div class="fcard-sub">صورة واضحة تزيد من فرص التواصل</div>
+          <div class="fcard-sub">تبقى الصورة خاصة إلى أن تُسجَّل الموافقة على نشرها وتعتمدها الإدارة</div>
         </div>
         <div class="fcard-body">
           <div class="photo-upload">
@@ -663,7 +672,7 @@ select.inp{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.
           </div>
           <div class="terms-card" id="kafalaTerms">
             <h4>إقرارات الإعلان</h4>
-            <p>الإعلان للبحث والتواصل فقط. يحتفظ المعلن بإثبات صفته وموافقة العامل، ويقدمهما للإدارة عبر قناة آمنة عند الطلب. لا ترفع هويات أو تصاريح في هذا النموذج. لا تظهر الصورة أو الاسم أو الهاتف في القائمة العامة.</p>
+            <p>الإعلان للبحث والتواصل فقط. يحتفظ المعلن بإثبات صفته وموافقة العامل، ويقدمهما للإدارة عبر قناة آمنة عند الطلب. لا ترفع هويات أو تصاريح في هذا النموذج. يظهر الإعلان برقم مرجعي. يبقى الاسم والهاتف خاصّين.</p>
             <p><a href="legal.html#worker-consent">موافقة العامل</a> · <a href="legal.html#ads">سياسة الإعلانات</a> · <a href="legal.html#sponsors">شروط الكفيل</a> · <a href="legal.html#privacy">الخصوصية</a></p>
             <div id="kafalaAgree">
               <label><input type="checkbox" id="agreeWorker"> حصلت على موافقة العامل المستقلة والطوعية على نشر البيانات المحددة ولم أوافق نيابة عنه.</label>
@@ -673,6 +682,12 @@ select.inp{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.
               <label><input type="checkbox" id="agreePrivacy"> قرأت سياسة الخصوصية وأوافق على معالجة بيانات هذا الطلب للغرض الموضح فيها.</label>
             </div>
           </div>
+          <fieldset class="fcard" style="padding:14px;margin:14px 0;min-width:0">
+            <legend>موافقة العامل على العرض العام (اختياري)</legend>
+            <p>فعّل فقط ما وافق العامل على نشره خلال مدة الإعلان. احتفظ بإثبات موافقته وقدّمه للإدارة عند الطلب.</p>
+            <label style="display:block;margin-top:8px"><input type="checkbox" id="publishWorkerPhoto"> وافق العامل على نشر صورته.</label>
+            <label style="display:block;margin-top:8px"><input type="checkbox" id="publishWorkerDetails"> وافق العامل على نشر جنسيته ومهاراته.</label>
+          </fieldset>
           <div id="kafalaPinFields" style="margin:16px 0">
             <h4>حماية إعلانك</h4>
             <div style="padding:14px;margin:10px 0;background:#fdf5de;border:1px solid #ead9a8;border-radius:12px">
@@ -749,9 +764,16 @@ select.inp{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.
       <div class="dm-sec-title">البيانات التفصيلية</div>
       <div class="dm-grid" id="dm-grid"></div>
       <div class="dm-contact">
-        <div class="dm-contact-lbl">خدمات الإعلان</div>
-        <a id="dm-contact-link" href="legal.html#contact">إرسال طلب تواصل</a>
-        <a id="dm-report-link" href="legal.html#contact">الإبلاغ عن الإعلان</a>
+        <button type="button" class="dm-contact-btn" id="dm-contact-toggle" aria-expanded="false" aria-controls="dm-contact-form">إرسال طلب تواصل</button>
+        <form id="dm-contact-form" hidden>
+          <p>يصل الطلب إلى إدارة ساهل-2 مع مرجع الإعلان وبريدك للرد.</p>
+          <label for="dm-contact-email">بريدك الإلكتروني</label>
+          <input class="inp" id="dm-contact-email" type="email" autocomplete="email" dir="ltr" maxlength="254" required>
+          <label for="dm-contact-message">رسالتك</label>
+          <textarea class="inp" id="dm-contact-message" rows="3" minlength="10" maxlength="1500" required></textarea>
+          <button class="dm-contact-btn" type="submit">إرسال الطلب</button>
+        </form>
+        <p id="dm-contact-status" role="status" tabindex="-1" style="color:#fff;overflow-wrap:anywhere"></p>
       </div>
       <div class="dm-expiry-note" id="dm-expiry"></div>
     </div>
@@ -778,12 +800,14 @@ async function loadListings() {
   const grid = document.getElementById('listingsGrid');
   grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:60px 20px;color:var(--muted)">جاري تحميل الإعلانات...</div>';
   try {
-    const {data,error} = await _db.rpc('saahl2_public_transfers');
+    const {data,error} = await _db.rpc('saahl2_public_transfer_profiles');
     if (error) throw error;
     listings = (data || []).map(row => ({
       id:row.id, name:'إعلان ' + row.id.slice(0,8).toUpperCase(),
       prof:row.profession || '', age:row.age, exp:row.experience_years || 0,
       emirate:row.emirate || '', salary:row.monthly_salary,
+      nationality:row.nationality || '', skills:Array.isArray(row.skills) ? row.skills : [],
+      photo:safeKafalaImageUrl(row.worker_photo_url),
       expiry:formatArabicDate(row.ends_at),
       daysLeft:Math.max(0, Math.ceil((new Date(row.ends_at) - Date.now()) / 86400000))
     }));
@@ -832,23 +856,25 @@ function renderListings(list) {
     const hash=Array.from(String(l.id)).reduce((acc,ch)=>((acc*31+ch.charCodeAt(0))>>>0),0);
     const color=palettes[hash%palettes.length];
 
-    const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    const esc=kafalaEscape;
     return `
     <article class="lcard transfer-poster" style="--poster:${color}">
-      <div class="poster-top">
+      <div class="poster-top${l.photo?'':' no-photo'}">
+        ${l.photo ? `<div class="poster-photo"><img src="${esc(l.photo)}" alt="صورة العامل" loading="lazy"></div>` : ''}
         <div class="poster-info">
           <div class="poster-heading">${esc(l.name)}</div>
           <div class="poster-sub">${esc(l.emirate)} · ${esc(l.age)} سنة</div>
-          <div class="poster-sub">${esc(l.prof)}</div>
+          <div class="poster-sub">${esc(l.prof)}${l.nationality?' · '+esc(l.nationality):''}</div>
           <div class="poster-salary">الراتب الشهري: <strong>${l.salary!=null?Number(l.salary).toLocaleString('en-AE')+' درهم':'غير محدد'}</strong></div>
         </div>
       </div>
       <button type="button" class="poster-toggle" aria-expanded="false" onclick="toggleTransferCard(this)">عرض التفاصيل <span aria-hidden="true">⌄</span></button>
       <div class="poster-details" hidden>
         <div class="poster-detail"><b>الخبرة</b><span>${esc(l.exp)} سنوات</span></div>
-        <div class="poster-detail wide"><b>الإمارة</b><span>${esc(l.emirate||'غير محددة')}</span></div>
+        ${l.nationality?`<div class="poster-detail"><b>الجنسية</b><span>${esc(l.nationality)}</span></div>`:''}
+        ${l.skills.length?`<div class="poster-detail wide"><b>المهارات</b><span>${esc(l.skills.join('، '))}</span></div>`:''}
         <div class="poster-expiry">ينتهي الإعلان: ${esc(l.expiry)}</div>
-        <button type="button" class="lcard-btn" onclick="openDetail('${esc(l.id)}')">التواصل أو الإبلاغ</button>
+        <button type="button" class="lcard-btn" onclick="openDetail('${esc(l.id)}')">التواصل بشأن الإعلان</button>
       </div>
     </article>`;
   }).join('');
@@ -871,7 +897,16 @@ function openDetail(id) {
   const l = listings.find(x => x.id === id);
   if (!l) return;
   currentDetail = l;
-  document.getElementById('dm-avatar').textContent = 'ع';
+  const avatar = document.getElementById('dm-avatar');
+  avatar.replaceChildren();
+  if (l.photo) {
+    const image = document.createElement('img');
+    image.src = l.photo;
+    image.alt = 'صورة العامل';
+    avatar.append(image);
+  } else {
+    avatar.textContent = 'ع';
+  }
   document.getElementById('dm-name').textContent = l.name;
   document.getElementById('dm-tags').innerHTML = [l.prof, l.emirate].map(t=>`<span class="dm-tag">${kafalaEscape(t)}</span>`).join('');
   document.getElementById('dm-grid').innerHTML = [
@@ -879,9 +914,10 @@ function openDetail(id) {
     {lb:'المهنة',v:l.prof},{lb:'سنوات الخبرة',v:l.exp+' سنوات'},
     {lb:'الراتب الشهري',v:l.salary!=null?Number(l.salary).toLocaleString('en-AE')+' درهم':'غير محدد'},
     {lb:'الإمارة',v:l.emirate},
+    ...(l.nationality ? [{lb:'الجنسية',v:l.nationality}] : []),
+    ...(l.skills.length ? [{lb:'المهارات',v:l.skills.join('، ')}] : []),
   ].map(i=>`<div class="dm-item"><div class="dm-item-lbl">${i.lb}</div><div class="dm-item-val">${kafalaEscape(i.v)}</div></div>`).join('');
-  document.getElementById('dm-contact-link').href = 'legal.html?kind=transfer_contact&ad='+encodeURIComponent(l.id)+'#contact';
-  document.getElementById('dm-report-link').href = 'legal.html?kind=transfer_report&ad='+encodeURIComponent(l.id)+'#contact';
+  resetTransferContact();
   document.getElementById('dm-expiry').textContent = `ينتهي الإعلان: ${l.expiry} — متبقي ${l.daysLeft} يوم`;
   document.getElementById('detailOv').classList.add('open');
   document.body.style.overflow = 'hidden';
@@ -889,10 +925,67 @@ function openDetail(id) {
 
 function closeDetail(e) {
   if (!e || e.target === document.getElementById('detailOv')) {
+    currentDetail = null;
     document.getElementById('detailOv').classList.remove('open');
     document.body.style.overflow = '';
   }
 }
+
+const contactForm = document.getElementById('dm-contact-form');
+const contactToggle = document.getElementById('dm-contact-toggle');
+const contactStatus = document.getElementById('dm-contact-status');
+const contactSubmit = contactForm.querySelector('button');
+let contactView = 0;
+
+function resetTransferContact() {
+  contactView++;
+  contactForm.reset();
+  contactForm.hidden = true;
+  contactSubmit.disabled = false;
+  contactToggle.hidden = false;
+  contactToggle.setAttribute('aria-expanded','false');
+  contactStatus.textContent = '';
+}
+
+contactToggle.addEventListener('click', () => {
+  contactToggle.hidden = true;
+  contactToggle.setAttribute('aria-expanded','true');
+  contactForm.hidden = false;
+  document.getElementById('dm-contact-email').focus();
+});
+
+contactForm.addEventListener('submit', async event => {
+  event.preventDefault();
+  if (!currentDetail || contactSubmit.disabled) return;
+  const message = document.getElementById('dm-contact-message').value.trim();
+  if (message.length < 10) {
+    contactStatus.textContent = 'أدخل رسالة من 10 أحرف على الأقل.';
+    return;
+  }
+  const view = contactView;
+  contactSubmit.disabled = true;
+  contactStatus.textContent = 'جارٍ الإرسال…';
+  try {
+    const {data,error} = await _db.rpc('saahl2_send_request', {
+      p_kind:'transfer_contact',p_ad:currentDetail.id,
+      p_email:document.getElementById('dm-contact-email').value.trim(),p_message:message
+    });
+    if (error) throw error;
+    if (view !== contactView || !currentDetail) return;
+    contactForm.hidden = true;
+    contactForm.reset();
+    contactStatus.textContent = 'استلمت إدارة ساهل-2 طلبك. رقم الطلب ' + data;
+  } catch (error) {
+    if (view !== contactView || !currentDetail) return;
+    contactStatus.textContent = error.code === 'P4290' ? 'انتظر قليلًا قبل إرسال طلب جديد.'
+      : 'تعذّر إرسال الطلب. تحقق من الاتصال ومن أن الإعلان ما زال معروضًا، ثم حاول مرة أخرى.';
+  } finally {
+    if (view === contactView && currentDetail) {
+      contactSubmit.disabled = false;
+      contactStatus.focus();
+    }
+  }
+});
 
 // ===== FORM =====
 function showPage(name) {
@@ -914,6 +1007,7 @@ function previewPhoto(input) {
   if (!file) return;
   if (!['image/jpeg','image/png','image/webp'].includes(file.type) || file.size > 5*1024*1024) { alert('اختر صورة JPG أو PNG أو WEBP بحجم لا يتجاوز 5MB'); input.value=''; return; }
   selectedPhotoFile = file;
+  document.getElementById('publishWorkerPhoto').checked = false;
   const reader = new FileReader();
   reader.onload = e => { if (selectedPhotoFile === file) showKafalaPhoto(e.target.result); };
   reader.readAsDataURL(file);
@@ -976,6 +1070,6 @@ loadListings();
 function toEnglishDigits(v){return String(v).replace(/[٠-٩۰-۹]/g,c=>String('٠١٢٣٤٥٦٧٨٩'.indexOf(c)>=0?'٠١٢٣٤٥٦٧٨٩'.indexOf(c):'۰۱۲۳۴۵۶۷۸۹'.indexOf(c)));}
 document.querySelectorAll('input,textarea').forEach(el=>{el.addEventListener('input',()=>{if(el.type!=='file'&&el.type!=='checkbox'){const next=toEnglishDigits(el.value);if(next!==el.value)el.value=next;}})});
 </script>
-<script src="kafala-owner.js?v=4"></script>
+<script src="kafala-owner.js?v=5"></script>
 </body>
 </html>

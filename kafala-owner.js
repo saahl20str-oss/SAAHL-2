@@ -139,6 +139,8 @@
     selectedPhotoFile = null;
     el('page-form').querySelector('input[type=file]').value = '';
     showKafalaPhoto(safeKafalaImageUrl(values.worker_photo_url));
+    el('publishWorkerPhoto').checked = values.publish_worker_photo === true;
+    el('publishWorkerDetails').checked = values.publish_worker_details === true;
   }
 
   async function readPhoto() {
@@ -183,6 +185,12 @@
       values[key] = ['age', 'experience_years', 'monthly_salary'].includes(key) ? (raw === '' ? null : Number(raw)) : raw || null;
     }
     values.skills = collectSkills();
+    values.publish_worker_photo = el('publishWorkerPhoto').checked;
+    values.publish_worker_details = el('publishWorkerDetails').checked;
+    if (values.publish_worker_photo && !selectedPhotoFile
+        && !safeKafalaImageUrl(owner?.data?.fields?.worker_photo_url).startsWith('data:image/')) {
+      throw new Error('أرفق صورة العامل لتفعيل نشرها، أو اترك خيار نشر الصورة غير محدد.');
+    }
     if (selectedPhotoFile) values.worker_photo_url = await readPhoto();
     return values;
   }
