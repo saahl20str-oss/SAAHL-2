@@ -127,6 +127,12 @@ try {
        animation.play();
        return outcome;
      });
+     const logoDivider=await page.locator('.saahl-ad-rail').evaluate(rail=>
+       [...rail.children].every(item=>{
+         const logo=getComputedStyle(item,'::after');
+         return logo.content==='""' && logo.backgroundImage.includes('/saahl-logo.png') && logo.width==='23px';
+       })
+     );
      const single=(await page.locator('#saahl-ad-next').isHidden()) &&
        (await page.locator('#saahl-ad-meta').textContent()).includes('كينيا');
      await details.click();
@@ -140,9 +146,9 @@ try {
        await page.locator('#adDetailOverlay').waitFor({state:'hidden',timeout:5000});
      }
      checks++;
-     const pass=motion&&single&&profileOpened&&onePage;
+     const pass=motion&&logoDivider&&single&&profileOpened&&onePage;
      if(!pass)fails++;
-     console.log(JSON.stringify({width,adStrip:{motion,single,profileOpened,onePage,pass}}));
+     console.log(JSON.stringify({width,adStrip:{motion,logoDivider,single,profileOpened,onePage,pass}}));
    }finally{await ctx.close();}
  }
  for(const asset of ['saahl-pwa-192.png','saahl-pwa-512.png','apple-touch-icon.png']){

@@ -727,7 +727,11 @@ body{padding-top:calc(var(--nav-height) + var(--strip-height))}
 .saahl-ad-copy{min-width:0;display:flex;align-items:center;gap:8px 11px}
 .saahl-ad-viewport{flex:1;min-width:0;overflow:hidden;white-space:nowrap;container-type:inline-size;direction:ltr}
 .saahl-ad-rail{display:flex;width:max-content;direction:ltr}
-.saahl-ad-message{flex:none;min-width:100cqw;padding-right:clamp(28px,6vw,80px);direction:rtl;text-align:left}
+.saahl-ad-message{position:relative;flex:none;min-width:100cqw;padding-right:clamp(36px,6vw,80px);direction:rtl;text-align:left}
+#ad-strip[data-active] .saahl-ad-message::after{
+ content:"";position:absolute;right:6px;top:50%;transform:translateY(-50%);
+ width:23px;height:29px;border-radius:5px;background:#fefefe url("./saahl-logo.png") center/16px auto no-repeat;
+}
 .saahl-ad-repeat{display:none}
 #ad-strip[data-active] .saahl-ad-repeat{display:block}
 #ad-strip[data-active] .saahl-ad-rail{animation:saahl-ad-marquee var(--ad-duration,20s) linear infinite}
@@ -738,7 +742,7 @@ body{padding-top:calc(var(--nav-height) + var(--strip-height))}
 #ad-strip:not([data-active]) .saahl-ad-message{width:100cqw;padding:0;text-align:start}
 @media(prefers-reduced-motion:reduce){
  #ad-strip[data-active] .saahl-ad-rail{animation:none}
- #ad-strip[data-active] .saahl-ad-repeat{display:none}
+ #ad-strip[data-active] .saahl-ad-repeat,#ad-strip[data-active] .saahl-ad-message::after{display:none}
  #ad-strip[data-active] .saahl-ad-message{width:100cqw;padding:0;text-align:start}
  #ad-strip[data-active] .saahl-ad-title,#ad-strip[data-active] .saahl-ad-meta{overflow:hidden;text-overflow:ellipsis}
 }
