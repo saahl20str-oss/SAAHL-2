@@ -81,7 +81,7 @@ try {
    console.log(JSON.stringify({width,workerPreview:{...good,closed}}));
    await ctx.close();
  }
- // A lone live ad still moves, and the profile uses the current tab.
+ // Published ads share one marquee; every button opens its own details.
  const stripOrigin='http://127.0.0.1:8765';
  const workerId='87654321-4321-4321-4321-123456789abc';
  const officeId='12345678-4321-4321-4321-123456789abc';
@@ -90,9 +90,11 @@ try {
  const worker={id:workerId,office_id:officeId,offices:office,display_name:'عاملة تجريبية',nationality:'كينيا'};
  const ad={id:workerId,placement:'strip',ad_topic:'عاملة متاحة: W-77',advertiser_name:'مكتب تجريبي',
    ad_details:'الجنسية: كينيا | رابط العاملة: '+profileUrl};
+ const otherAd={id:officeId,placement:'strip',ad_topic:'خدمات مكتب ثانٍ',
+   advertiser_name:'مكتب ثانٍ',ad_details:'تفاصيل الإعلان الثاني',whatsapp:'0501234567'};
  const stripSdk=`window.supabase={createClient:()=>({from:table=>({
    select(){return this},in(){return this},eq(){return this},not(){return this},order(){return this},
-   limit:async()=>({data:({strip_ads:[${JSON.stringify(ad)}],offices:[${JSON.stringify(office)}],workers:[${JSON.stringify(worker)}]})[table]||[]})
+   limit:async()=>({data:({strip_ads:${JSON.stringify([ad,otherAd])},offices:[${JSON.stringify(office)}],workers:[${JSON.stringify(worker)}]})[table]||[]})
  })})};`;
  for(const width of [320,1280]){
    const ctx=await browser.newContext({viewport:{width,height:844},reducedMotion:'no-preference'});
@@ -101,41 +103,37 @@ try {
      await ctx.route(/supabase-js@2/,route=>route.fulfill({contentType:'application/javascript',body:stripSdk}));
      const page=await ctx.newPage();
      await page.goto(stripOrigin+'/index.html');
-     const details=page.getByRole('button',{name:'عرض التفاصيل',exact:true});
-     await details.waitFor();
+     const first=page.getByRole('button',{name:'عرض التفاصيل — مكتب تجريبي',exact:true});
+     await first.waitFor();
      const motion=await page.locator('.saahl-ad-rail').evaluate(async rail=>{
        const animation=rail.getAnimations().find(item=>item.animationName==='saahl-ad-marquee');
        if(!animation)return false;
        animation.pause();
        await animation.ready;
        const duration=animation.effect.getComputedTiming().duration;
-       const details=document.getElementById('saahl-ad-open');
-       const bounds=rail.parentElement.getBoundingClientRect();
        const [original,repeat]=rail.children;
        const x=time=>{animation.currentTime=time;return rail.getBoundingClientRect().x;};
        const start=x(0);
-       const buttonStart=details.getBoundingClientRect().x;
-       const repeatStart=repeat.getBoundingClientRect().left;
        const quarter=x(duration/4);
        const middle=x(duration/2);
        const final=x(duration-10);
-       const originalEnd=original.getBoundingClientRect().left;
-       const outcome=quarter>start+5 && middle>quarter+5 && final>middle+5 &&
+       return quarter>start+5 && middle>quarter+5 && final>middle+5 &&
          Math.abs((quarter-start)/(duration/4000)-40)<2 &&
-         Math.abs(repeatStart-bounds.left)<2 && Math.abs(originalEnd-repeatStart)<2 &&
-         details.getBoundingClientRect().x===buttonStart;
-       animation.play();
-       return outcome;
+         original.children.length===4 && repeat.children.length===4;
      });
-     const logoDivider=await page.locator('.saahl-ad-rail').evaluate(rail=>
-       [...rail.children].every(item=>{
-         const logo=getComputedStyle(item,'::after');
-         return logo.content==='""' && logo.backgroundImage.includes('/saahl-logo.png') && logo.width==='23px';
-       })
-     );
-     const single=(await page.locator('#saahl-ad-next').isHidden()) &&
-       (await page.locator('#saahl-ad-meta').textContent()).includes('كينيا');
-     await details.click();
+     const dividers=page.locator('.saahl-ad-group:not([aria-hidden]) .saahl-ad-divider');
+     const logoDivider=await dividers.count()===2 &&
+       await dividers.first().evaluate(node=>getComputedStyle(node).backgroundImage.includes('/saahl-logo.png'));
+     const noArrows=await page.locator('#saahl-ad-prev,#saahl-ad-next').count()===0;
+     await page.emulateMedia({reducedMotion:'reduce'});
+     await page.getByRole('button',{name:'عرض التفاصيل — خدمات مكتب ثانٍ'}).click();
+     const dialog=page.locator('#adDetailOverlay');
+     const secondCorrect=(await dialog.textContent()).includes('تفاصيل الإعلان الثاني') &&
+       (await dialog.getByRole('link',{name:'تواصل عبر واتساب'}).getAttribute('href')).includes('971501234567');
+     await page.getByRole('button',{name:'إغلاق',exact:true}).click();
+     await first.click();
+     const firstCorrect=(await dialog.textContent()).includes('الجنسية: كينيا') &&
+       !(await dialog.textContent()).includes('تفاصيل الإعلان الثاني');
      const link=page.getByRole('link',{name:'عرض ملف العاملة'});
      const sameTarget=await link.getAttribute('target')==='_self';
      if(sameTarget)await Promise.all([page.waitForURL(profileUrl),link.click()]);
@@ -146,9 +144,9 @@ try {
        await page.locator('#adDetailOverlay').waitFor({state:'hidden',timeout:5000});
      }
      checks++;
-     const pass=motion&&logoDivider&&single&&profileOpened&&onePage;
+     const pass=motion&&logoDivider&&noArrows&&firstCorrect&&secondCorrect&&profileOpened&&onePage;
      if(!pass)fails++;
-     console.log(JSON.stringify({width,adStrip:{motion,logoDivider,single,profileOpened,onePage,pass}}));
+     console.log(JSON.stringify({width,adStrip:{motion,logoDivider,noArrows,firstCorrect,secondCorrect,profileOpened,onePage,pass}}));
    }finally{await ctx.close();}
  }
  for(const asset of ['saahl-pwa-192.png','saahl-pwa-512.png','apple-touch-icon.png']){

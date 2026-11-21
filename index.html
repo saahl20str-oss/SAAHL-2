@@ -723,68 +723,48 @@ footer{
 <style>
 body{padding-top:calc(var(--nav-height) + var(--strip-height))}
 #ad-strip{position:fixed;top:var(--nav-height);inset-inline:0;z-index:490;background:#16171c;color:#fff;border-bottom:1px solid #c9a84c}
-.saahl-ad-inner{display:grid;grid-template-columns:minmax(0,1fr) auto auto;align-items:center;gap:8px 12px;max-width:1440px;margin:auto;padding:7px max(12px,3vw)}
-.saahl-ad-copy{min-width:0;display:flex;align-items:center;gap:8px 11px}
-.saahl-ad-viewport{flex:1;min-width:0;overflow:hidden;white-space:nowrap;container-type:inline-size;direction:ltr}
-.saahl-ad-rail{display:flex;width:max-content;direction:ltr}
-.saahl-ad-message{position:relative;flex:none;min-width:100cqw;padding-right:clamp(36px,6vw,80px);direction:rtl;text-align:left}
-#ad-strip[data-active] .saahl-ad-message::after{
- content:"";position:absolute;right:6px;top:50%;transform:translateY(-50%);
- width:23px;height:29px;border-radius:5px;background:#fefefe url("./saahl-logo.png") center/16px auto no-repeat;
-}
-.saahl-ad-repeat{display:none}
-#ad-strip[data-active] .saahl-ad-repeat{display:block}
+.saahl-ad-inner{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:10px;max-width:1440px;margin:auto;padding:7px max(10px,2vw)}
+.saahl-ad-viewport{min-width:0;overflow:hidden;container-type:inline-size;direction:ltr}
+.saahl-ad-rail,.saahl-ad-group{display:flex;width:max-content;align-items:center;direction:ltr}
+.saahl-ad-group{min-width:100cqw;flex:none}
+.saahl-ad-entry{min-width:min(100cqw,360px);max-width:min(100cqw,540px);flex:0 0 auto;display:flex;align-items:center;gap:8px;padding-inline:9px;direction:rtl}
+.saahl-ad-copy{min-width:0;flex:1}
+.saahl-ad-title,.saahl-ad-meta{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.saahl-ad-title{font-size:14px;line-height:1.45;color:#fff6e5}
+.saahl-ad-meta{color:#e0d9cb;font-size:12px}
+.saahl-ad-divider{flex:none;width:23px;height:29px;margin-inline:8px;border-radius:5px;background:#fefefe url("./saahl-logo.png") center/16px auto no-repeat}
 #ad-strip[data-active] .saahl-ad-rail{animation:saahl-ad-marquee var(--ad-duration,20s) linear infinite}
-@keyframes saahl-ad-marquee{
-  from{transform:translateX(-50%)}
-  to{transform:translateX(0)}
-}
-#ad-strip:not([data-active]) .saahl-ad-message{width:100cqw;padding:0;text-align:start}
+#ad-strip[data-active] .saahl-ad-rail:has(button:hover,button:focus){animation-play-state:paused}
+@keyframes saahl-ad-marquee{from{transform:translateX(-50%)}to{transform:translateX(0)}}
 @media(prefers-reduced-motion:reduce){
- #ad-strip[data-active] .saahl-ad-rail{animation:none}
- #ad-strip[data-active] .saahl-ad-repeat,#ad-strip[data-active] .saahl-ad-message::after{display:none}
- #ad-strip[data-active] .saahl-ad-message{width:100cqw;padding:0;text-align:start}
- #ad-strip[data-active] .saahl-ad-title,#ad-strip[data-active] .saahl-ad-meta{overflow:hidden;text-overflow:ellipsis}
+ #ad-strip[data-active] .saahl-ad-rail{animation:none;width:100cqw}
+ .saahl-ad-group[aria-hidden="true"]{display:none}
+ .saahl-ad-viewport{overflow-x:auto;direction:ltr;scrollbar-width:thin}
 }
-.saahl-ad-tag{flex:none;border-radius:6px;background:#3c331f;color:#f4d481;padding:3px 8px;font-size:11px;font-weight:800}
-.saahl-ad-title{display:block;font-size:15px;line-height:1.4}
-.saahl-ad-meta{display:block;color:#e0d9cb;font-size:12px}
-.saahl-ad-actions{display:flex;align-items:center;gap:5px}
-.saahl-ad-actions button,.saahl-ad-cta{min-height:36px;border:1px solid #a7823b;border-radius:7px;padding:4px 10px;font:inherit;font-size:12px;font-weight:800;color:#ffe3a1;background:transparent;cursor:pointer;white-space:nowrap}
-.saahl-ad-actions button:hover,.saahl-ad-cta:hover{border-color:#ffe3a1}
-.saahl-ad-actions .saahl-ad-arrow{min-width:34px;padding-inline:5px;font-size:16px}
+.saahl-ad-detail-button,.saahl-ad-cta{min-height:36px;border:1px solid #a7823b;border-radius:7px;padding:4px 9px;font:inherit;font-size:12px;font-weight:800;color:#ffe3a1;background:transparent;cursor:pointer;white-space:nowrap}
+.saahl-ad-detail-button:hover,.saahl-ad-cta:hover{border-color:#ffe3a1}
 .saahl-ad-cta{display:inline-flex;align-items:center;justify-content:center;background:#d3b25c;color:#17140e;text-decoration:none}
-#ad-strip [hidden]{display:none}
+.saahl-ad-placeholder{direction:rtl;text-align:right;font-size:13px;min-width:100cqw}
 #adDetailOverlay{position:fixed;inset:0;width:min(500px,calc(100% - 26px));max-height:85vh;overflow:auto;margin:auto;padding:22px;border:1px solid #e8ddc4;border-radius:16px;color:#23211b;background:#fff;text-align:right;direction:rtl}
 #adDetailOverlay::backdrop{background:#141215aa}
 #adDetailOverlay h2{font-size:22px;margin:10px 0}
 #adDetailOverlay p{white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.8;margin-block:12px}
 #adDetailOverlay a,#closeSaahlAd{display:inline-block;border:0;border-radius:8px;padding:9px 13px;margin:4px 0 4px 5px;background:#e9d8ad;color:#2c2311;font:inherit;font-weight:800;text-decoration:none;cursor:pointer}
 @media(max-width:700px){
- :root{--strip-height:95px}
- .saahl-ad-inner{grid-template-columns:minmax(0,1fr) auto;gap:4px 8px;padding:7px 10px}
- .saahl-ad-copy{grid-column:1/-1;gap:6px;align-items:flex-start;flex-wrap:wrap}
- .saahl-ad-title{font-size:14px}
+ :root{--strip-height:57px}
+ .saahl-ad-inner{padding:6px 8px;gap:5px}
+ .saahl-ad-entry{padding-inline:5px;gap:5px}
+ .saahl-ad-title{font-size:13px}
  .saahl-ad-meta{font-size:11px}
- .saahl-ad-cta{grid-column:2}
- .saahl-ad-actions button,.saahl-ad-cta{min-height:42px}
+ .saahl-ad-detail-button,.saahl-ad-cta{min-height:42px;padding-inline:6px;font-size:11px}
 }
 </style>
 <section id="ad-strip" aria-label="إعلانات ساهل 2">
  <div class="saahl-ad-inner">
-  <div class="saahl-ad-copy">
-   <span class="saahl-ad-tag" id="saahl-ad-type">إعلانات ساهل 2</span>
-   <div class="saahl-ad-viewport">
-    <div class="saahl-ad-rail">
-     <p class="saahl-ad-message"><strong class="saahl-ad-title" id="saahl-ad-title">روّج لخدمات مكتبك</strong><span class="saahl-ad-meta" id="saahl-ad-meta" hidden></span></p>
-     <p class="saahl-ad-message saahl-ad-repeat" aria-hidden="true"><strong class="saahl-ad-title"></strong><span class="saahl-ad-meta" hidden></span></p>
-    </div>
+  <div class="saahl-ad-viewport">
+   <div class="saahl-ad-rail">
+    <p class="saahl-ad-placeholder">روّج لخدمات مكتبك</p>
    </div>
-  </div>
-  <div class="saahl-ad-actions">
-   <button type="button" class="saahl-ad-arrow" id="saahl-ad-prev" aria-label="الإعلان السابق" hidden>›</button>
-   <button type="button" id="saahl-ad-open" hidden>عرض التفاصيل</button>
-   <button type="button" class="saahl-ad-arrow" id="saahl-ad-next" aria-label="الإعلان التالي" hidden>‹</button>
   </div>
   <a class="saahl-ad-cta" href="advertise.html">أعلن هنا</a>
  </div>
@@ -882,53 +862,68 @@ function saahlAdRemaining(ad){
  const mins=Math.ceil(ms/60000);
  return mins>=1440?'متبقٍ '+Math.ceil(mins/1440)+' يوم':mins>=60?'متبقٍ '+Math.floor(mins/60)+' ساعة'+(mins%60?' و'+mins%60+' دقيقة':''):'متبقٍ '+mins+' دقيقة';
 }
-let stripAds=[], stripIndex=0;
-function renderSaahlStrip(index=stripIndex){
- const count=stripAds.length;
- stripIndex=count ? (index+count)%count : 0;
- const ad=stripAds[stripIndex], copy=ad ? getSaahlAdCopy(ad) : null;
- const get=id=>document.getElementById('saahl-ad-'+id);
- get('type').textContent=copy?.worker?'عاملة متاحة للاستقدام':copy?.type || 'إعلانات ساهل 2';
- get('title').textContent=copy?.headline || 'روّج لخدمات مكتبك';
- get('title').title=get('title').textContent;
- const meta=copy ? [...copy.meta,saahlAdRemaining(ad)].filter(Boolean).join(' · ') : '';
- get('meta').textContent=meta;
- get('meta').hidden=!meta;
- const repeat=document.querySelector('.saahl-ad-repeat');
- repeat.querySelector('.saahl-ad-title').textContent=get('title').textContent;
- const repeatMeta=repeat.querySelector('.saahl-ad-meta');
- repeatMeta.textContent=meta;
- repeatMeta.hidden=!meta;
- get('prev').hidden=get('next').hidden=count<2;
- get('open').hidden=!ad;
- document.getElementById('ad-strip').toggleAttribute('data-active',Boolean(ad));
+let stripAds=[];
+function renderSaahlStrip(){
+ const strip=document.getElementById('ad-strip');
+ const rail=strip.querySelector('.saahl-ad-rail');
+ strip.toggleAttribute('data-active',stripAds.length>0);
+ rail.replaceChildren();
+ if(!stripAds.length){
+  const message=document.createElement('p');
+  message.className='saahl-ad-placeholder';
+  message.textContent='روّج لخدمات مكتبك';
+  rail.append(message);
+ }else{
+  for(const duplicate of [false,true]){
+   const group=document.createElement('div');
+   group.className='saahl-ad-group';
+   if(duplicate)group.setAttribute('aria-hidden','true');
+   for(const ad of stripAds){
+    const copy=getSaahlAdCopy(ad);
+    const entry=document.createElement('div');
+    entry.className='saahl-ad-entry';
+    const content=document.createElement('div');
+    content.className='saahl-ad-copy';
+    const title=document.createElement('strong');
+    title.className='saahl-ad-title';
+    title.textContent=copy.headline;
+    title.title=copy.headline;
+    const meta=document.createElement('span');
+    meta.className='saahl-ad-meta';
+    meta.textContent=[copy.worker?copy.type:'',...copy.meta,saahlAdRemaining(ad)].filter(Boolean).join(' · ');
+    const button=document.createElement('button');
+    button.type='button';
+    button.className='saahl-ad-detail-button';
+    button.textContent='عرض التفاصيل';
+    button.setAttribute('aria-label','عرض التفاصيل — '+copy.headline);
+    if(duplicate)button.tabIndex=-1;
+    button.onclick=()=>openSaahlAd(ad);
+    content.append(title,meta);
+    entry.append(content,button);
+    const separator=document.createElement('span');
+    separator.className='saahl-ad-divider';
+    separator.setAttribute('aria-hidden','true');
+    group.append(entry,separator);
+   }
+   rail.append(group);
+  }
+ }
  adjustLayoutForStrip();
 }
 function initSaahlStrip(){
  const strip=document.getElementById('ad-strip');
  const dialog=document.getElementById('adDetailOverlay');
- document.getElementById('saahl-ad-prev').onclick=()=>renderSaahlStrip(stripIndex-1);
- document.getElementById('saahl-ad-next').onclick=()=>renderSaahlStrip(stripIndex+1);
- document.getElementById('saahl-ad-open').onclick=()=>{if(stripAds[stripIndex])openSaahlAd(stripAds[stripIndex]);};
  dialog.addEventListener('click',event=>{
   const box=dialog.getBoundingClientRect();
   if(event.target===dialog&&(event.clientX<box.left||event.clientX>box.right||event.clientY<box.top||event.clientY>box.bottom))dialog.close();
  });
  loadAdStrip();
- setInterval(()=>{
-  if(stripAds.length>1 && !document.hidden && !dialog.open && !strip.matches(':hover,:focus-within') &&
-     !matchMedia('(prefers-reduced-motion: reduce)').matches)renderSaahlStrip(stripIndex+1);
- },10000);
- setInterval(()=>{
-  const current=stripAds[stripIndex];
-  stripAds=stripAds.filter(ad=>!ad.expires_at || Date.parse(ad.expires_at)>Date.now());
-  const index=stripAds.indexOf(current);
-  renderSaahlStrip(index<0?0:index);
- },30000);
+ setInterval(()=>{if(!document.hidden && !dialog.open && !strip.contains(document.activeElement))loadAdStrip();},30000);
+ document.addEventListener('visibilitychange',()=>{if(!document.hidden&&!dialog.open)loadAdStrip();});
  if('ResizeObserver' in window){
   const observer=new ResizeObserver(adjustLayoutForStrip);
   observer.observe(strip);
-  observer.observe(strip.querySelector('.saahl-ad-message'));
+  observer.observe(strip.querySelector('.saahl-ad-rail'));
  }
 }
 async function loadAdStrip(){
@@ -940,17 +935,23 @@ async function loadAdStrip(){
    if(error)throw error;
    const now=Date.now();
    ads=(data||[]).filter(ad=>['strip','spotlight'].includes(ad.placement)&&(!ad.starts_at||Date.parse(ad.starts_at)<=now)&&(!ad.expires_at||Date.parse(ad.expires_at)>now));
-   // إزالة التكرار البصري للإعلانات المتطابقة دون حذف أي سجل محفوظ
-   const seenAdContents=new Set();
-   ads=ads.filter(ad=>{
-     const key=[ad.ad_topic,ad.ad_details,ad.advertiser_name,ad.phone,ad.whatsapp].map(v=>String(v||'').trim().replace(/\s+/g,' ').toLowerCase()).join('|');
-     if(seenAdContents.has(key))return false;
-     seenAdContents.add(key);return true;
-   });
+
   }
- }catch(e){console.warn('Ad strip unavailable:',e)}
+ }catch(e){
+  console.warn('Ad strip unavailable:',e);
+  ads=stripAds.filter(ad=>!ad.expires_at||Date.parse(ad.expires_at)>Date.now());
+ }
+ if(JSON.stringify(stripAds)===JSON.stringify(ads)){
+  document.querySelectorAll('.saahl-ad-group').forEach(group=>{
+   group.querySelectorAll('.saahl-ad-meta').forEach((meta,index)=>{
+    const ad=ads[index],copy=getSaahlAdCopy(ad);
+    meta.textContent=[copy.worker?copy.type:'',...copy.meta,saahlAdRemaining(ad)].filter(Boolean).join(' · ');
+   });
+  });
+  return;
+ }
  stripAds=ads;
- renderSaahlStrip(0);
+ renderSaahlStrip();
 }
 // Keep the fixed advertisement strip and section anchors clear of page content.
 function adjustLayoutForStrip(){
@@ -958,7 +959,7 @@ function adjustLayoutForStrip(){
   if(strip){
    document.documentElement.style.setProperty('--strip-height',strip.offsetHeight+'px');
    const rail=strip.querySelector('.saahl-ad-rail');
-   const distance=strip.querySelector('.saahl-ad-message').offsetWidth;
+   const distance=strip.querySelector('.saahl-ad-group')?.getBoundingClientRect().width;
    if(distance)rail.style.setProperty('--ad-duration',(distance/40).toFixed(2)+'s');
   }
   positionSpotlight();

@@ -569,7 +569,14 @@ async function loadKf(){
  const status=expired?'منتهي':edit?'تعديل بانتظار المراجعة':k.review_status==='rejected'?'مرفوض':k.is_active&&k.launch_verified_at?'منشور':k.is_active?'بانتظار التحقق':k.review_status==='approved'?'موقوف':'بانتظار المراجعة';
  const remaining=k.is_active&&k.ends_at?Math.max(0,Math.ceil((new Date(k.ends_at)-Date.now())/86400000)):null;
  const details='<div class="kf-meta">الجنسية: '+kfSafe(k.nationality)+' | العمر: '+kfSafe(k.age)+' | الخبرة: '+kfSafe(k.experience_years)+' سنة | المدة: '+kfSafe(k.ad_days)+' يوم</div><div class="kf-meta">المهارات: '+kfSafe((k.skills||[]).join('، ')||'غير محددة')+'</div><div class="kf-meta">سبب النقل: '+kfSafe(k.reason)+'</div><div class="kf-meta">اسم الكفيل: '+kfSafe(k.sponsor_display_name)+' | الهاتف: <span dir="ltr">'+kfSafe(k.contact_phone)+'</span></div><div class="kf-meta">تاريخ الطلب: '+fd(k.created_at)+' | انتهاء العرض: '+(k.is_active?fd(k.ends_at):'يحدد عند النشر')+(remaining!==null?' | المتبقي: '+remaining+' يوم':'')+'</div>';
- const verification=k.launch_verified_at?'<p class="kf-meta">تم توثيق صفة المعلن وموافقة العامل في '+fd(k.launch_verified_at)+'</p>':(!expired&&k.review_status!=='rejected'?'<p class="kf-meta">محجوب عن الجمهور إلى حين التحقق من صفة المعلن وموافقة العامل.</p><button class="btn btn-o btn-s" onclick="verifyTransfer(\''+k.id+'\')">توثيق التحقق</button>':'');
+ const declarationReview=k.launch_evidence_ref?.startsWith('advertiser-declarations:');
+ const verification=k.launch_verified_at
+   ? '<p class="kf-meta">'+(declarationReview?'اعتمدت الإدارة الطلب بناءً على إقرارات المعلن في ':'تم توثيق صفة المعلن وموافقة العامل في ')+fd(k.launch_verified_at)+'</p>'
+   : !expired&&k.review_status!=='rejected'
+     ? k.launch_declarations_at&&k.review_status==='pending_review'
+       ? '<p class="kf-meta">أقرّ المعلن بصفته وموافقة العامل وصحة البيانات. راجع التفاصيل ثم اعتمد الطلب أو ارفضه.</p>'
+       : '<p class="kf-meta">هذا الطلب يحتاج توثيق التحقق قبل نشره.</p><button class="btn btn-o btn-s" onclick="verifyTransfer(\''+k.id+'\')">توثيق التحقق</button>'
+     : '';
  const actions=expired?`<p class="kf-meta">انتهت فترة الإعلان وهو غير ظاهر للزوار.</p><button class="btn btn-d btn-s" onclick="deleteKf('${k.id}','expired',this)">حذف الإعلان</button>`:rejected?`<div class="kf-actions"><button class="btn btn-d btn-s" onclick="deleteKf('${k.id}','rejected',this)">حذف الطلب</button></div>`:'<div class="kf-actions">'+(!edit&&!editError&&k.review_status==='pending_review'?'<button class="btn btn-s" onclick="reviewKf(\''+k.id+'\',\'approve\')">اعتماد ونشر</button><button class="btn btn-o btn-s" onclick="reviewKf(\''+k.id+'\',\'reject\')">رفض</button>':'')+(k.is_active?'<button class="btn btn-d btn-s" onclick="reviewKf(\''+k.id+'\',\'stop\')">إيقاف</button>':k.review_status==='approved'?'<button class="btn btn-s" onclick="reviewKf(\''+k.id+'\',\'resume\')">استئناف إن لم تنتهِ المدة</button>':'')+'</div>';
  return '<article class="kf-line"><div class="kf-line-main"><div class="kf-line-name"><strong>'+kfSafe(k.worker_name)+'</strong><small>'+kfSafe(k.profession)+' — '+kfSafe(k.emirate)+'</small></div><span class="bge '+(expired?'expired':(k.is_active&&k.launch_verified_at)?'active':'pending')+'">'+status+'</span><span class="kf-line-date">'+fd(k.created_at)+'</span><button type="button" class="btn btn-o btn-s" onclick="this.closest(\'.kf-line\').classList.toggle(\'expanded\')">التفاصيل</button></div><div class="kf-line-detail">'+details+kfReviewFields(k)+verification+actions+(edit&&!expired?kfEditReview(edit):'')+'</div></article>';
  }).join('')+'</div>';
@@ -618,9 +625,19 @@ async function verifyTransfer(id){
 }
 async function reviewKf(id,action){
  const label={approve:'الموافقة ونشر الإعلان',reject:'رفض الإعلان',stop:'إيقاف الإعلان',resume:'استئناف الإعلان'}[action];
- if(!label||!confirm('تأكيد '+label+'؟'))return;
- const {error}=await db.rpc('review_kafala_ad',{p_id:id,p_action:action});
- if(error){toast('تعذر تنفيذ الإجراء: '+error.message,5000);return;}
+ const request=aKf.find(item=>item.id===id);
+ const declaredApproval=action==='approve'&&Boolean(request?.launch_declarations_at);
+ if(action==='approve'&&!declaredApproval&&!request?.launch_verified_at){
+  toast('الطلب القديم يحتاج توثيق التحقق قبل اعتماده.');return;
+ }
+ const question=declaredApproval
+  ? 'هل راجعت بيانات الطلب وإقرارات المعلن وتريد نشره؟'
+  : 'تأكيد '+label+'؟';
+ if(!label||!confirm(question))return;
+ const {error}=declaredApproval
+  ? await db.rpc('saahl2_approve_declared_transfer',{p_id:id})
+  : await db.rpc('review_kafala_ad',{p_id:id,p_action:action});
+ if(error){toast('تعذّر تنفيذ الإجراء. حدّث القائمة وتحقق من حالة الطلب وأي تعديل معلّق.',5000);return;}
  toast('تم تنفيذ الإجراء بنجاح');await loadKf();
 }
 function saahlAdDetails(raw){
