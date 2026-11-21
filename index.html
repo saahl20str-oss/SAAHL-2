@@ -27,8 +27,10 @@
   --muted:#6B6B6B;
   --border:#E8E8E8;
   --white:#FFFFFF;
+  --nav-height:68px;
+  --strip-height:43px;
 }
-html{scroll-behavior:smooth}
+html{scroll-behavior:smooth;scroll-padding-top:calc(var(--nav-height) + var(--strip-height) + 12px)}
 body{
   font-family:'Tajawal',sans-serif;
   background:#fff;
@@ -67,7 +69,7 @@ nav{
   backdrop-filter:blur(20px);
   -webkit-backdrop-filter:blur(20px);
   border-bottom:1px solid rgba(0,0,0,.06);
-  height:68px;
+  height:var(--nav-height);
   display:flex;align-items:center;justify-content:space-between;
   padding:0 6%;
   transition:box-shadow .3s;
@@ -111,10 +113,9 @@ nav.scrolled{box-shadow:0 4px 32px rgba(0,0,0,.08)}
 
 /* ===== HERO ===== */
 .hero{
-  min-height:100vh;
   display:flex;flex-direction:column;
   align-items:center;justify-content:center;
-  padding:120px 6% 80px;
+  padding:clamp(32px,5vw,68px) 6% clamp(28px,4vw,52px);
   position:relative;
   overflow:hidden;
   background:#fff;
@@ -157,7 +158,7 @@ nav.scrolled{box-shadow:0 4px 32px rgba(0,0,0,.08)}
   color:var(--gold-d);
   padding:7px 18px;border-radius:50px;
   font-size:12px;font-weight:700;
-  margin-bottom:28px;
+  margin-bottom:clamp(12px,2vw,24px);
   letter-spacing:.5px;
   animation:fadeUp .8s ease both;
 }
@@ -193,9 +194,9 @@ nav.scrolled{box-shadow:0 4px 32px rgba(0,0,0,.08)}
 .hero-typed-wrap{
   font-size:clamp(28px,4vw,52px);
   font-weight:700;color:var(--dark);
-  text-align:center;margin-bottom:24px;
+  text-align:center;margin-bottom:clamp(10px,2vw,20px);
   animation:fadeUp .9s .2s ease both;
-  min-height:64px;
+  min-height:1.15em;
   display:flex;align-items:center;justify-content:center;gap:12px;
 }
 .hero-typed{color:var(--gold)}
@@ -210,14 +211,13 @@ nav.scrolled{box-shadow:0 4px 32px rgba(0,0,0,.08)}
 .hero-sub{
   font-size:16px;color:var(--muted);
   max-width:540px;text-align:center;
-  line-height:1.8;margin-bottom:44px;
+  line-height:1.8;margin-bottom:clamp(16px,3vw,28px);
   animation:fadeUp .9s .3s ease both;
   font-weight:400;
 }
 
 .hero-btns{
   display:flex;gap:14px;justify-content:center;flex-wrap:wrap;
-  margin-bottom:64px;
   animation:fadeUp .9s .4s ease both;
 }
 .btn-primary{
@@ -280,7 +280,7 @@ nav.scrolled{box-shadow:0 4px 32px rgba(0,0,0,.08)}
 }
 
 /* ===== HOW SECTION ===== */
-.section{padding:100px 6%}
+.section{padding:clamp(32px,5vw,64px) 6%}
 .section-tag{
   display:inline-flex;align-items:center;gap:6px;
   background:var(--gold-xl);color:var(--gold-d);
@@ -302,7 +302,7 @@ nav.scrolled{box-shadow:0 4px 32px rgba(0,0,0,.08)}
 
 /* HOW STEPS — HORIZONTAL TIMELINE */
 
-.how-header{text-align:center;margin-bottom:60px}
+.how-header{text-align:center;margin-bottom:clamp(20px,3vw,38px)}
 .how-header .section-sub{margin:0 auto}
 
 .steps-timeline{
@@ -519,7 +519,7 @@ nav.scrolled{box-shadow:0 4px 32px rgba(0,0,0,.08)}
 
 /* ===== CTA ===== */
 .cta-section{
-  background:var(--dark);padding:100px 6%;
+  background:var(--dark);padding:clamp(36px,5.5vw,72px) 6%;
   position:relative;overflow:hidden;text-align:center;
 }
 .cta-bg-circle{
@@ -663,8 +663,7 @@ footer{
   .steps-timeline::before{display:none}
   .types-grid{grid-template-columns:1fr;gap:16px}
   .footer-grid{grid-template-columns:1fr;gap:32px}
-  .section{padding:64px 5%}
-  .hero{padding:100px 5% 64px}
+  .section,.hero{padding-inline:5%}
 }
 @media(max-width:480px){
   .feat-card{padding:18px}
@@ -678,14 +677,12 @@ footer{
  #spotlightWidget #spotSlides>div{padding:8px 12px!important}
  #spotlightWidget #spotSlides img{width:65px!important;height:75px!important}
  #spotlightReopen{position:relative!important;top:auto!important;left:auto!important;right:auto!important;margin:8px auto!important}
- .hero{padding-top:45px!important}
  #ad-strip{min-height:42px}
  #ad-strip .saahl-ad-cta{font-size:11px!important;white-space:nowrap}
 }
 
 /* Unified advertisements: spotlight remains preserved but hidden everywhere */
 #spotlightWidget,#spotlightReopen,#mobileSpotAnchor{display:none!important}
-.hero{padding-top:48px!important}
 .saahl-ad-unit{cursor:pointer;max-width:640px}
 .saahl-ad-unit .saahl-ad-summary{display:inline-block;max-width:300px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .saahl-ad-unit .saahl-ad-open{border:1px solid #c9a84c;border-radius:7px;color:#f0cf79;background:transparent;padding:4px 10px;font:inherit;font-weight:700;cursor:pointer;white-space:nowrap}
@@ -737,13 +734,14 @@ footer{
 
 <body>
 <style>
-#ad-strip{position:fixed!important;top:68px!important;left:0;right:0;z-index:490!important;min-height:43px;display:flex!important;align-items:center;gap:16px;overflow:hidden;box-sizing:border-box;direction:rtl}
+#ad-strip{position:fixed!important;top:var(--nav-height)!important;left:0;right:0;z-index:490!important;min-height:43px;display:flex!important;align-items:center;gap:16px;overflow:hidden;box-sizing:border-box;direction:rtl}
 #ad-strip .saahl-ad-cta{flex-shrink:0;background:#c9a84c;color:#16171c!important;text-decoration:none;font-weight:900;border-radius:6px;padding:5px 12px;font-size:13px;position:relative;z-index:2}
 #ad-strip .saahl-ad-viewport{flex:1;overflow:hidden;min-width:0;direction:ltr;position:relative}
 #ad-strip .saahl-ad-track{display:inline-flex;align-items:center;white-space:nowrap;width:max-content;gap:18px;color:#fff;will-change:transform;direction:rtl}
 #ad-strip .saahl-ad-track a{color:#e5c36a;text-decoration:underline;text-underline-offset:3px;font-weight:800}#ad-strip .saahl-logo-separator{display:inline-flex;align-items:center;gap:5px;flex-shrink:0}#ad-strip .saahl-original-mark{display:inline-block;width:18px;height:25px;object-fit:contain;background:transparent;border:0;box-shadow:none;filter:url(#saahlLogoTransparentGold)}#ad-strip .saahl-ad-unit{display:inline-flex;align-items:center;gap:8px;direction:rtl;flex-shrink:0}
 #ad-strip:hover .saahl-ad-track{animation-play-state:paused}
-body{padding-top:43px}
+body{padding-top:calc(var(--nav-height) + var(--strip-height))}
+@media(max-width:700px){:root{--strip-height:48px}}
 @media(prefers-reduced-motion:reduce){#ad-strip .saahl-ad-track{animation:none}}
 #ad-strip .saahl-logo-separator{gap:3px!important}#ad-strip .saahl-original-mark{width:13px!important;height:19px!important;object-fit:contain!important;background:transparent!important;border:0!important;box-shadow:none!important}
 #ad-strip .saahl-ad-remaining{white-space:nowrap;font-size:11px;border:1px solid #5d5234;border-radius:6px;padding:3px 6px}#ad-strip .saahl-ad-unit .saahl-ad-summary{max-width:380px}@media(max-width:700px){#ad-strip .saahl-ad-unit .saahl-ad-remaining{display:inline-block!important;font-size:10px;padding:2px 4px}#ad-strip .saahl-ad-unit strong{max-width:none!important}#ad-strip .saahl-ad-unit .saahl-ad-summary{display:inline-block!important;max-width:140px!important}}
@@ -839,14 +837,10 @@ async function loadAdStrip(){
  requestAnimationFrame(startStripMotion);
 }
 window.addEventListener('resize',()=>requestAnimationFrame(startStripMotion));
-// يدفع الناف بار والقسم الرئيسي لأسفل بمقدار ارتفاع الشريط الفعلي، لمنع التداخل بينهما
+// Keep the fixed advertisement strip and section anchors clear of page content.
 function adjustLayoutForStrip(){
   const strip = document.getElementById('ad-strip');
-  const nav = document.getElementById('mainNav');
-  const hero = document.querySelector('.hero');
-  const stripH = (strip && strip.style.display !== 'none') ? strip.offsetHeight : 0;
-  if(nav) nav.style.top = '0px';
-  if(hero) hero.style.paddingTop = window.innerWidth<=700?'34px':'48px';
+  if(strip) document.documentElement.style.setProperty('--strip-height', strip.offsetHeight+'px');
   positionSpotlight();
 }
 window.addEventListener('resize', adjustLayoutForStrip);
@@ -1103,7 +1097,7 @@ window.addEventListener('load',loadSpotlight);
       <span data-t="btn1">ابدأ البحث</span>
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
     </a>
-    <a href="office.html" class="btn-secondary" data-t="btn2">أضف مكتبك</a>
+    <a href="office.html?register=1" class="btn-secondary" data-t="btn2">أضف مكتبك</a>
   </div>
 
   </section>
@@ -1179,7 +1173,7 @@ window.addEventListener('load',loadSpotlight);
       </div>
     </a>
 
-    <a href="office.html" class="type-card reveal reveal-delay-1">
+    <a href="office.html?register=1" class="type-card reveal reveal-delay-1">
       <div class="type-visual" style="background:linear-gradient(135deg,#fff,#FFF9EA);height:170px">
         <div class="premium-icon-wrap" aria-hidden="true">
           <svg class="premium-icon" viewBox="0 0 96 96" fill="none">
@@ -1303,7 +1297,7 @@ window.addEventListener('load',loadSpotlight);
     <p class="cta-sub" data-t="cta_sub">استعرض العاملات المتاحات وتواصل مباشرة مع مكاتب الاستقدام المسجلة</p>
     <div class="cta-btns">
       <a href="marketplace.html" class="btn-cta-primary" data-t="cta_b1">ابدأ البحث الآن</a>
-      <a href="office.html" class="btn-cta-secondary" data-t="cta_b2">أضف مكتبك</a>
+      <a href="office.html?register=1" class="btn-cta-secondary" data-t="cta_b2">أضف مكتبك</a>
     </div>
   </div>
 </section>
@@ -1321,7 +1315,7 @@ window.addEventListener('load',loadSpotlight);
     <div class="footer-col">
       <h4 data-t="fh1">الخدمات</h4>
       <a href="marketplace.html" data-t="fl1">بحث عن عاملة</a>
-      <a href="office.html" data-t="fl2">تسجيل مكتب</a>
+      <a href="office.html?register=1" data-t="fl2">تسجيل مكتب</a>
       <a href="kafala.html" data-t="fl3">نقل كفالة</a>
     </div>
     <div class="footer-col">
@@ -1335,7 +1329,7 @@ window.addEventListener('load',loadSpotlight);
       <h4 data-t="fh3">تواصل</h4>
       <a href="office.html" data-t="fl8">دخول المكاتب</a>
       <a href="marketplace.html" data-t="fl9">التواصل مع المكتب</a><a href="legal.html#contact">ساهل للوساطة التجارية والدعم</a><a href="mailto:saahl2030@gmail.com"><bdi>saahl2030@gmail.com</bdi></a>
-      <a href="office.html" data-t="fl10">تسجيل مكتب جديد</a>
+      <a href="office.html?register=1" data-t="fl10">تسجيل مكتب جديد</a>
       <a href="#types" data-t="fl11">الإمارات العربية المتحدة</a>
     </div>
   </div>
