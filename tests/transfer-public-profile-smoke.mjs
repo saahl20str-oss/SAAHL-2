@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import { chromium } from 'playwright';
 import { spawn } from 'node:child_process';
+import { readFile } from 'node:fs/promises';
 
 const site = 'http://127.0.0.1:8787/';
 const server = spawn('python3',['-m','http.server','8787','--bind','127.0.0.1'],{stdio:'ignore'});
@@ -24,15 +25,16 @@ try {
       window.requests = [];
       window.supabase = {createClient:()=>({async rpc(name,args) {
         if (name==='saahl2_public_transfer_profiles') return {data:${JSON.stringify(rows)}};
-        if (name==='saahl2_send_request') {
+        if (name==='saahl2_transfer_whatsapp') {
           window.requests.push(args);
-          return args.p_email.startsWith('retry@')
-            ? {error:{code:'P4290'}} : {data:'receipt-123'};
+          return {data: args.p_ad === '${firstId}' ? '971500000001' : null};
         }
         throw Error('Unexpected RPC '+name);
       }})};
     `}));
     await page.route('https://fonts.googleapis.com/**',route=>route.abort());
+    await page.addInitScript(() => Object.defineProperty(navigator,'share',{value:undefined}));
+    await page.route('https://wa.me/**',route=>route.fulfill({contentType:'text/plain',body:'WhatsApp test stub'}));
     await page.goto(site+'kafala.html', {waitUntil:'domcontentloaded'});
     const cards = page.locator('.transfer-poster');
     await cards.nth(1).waitFor();
@@ -42,7 +44,7 @@ try {
     assert.equal(await cards.nth(1).locator('.poster-top').evaluate(el=>getComputedStyle(el).gridTemplateColumns.split(' ').length),1);
     const open = async card => {
       await card.getByRole('button',{name:'عرض التفاصيل'}).click();
-      await card.getByRole('button',{name:'التواصل بشأن الإعلان'}).click();
+      await card.getByRole('button',{name:'بطاقة الاستفسار والتواصل'}).click();
     };
     const modal = page.locator('#detailOv');
     await open(cards.first());
@@ -50,28 +52,36 @@ try {
     assert.match(await modal.innerText(),/الهند/);
     assert.match(await modal.innerText(),/أعمال السباكة/);
     assert.doesNotMatch(await modal.innerText(),/الإبلاغ عن الإعلان/);
-    await modal.getByRole('button',{name:'إرسال طلب تواصل'}).click();
-    await modal.getByLabel('بريدك الإلكتروني').fill('retry@example.com');
-    await modal.getByLabel('رسالتك').fill('أرغب بالتواصل حول الإعلان.');
-    await modal.getByRole('button',{name:'إرسال الطلب'}).click();
-    await modal.getByText('انتظر قليلًا قبل إرسال طلب جديد.').waitFor();
-    await modal.getByLabel('بريدك الإلكتروني').fill('visitor@example.com');
-    await modal.getByRole('button',{name:'إرسال الطلب'}).click();
-    await modal.getByText(/receipt-123/).waitFor();
-    assert.equal(page.url(),site+'kafala.html');
-    const requests = await page.evaluate(()=>window.requests);
-    assert.equal(requests.length,2);
-    assert.ok(requests.every(request=>request.p_ad===firstId && request.p_kind==='transfer_contact'));
+    const download = page.waitForEvent('download');
+    await modal.getByRole('button',{name:'احفظ بطاقة الاستفسار'}).click();
+    const card = await download;
+    assert.match(card.suggestedFilename(),/11223344[.]png$/);
+    const png = await readFile(await card.path());
+    assert.equal(png.readUInt32BE(16),800);
+    assert.equal(png.readUInt32BE(20),1006);
     await modal.locator('.dm-close').click();
     await open(cards.nth(1));
     assert.equal(await modal.locator('#dm-avatar img').count(),0);
-    assert.doesNotMatch(await modal.innerText(),/الهند|أعمال السباكة|receipt-123/);
-    assert.ok(await modal.getByRole('button',{name:'إرسال طلب تواصل'}).isVisible());
+    assert.doesNotMatch(await modal.innerText(),/الهند|أعمال السباكة/);
+    const whatsappButton = modal.getByRole('button',{name:'تواصل مع المعلن عبر واتساب'});
+    await whatsappButton.click();
+    await modal.getByText('واتساب غير مفعّل لهذا الإعلان.').waitFor();
+    assert.equal(page.url(),site+'kafala.html');
+    await page.goto(site+'kafala.html#ad='+firstId);
+    await modal.getByText('إعلان 11223344',{exact:true}).waitFor();
+    const destination = page.waitForRequest(url => url.url().startsWith('https://wa.me/'));
+    await whatsappButton.click();
+    const url = new URL((await destination).url());
+    assert.equal(url.pathname,'/971500000001');
+    assert.match(url.searchParams.get('text'),/أرغب|أود الاستفسار/);
+    assert.match(url.searchParams.get('text'),/11223344/);
+    assert.match(url.searchParams.get('text'),new RegExp(firstId));
+    assert.match(url.searchParams.get('text'),/أعمال السباكة/);
     assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1));
     assert.deepEqual(errors,[]);
     await page.close();
   }
-  console.log('Transfer profile and contact tests passed at mobile and desktop widths.');
+  console.log('Transfer profiles, inquiry cards, and direct WhatsApp links passed at mobile and desktop widths.');
 } finally {
   await browser.close();
   server.kill();

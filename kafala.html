@@ -355,12 +355,9 @@ select.inp{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.
 #listingsGrid .poster-top.no-photo{grid-template-columns:minmax(0,1fr)}
 #listingsGrid .poster-top img,.dm-avatar img{width:100%;height:100%;object-fit:cover}
 .dm-avatar{overflow:hidden}
-.dm-contact .dm-contact-btn{background:#f8efdc;color:#2d251a;margin:0}
-.dm-contact form{display:grid;gap:8px;color:#fff}
-.dm-contact form[hidden],.dm-contact button[hidden]{display:none}
-.dm-contact label,.dm-contact p{font-size:13px}
-.dm-contact textarea{resize:vertical}
-.dm-contact .inp{font-size:16px}
+.dm-contact .dm-contact-btn{background:#a6ecc2;color:#102b1c;margin:0;min-height:44px}
+.dm-contact .dm-card-btn{background:#f8efdc;color:#2d251a;margin-top:8px}
+.dm-contact p{font-size:13px;color:#fff;line-height:1.6;margin-top:8px}
 #dm-contact-status:empty{display:none}
 .terms-card a{text-decoration:underline}
 </style>
@@ -672,7 +669,7 @@ select.inp{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.
           </div>
           <div class="terms-card" id="kafalaTerms">
             <h4>إقرارات الإعلان</h4>
-            <p>الإعلان للبحث والتواصل فقط. يحتفظ المعلن بإثبات صفته وموافقة العامل، ويقدمهما للإدارة عبر قناة آمنة عند الطلب. لا ترفع هويات أو تصاريح في هذا النموذج. يظهر الإعلان برقم مرجعي. يبقى الاسم والهاتف خاصّين.</p>
+            <p>الإعلان للبحث والتواصل فقط. يحتفظ المعلن بإثبات صفته وموافقة العامل، ويقدمهما للإدارة عبر قناة آمنة عند الطلب. لا ترفع هويات أو تصاريح في هذا النموذج. يظهر الإعلان برقم مرجعي. يبقى اسم العامل خاصًّا. رقم المعلن متاح عبر واتساب بموافقته.</p>
             <p><a href="legal.html#worker-consent">موافقة العامل</a> · <a href="legal.html#ads">سياسة الإعلانات</a> · <a href="legal.html#sponsors">شروط الكفيل</a> · <a href="legal.html#privacy">الخصوصية</a></p>
             <div id="kafalaAgree">
               <label><input type="checkbox" id="agreeWorker"> حصلت على موافقة العامل المستقلة والطوعية على نشر البيانات المحددة ولم أوافق نيابة عنه.</label>
@@ -688,6 +685,9 @@ select.inp{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.
             <label style="display:block;margin-top:8px"><input type="checkbox" id="publishWorkerPhoto"> وافق العامل على نشر صورته.</label>
             <label style="display:block;margin-top:8px"><input type="checkbox" id="publishWorkerDetails"> وافق العامل على نشر جنسيته ومهاراته.</label>
           </fieldset>
+          <label style="display:block;margin:14px 0"><input type="checkbox" id="allowTransferWhatsapp">
+            أؤكد أن رقم التواصل يخصني أو أنني مخوّل باستخدامه، وأوافق على إتاحته لزوار الإعلان عند التواصل عبر واتساب.
+          </label>
           <div id="kafalaPinFields" style="margin:16px 0">
             <h4>حماية إعلانك</h4>
             <div style="padding:14px;margin:10px 0;background:#fdf5de;border:1px solid #ead9a8;border-radius:12px">
@@ -764,22 +764,17 @@ select.inp{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.
       <div class="dm-sec-title">البيانات التفصيلية</div>
       <div class="dm-grid" id="dm-grid"></div>
       <div class="dm-contact">
-        <button type="button" class="dm-contact-btn" id="dm-contact-toggle" aria-expanded="false" aria-controls="dm-contact-form">إرسال طلب تواصل</button>
-        <form id="dm-contact-form" hidden>
-          <p>يصل الطلب إلى إدارة ساهل-2 مع مرجع الإعلان وبريدك للرد.</p>
-          <label for="dm-contact-email">بريدك الإلكتروني</label>
-          <input class="inp" id="dm-contact-email" type="email" autocomplete="email" dir="ltr" maxlength="254" required>
-          <label for="dm-contact-message">رسالتك</label>
-          <textarea class="inp" id="dm-contact-message" rows="3" minlength="10" maxlength="1500" required></textarea>
-          <button class="dm-contact-btn" type="submit">إرسال الطلب</button>
-        </form>
-        <p id="dm-contact-status" role="status" tabindex="-1" style="color:#fff;overflow-wrap:anywhere"></p>
+        <button type="button" class="dm-contact-btn" id="dm-contact-whatsapp">تواصل مع المعلن عبر واتساب</button>
+        <button type="button" class="dm-contact-btn dm-card-btn" id="dm-contact-card">احفظ بطاقة الاستفسار</button>
+        <p>يفتح واتساب برسالة جاهزة. يمكنك أيضًا إرفاق بطاقة الاستفسار كصورة في محادثة المعلن.</p>
+        <p id="dm-contact-status" role="status" tabindex="-1"></p>
       </div>
       <div class="dm-expiry-note" id="dm-expiry"></div>
     </div>
   </div>
 </div>
 
+<script src="kafala-whatsapp.js?v=1"></script>
 <script>
 // ===== SUPABASE =====
 const K_SUPABASE_URL = 'https://hkfxikmpfgixrbrboxeb.supabase.co';
@@ -812,6 +807,7 @@ async function loadListings() {
       daysLeft:Math.max(0, Math.ceil((new Date(row.ends_at) - Date.now()) / 86400000))
     }));
     renderListings(listings);
+    openLinkedTransfer();
   } catch (e) {
     console.error('loadListings:', e);
     grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:60px 20px;color:#E53E3E">تعذّر تحميل الإعلانات، حاول تحديث الصفحة</div>';
@@ -874,7 +870,7 @@ function renderListings(list) {
         ${l.nationality?`<div class="poster-detail"><b>الجنسية</b><span>${esc(l.nationality)}</span></div>`:''}
         ${l.skills.length?`<div class="poster-detail wide"><b>المهارات</b><span>${esc(l.skills.join('، '))}</span></div>`:''}
         <div class="poster-expiry">ينتهي الإعلان: ${esc(l.expiry)}</div>
-        <button type="button" class="lcard-btn" onclick="openDetail('${esc(l.id)}')">التواصل بشأن الإعلان</button>
+        <button type="button" class="lcard-btn" onclick="openDetail('${esc(l.id)}')">بطاقة الاستفسار والتواصل</button>
       </div>
     </article>`;
   }).join('');
@@ -917,7 +913,9 @@ function openDetail(id) {
     ...(l.nationality ? [{lb:'الجنسية',v:l.nationality}] : []),
     ...(l.skills.length ? [{lb:'المهارات',v:l.skills.join('، ')}] : []),
   ].map(i=>`<div class="dm-item"><div class="dm-item-lbl">${i.lb}</div><div class="dm-item-val">${kafalaEscape(i.v)}</div></div>`).join('');
-  resetTransferContact();
+  document.getElementById('dm-contact-status').textContent = '';
+  whatsappButton.disabled = false;
+  cardButton.disabled = false;
   document.getElementById('dm-expiry').textContent = `ينتهي الإعلان: ${l.expiry} — متبقي ${l.daysLeft} يوم`;
   document.getElementById('detailOv').classList.add('open');
   document.body.style.overflow = 'hidden';
@@ -931,59 +929,78 @@ function closeDetail(e) {
   }
 }
 
-const contactForm = document.getElementById('dm-contact-form');
-const contactToggle = document.getElementById('dm-contact-toggle');
+const whatsappButton = document.getElementById('dm-contact-whatsapp');
+const cardButton = document.getElementById('dm-contact-card');
+if (navigator.canShare && navigator.share) cardButton.textContent = 'مشاركة بطاقة الاستفسار';
 const contactStatus = document.getElementById('dm-contact-status');
-const contactSubmit = contactForm.querySelector('button');
-let contactView = 0;
 
-function resetTransferContact() {
-  contactView++;
-  contactForm.reset();
-  contactForm.hidden = true;
-  contactSubmit.disabled = false;
-  contactToggle.hidden = false;
-  contactToggle.setAttribute('aria-expanded','false');
-  contactStatus.textContent = '';
+function openLinkedTransfer() {
+  const match = location.hash.match(/^#ad=([0-9a-f-]{36})$/i);
+  if (!match) return;
+  if (listings.some(ad => ad.id === match[1])) {
+    showPage('list');
+    openDetail(match[1]);
+  } else if (!document.getElementById('linkedAdNotice')) {
+    const notice = document.createElement('p');
+    notice.id = 'linkedAdNotice';
+    notice.className = 'poster-expiry';
+    notice.textContent = 'هذا الإعلان لم يعد معروضًا.';
+    document.getElementById('listingsGrid').before(notice);
+  }
 }
+window.addEventListener('hashchange',openLinkedTransfer);
 
-contactToggle.addEventListener('click', () => {
-  contactToggle.hidden = true;
-  contactToggle.setAttribute('aria-expanded','true');
-  contactForm.hidden = false;
-  document.getElementById('dm-contact-email').focus();
+whatsappButton.addEventListener('click', async () => {
+  const ad = currentDetail;
+  if (!ad) return;
+  whatsappButton.disabled = true;
+  contactStatus.textContent = 'جارٍ فتح واتساب…';
+  try {
+    const {data,error} = await _db.rpc('saahl2_transfer_whatsapp',{p_ad:ad.id});
+    if (currentDetail !== ad) return;
+    if (error) throw error;
+    if (typeof data !== 'string' || !/^[1-9]\d{7,14}$/.test(data)) {
+      contactStatus.textContent = 'واتساب غير مفعّل لهذا الإعلان.';
+      return;
+    }
+    contactStatus.textContent = '';
+    window.location.assign(transferWhatsAppUrl(ad,data));
+  } catch {
+    if (currentDetail === ad) contactStatus.textContent = 'تعذّر فتح واتساب. حاول مرة أخرى.';
+  } finally {
+    if (currentDetail === ad) whatsappButton.disabled = false;
+  }
 });
 
-contactForm.addEventListener('submit', async event => {
-  event.preventDefault();
-  if (!currentDetail || contactSubmit.disabled) return;
-  const message = document.getElementById('dm-contact-message').value.trim();
-  if (message.length < 10) {
-    contactStatus.textContent = 'أدخل رسالة من 10 أحرف على الأقل.';
-    return;
-  }
-  const view = contactView;
-  contactSubmit.disabled = true;
-  contactStatus.textContent = 'جارٍ الإرسال…';
+cardButton.addEventListener('click', async () => {
+  const ad = currentDetail;
+  if (!ad) return;
+  cardButton.disabled = true;
   try {
-    const {data,error} = await _db.rpc('saahl2_send_request', {
-      p_kind:'transfer_contact',p_ad:currentDetail.id,
-      p_email:document.getElementById('dm-contact-email').value.trim(),p_message:message
-    });
-    if (error) throw error;
-    if (view !== contactView || !currentDetail) return;
-    contactForm.hidden = true;
-    contactForm.reset();
-    contactStatus.textContent = 'استلمت إدارة ساهل-2 طلبك. رقم الطلب ' + data;
-  } catch (error) {
-    if (view !== contactView || !currentDetail) return;
-    contactStatus.textContent = error.code === 'P4290' ? 'انتظر قليلًا قبل إرسال طلب جديد.'
-      : 'تعذّر إرسال الطلب. تحقق من الاتصال ومن أن الإعلان ما زال معروضًا، ثم حاول مرة أخرى.';
-  } finally {
-    if (view === contactView && currentDetail) {
-      contactSubmit.disabled = false;
-      contactStatus.focus();
+    const blob = await renderTransferInquiryCard(ad);
+    if (currentDetail !== ad) return;
+    const name = 'saahl-inquiry-' + ad.id.slice(0,8) + '.png';
+    const file = new File([blob],name,{type:'image/png'});
+    if (navigator.share && navigator.canShare?.({files:[file]})) {
+      try {
+        await navigator.share({files:[file],title:'استفسار عن عامل | ساهل ٢'});
+        return;
+      } catch (error) {
+        if (error.name === 'AbortError' || currentDetail !== ad) return;
+      }
     }
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = name;
+    document.body.append(link);
+    link.click();
+    link.remove();
+    setTimeout(() => URL.revokeObjectURL(link.href),30000);
+    contactStatus.textContent = 'احفظ الصورة ثم أرفقها في محادثة واتساب مع المعلن.';
+  } catch {
+    if (currentDetail === ad) contactStatus.textContent = 'تعذّر تجهيز البطاقة. حاول مرة أخرى.';
+  } finally {
+    if (currentDetail === ad) cardButton.disabled = false;
   }
 });
 
@@ -1070,6 +1087,6 @@ loadListings();
 function toEnglishDigits(v){return String(v).replace(/[٠-٩۰-۹]/g,c=>String('٠١٢٣٤٥٦٧٨٩'.indexOf(c)>=0?'٠١٢٣٤٥٦٧٨٩'.indexOf(c):'۰۱۲۳۴۵۶۷۸۹'.indexOf(c)));}
 document.querySelectorAll('input,textarea').forEach(el=>{el.addEventListener('input',()=>{if(el.type!=='file'&&el.type!=='checkbox'){const next=toEnglishDigits(el.value);if(next!==el.value)el.value=next;}})});
 </script>
-<script src="kafala-owner.js?v=5"></script>
+<script src="kafala-owner.js?v=6"></script>
 </body>
 </html>

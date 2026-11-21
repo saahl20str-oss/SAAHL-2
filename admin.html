@@ -592,7 +592,8 @@ function kfReviewFields(ad, full=false){
  const safePhoto=(value.length<=700000&&/^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+/]+=*$/.test(value))
    || value.startsWith(SU+'/storage/v1/object/sign/saahl-kafala-photos/');
  const visibility='<div class="kf-meta">موافقة النشر العام: '+(ad.publish_worker_photo?'الصورة':'الصورة خاصة')
-   +' · '+(ad.publish_worker_details?'الجنسية والمهارات':'الجنسية والمهارات خاصة')+'</div>';
+   +' · '+(ad.publish_worker_details?'الجنسية والمهارات':'الجنسية والمهارات خاصة')+'</div>'
+   +'<div class="kf-meta">تواصل المعلن عبر واتساب: '+(ad.whatsapp_contact_allowed?'موافق':'غير مفعّل')+'</div>';
  return lines+visibility+(safePhoto?'<img alt="صورة العامل" loading="lazy" style="max-width:100%;max-height:180px;object-fit:contain" src="'+kfSafe(value)+'">':'');
 }
 function kfEditReview(edit){

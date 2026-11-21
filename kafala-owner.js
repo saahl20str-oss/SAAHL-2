@@ -141,6 +141,7 @@
     showKafalaPhoto(safeKafalaImageUrl(values.worker_photo_url));
     el('publishWorkerPhoto').checked = values.publish_worker_photo === true;
     el('publishWorkerDetails').checked = values.publish_worker_details === true;
+    el('allowTransferWhatsapp').checked = values.whatsapp_contact_allowed === true;
   }
 
   async function readPhoto() {
@@ -187,6 +188,12 @@
     values.skills = collectSkills();
     values.publish_worker_photo = el('publishWorkerPhoto').checked;
     values.publish_worker_details = el('publishWorkerDetails').checked;
+    values.whatsapp_contact_allowed = el('allowTransferWhatsapp').checked;
+    const phone = (values.contact_phone || '').replace(/[^+0-9]/g,'');
+    if (values.whatsapp_contact_allowed
+        && !/^(0(?:5[0-9]{8}|[234679][0-9]{7})|(?:[+]|00)?971(?:5[0-9]{8}|[234679][0-9]{7})|(?:[+]|00)(?!971)[1-9][0-9]{7,14})$/.test(phone)) {
+      throw new Error('أدخل رقم واتساب إماراتيًا صحيحًا أو رقمًا دوليًا يبدأ بمفتاح الدولة.');
+    }
     if (values.publish_worker_photo && !selectedPhotoFile
         && !safeKafalaImageUrl(owner?.data?.fields?.worker_photo_url).startsWith('data:image/')) {
       throw new Error('أرفق صورة العامل لتفعيل نشرها، أو اترك خيار نشر الصورة غير محدد.');
@@ -398,6 +405,8 @@
     showPage('form');
     reserveNumber();
   };
+
+  el('wContact').addEventListener('input', () => { el('allowTransferWhatsapp').checked = false; });
 
   const declarationIds = ['agreeWorker','agreeSponsor','agreeAccuracy','agreeTerms','agreePrivacy'];
   window.processPayment = async () => {
