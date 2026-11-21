@@ -148,6 +148,12 @@ main{max-width:760px;margin:0 auto 65px;padding:0 18px}
 <div class="experience-box"><div class="dash-header"><div><h3>الخبرات السابقة</h3><p>أضف كل دولة عملت بها العاملة وعدد السنوات.</p></div><button id="addExperience" class="secondary">+ إضافة دولة</button></div><div id="experienceRows"></div><div class="muted" id="experienceTotal">إجمالي الخبرة: 0 سنة</div></div>
 <label>المهارات أو ملاحظات إضافية</label><textarea id="description" rows="3" placeholder="مثال: الطبخ، رعاية الأطفال، التنظيف..."></textarea><p id="workerEditorFeedback" class="worker-editor-note" role="status"></p>
 <div class="editor-actions"><button id="addWorker">حفظ ومتابعة للنشر</button><button id="saveWorkerDraft" class="secondary">حفظ كمسودة</button><button id="cancelWorker2" class="secondary">إلغاء</button></div>
+<details id="workerWithdrawal" hidden>
+  <summary>تسجيل سحب موافقة العاملة</summary>
+  <p class="muted">اختر ما طلبت العاملة إيقاف عرضه للزوار.</p>
+  <button type="button" class="secondary hidden" id="withdrawWorkerPhoto">إيقاف عرض الصورة فقط</button>
+  <button type="button" class="secondary" id="withdrawWorkerProfile">إيقاف نشر الملف بالكامل</button>
+</details>
 <p class="muted">يظهر الملف في البحث عند نشره من المكتب بعد الحصول على موافقة العاملة.</p></section></section></main>
 <dialog id="workerPublication" class="publication-dialog" aria-labelledby="publicationTitle">
   <h3 id="publicationTitle">نشر ملف العاملة</h3>
@@ -303,6 +309,8 @@ let workerLoadVersion = 0;
 function resetWorkerForm(){
   editingWorkerId = null;
   editingWorker = null;
+  $('workerWithdrawal').hidden = true;
+  $('workerWithdrawal').open = false;
   removeWorkerPhoto = false;
   $('editorTitle').textContent = 'إضافة عاملة جديدة';
   $('saveWorkerDraft').textContent = 'حفظ كمسودة';
@@ -397,6 +405,8 @@ async function editWorker(id){
   resetWorkerForm();
   editingWorkerId = id;
   editingWorker = data;
+  $('workerWithdrawal').hidden = !data.publication_consent_at;
+  show('withdrawWorkerPhoto',Boolean(data.photo_url));
   $('editorTitle').textContent = 'تعديل بيانات العاملة';
   $('saveWorkerDraft').textContent = 'حفظ والعودة';
   for(const [field,key] of Object.entries({workerName:'display_name',workerNumber:'worker_number',religion:'religion',
@@ -416,6 +426,44 @@ async function editWorker(id){
   openEditor();
   updatePhotoPreview();
 }
+
+async function withdrawWorkerPublication(full){
+  if(!office || !editingWorker?.publication_consent_at) return;
+  const id=editingWorker.id, officeId=office.id;
+  const question=full
+    ? 'هل طلبت العاملة إيقاف نشر ملفها بالكامل من البحث والإعلانات؟'
+    : 'هل طلبت العاملة إيقاف عرض صورتها فقط في البحث والإعلانات؟';
+  if(!confirm(question)) return;
+  const buttons=[$('withdrawWorkerPhoto'),$('withdrawWorkerProfile')];
+  buttons.forEach(button=>button.disabled=true);
+  try{
+    const {error}=await db.rpc('saahl2_withdraw_worker_publication',{p_worker:id,p_full:full});
+    if(error) throw error;
+    if(office?.id!==officeId) return;
+    if(editingWorkerId===id){
+      // Clear the saved and in-form photo so a subsequent save cannot restore it.
+      editingWorker.photo_url=null;
+      editingWorker.publication_photo_draft=null;
+      $('photo').value='';
+      $('workerPhotoFile').value='';
+      updatePhotoPreview();
+      show('withdrawWorkerPhoto',false);
+      if(full){
+        editingWorker.publication_consent_at=null;
+        $('workerWithdrawal').hidden=true;
+        closeEditor();
+      }
+    }
+    message(full?'تم إيقاف نشر الملف وإعلاناته.':'تم إيقاف عرض الصورة.');
+    await loadWorkers();
+  }catch{
+    message('تعذّر إيقاف العرض. تحقق من الاتصال وحاول مرة أخرى.',true);
+  }finally{
+    buttons.forEach(button=>button.disabled=false);
+  }
+}
+$('withdrawWorkerPhoto').onclick=()=>withdrawWorkerPublication(false);
+$('withdrawWorkerProfile').onclick=()=>withdrawWorkerPublication(true);
 
 function openPublication(worker){
   if(isWorkerPublished(worker)) return message('الملف منشور في بحث الكفيل.');
