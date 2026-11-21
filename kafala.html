@@ -685,7 +685,7 @@ select.inp{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.
             <label style="display:block;margin-top:8px"><input type="checkbox" id="publishWorkerPhoto"> وافق العامل على نشر صورته.</label>
             <label style="display:block;margin-top:8px"><input type="checkbox" id="publishWorkerDetails"> وافق العامل على نشر جنسيته ومهاراته.</label>
           </fieldset>
-          <label style="display:block;margin:14px 0"><input type="checkbox" id="allowTransferWhatsapp">
+          <label style="display:block;margin:14px 0"><input type="checkbox" id="allowTransferWhatsapp" aria-describedby="whatsappSubmitReminder">
             أؤكد أن رقم التواصل يخصني أو أنني مخوّل باستخدامه، وأوافق على إتاحته لزوار الإعلان عند التواصل عبر واتساب.
           </label>
           <div id="kafalaPinFields" style="margin:16px 0">
@@ -708,6 +708,9 @@ select.inp{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.
           </div>
           <!-- PAYMENT -->
           <div class="pay-box">
+            <p id="whatsappSubmitReminder" style="background:#fff6df;color:#563a0c;border:1px solid #e8ce92;border-radius:8px;padding:10px 12px;margin:0 0 12px;font-size:14px;text-align:start;line-height:1.6">
+              <strong>قبل الإرسال</strong> فعّل خيار التواصل عبر واتساب ليتمكن زوار الإعلان من مراسلتك مباشرة على رقم التواصل.
+            </p>
             <div id="kafala-pay-msg" role="status" aria-live="polite" style="font-size:13px;margin-bottom:10px"></div>
             <button class="stripe-btn" id="kafala-pay-btn" type="button" onclick="processPayment()">إرسال الإعلان دون دفع</button>
             <button class="nav-link" id="kafalaCancelEdit" type="button" hidden>الرجوع إلى الطلب</button>
@@ -1087,6 +1090,6 @@ loadListings();
 function toEnglishDigits(v){return String(v).replace(/[٠-٩۰-۹]/g,c=>String('٠١٢٣٤٥٦٧٨٩'.indexOf(c)>=0?'٠١٢٣٤٥٦٧٨٩'.indexOf(c):'۰۱۲۳۴۵۶۷۸۹'.indexOf(c)));}
 document.querySelectorAll('input,textarea').forEach(el=>{el.addEventListener('input',()=>{if(el.type!=='file'&&el.type!=='checkbox'){const next=toEnglishDigits(el.value);if(next!==el.value)el.value=next;}})});
 </script>
-<script src="kafala-owner.js?v=6"></script>
+<script src="kafala-owner.js?v=7"></script>
 </body>
 </html>

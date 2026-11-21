@@ -422,6 +422,13 @@
       if (!declarationIds.every(id => el(id).checked)) return message(msg, 'أكمل جميع إقرارات الإعلان قبل الإرسال.');
       if (!validPin(pin) || pin !== el('createOwnerPinAgain').value) return message(msg, 'أدخل 6 أرقام متطابقة في خانتي الرمز.');
     }
+    const whatsappConsent = el('allowTransferWhatsapp');
+    if (!whatsappConsent.checked && !window.confirm(
+      'التواصل عبر واتساب غير مفعّل، لذلك لن يتمكن الزوار من مراسلتك. هل تريد متابعة الإرسال بدون واتساب؟'
+    )) {
+      whatsappConsent.focus();
+      return;
+    }
     const button = el('kafala-pay-btn');
     button.disabled = true;
     message(msg, 'جارٍ الحفظ…');
