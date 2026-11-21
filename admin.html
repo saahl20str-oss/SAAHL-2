@@ -537,13 +537,22 @@ async function loadKf(){
  ]);
  if(error){w.textContent='تعذر تحميل طلبات نقل الكفالة: '+error.message;const badge=document.getElementById('kf-badge');if(badge)badge.style.display='none';const total=document.getElementById('s-kf');if(total)total.textContent='—';const pendingCard=document.getElementById('s-kf-pending');if(pendingCard)pendingCard.textContent='—';const summary=document.getElementById('ss-kf');if(summary)summary.textContent='تعذر تحميل الإعلانات';return;}
  aKf=data||[];
+ const legacyPhotoPrefix=SU+'/storage/v1/object/public/saahl-kafala-photos/';
+ await Promise.all(aKf.map(async item=>{
+  if(!item.worker_photo_url?.startsWith(legacyPhotoPrefix))return;
+  try{
+   const path=decodeURIComponent(new URL(item.worker_photo_url).pathname.split('/saahl-kafala-photos/')[1]);
+   const {data}=await db.storage.from('saahl-kafala-photos').createSignedUrl(path,600);
+   if(data?.signedUrl)item.review_photo_url=data.signedUrl;
+  }catch{ /* Keep the review record accessible even if a legacy photo is missing. */ }
+ }));
  const editsByAd=new Map((edits||[]).map(edit=>[edit.ad_id,edit]));
  const isExpired=k=>k.review_status==='approved'&&k.ends_at&&Date.parse(k.ends_at)<=Date.now();
  const expiredCount=aKf.filter(isExpired).length;
  const pendingCount=aKf.filter(k=>!isExpired(k)&&(k.review_status==='pending_review'||editsByAd.has(k.id))).length;
  const kfTotal=document.getElementById('s-kf'),kfSummary=document.getElementById('ss-kf'),kfStatus=document.getElementById('ss-kf-status');
  const kfPending=pendingCount;
- const kfPublished=aKf.filter(k=>k.is_active===true&&!isExpired(k)).length;
+ const kfPublished=aKf.filter(k=>k.is_active===true&&k.launch_verified_at&&!isExpired(k)).length;
  const kfRejected=aKf.filter(k=>k.review_status==='rejected').length;
  if(kfTotal)kfTotal.textContent=String(aKf.length);
  const kfPendingCard=document.getElementById('s-kf-pending');if(kfPendingCard)kfPendingCard.textContent=String(kfPending);
@@ -557,12 +566,12 @@ async function loadKf(){
  const edit=editsByAd.get(k.id);
  const expired=isExpired(k);
  const rejected=!edit&&k.review_status==='rejected'&&!k.is_active;
- const status=expired?'منتهي':edit?'تعديل بانتظار المراجعة':k.review_status==='rejected'?'مرفوض':k.is_active?'منشور':k.review_status==='approved'?'موقوف':'بانتظار المراجعة';
+ const status=expired?'منتهي':edit?'تعديل بانتظار المراجعة':k.review_status==='rejected'?'مرفوض':k.is_active&&k.launch_verified_at?'منشور':k.is_active?'بانتظار التحقق':k.review_status==='approved'?'موقوف':'بانتظار المراجعة';
  const remaining=k.is_active&&k.ends_at?Math.max(0,Math.ceil((new Date(k.ends_at)-Date.now())/86400000)):null;
  const details='<div class="kf-meta">الجنسية: '+kfSafe(k.nationality)+' | العمر: '+kfSafe(k.age)+' | الخبرة: '+kfSafe(k.experience_years)+' سنة | المدة: '+kfSafe(k.ad_days)+' يوم</div><div class="kf-meta">المهارات: '+kfSafe((k.skills||[]).join('، ')||'غير محددة')+'</div><div class="kf-meta">سبب النقل: '+kfSafe(k.reason)+'</div><div class="kf-meta">اسم الكفيل: '+kfSafe(k.sponsor_display_name)+' | الهاتف: <span dir="ltr">'+kfSafe(k.contact_phone)+'</span></div><div class="kf-meta">تاريخ الطلب: '+fd(k.created_at)+' | انتهاء العرض: '+(k.is_active?fd(k.ends_at):'يحدد عند النشر')+(remaining!==null?' | المتبقي: '+remaining+' يوم':'')+'</div>';
  const verification=k.launch_verified_at?'<p class="kf-meta">تم توثيق صفة المعلن وموافقة العامل في '+fd(k.launch_verified_at)+'</p>':(!expired&&k.review_status!=='rejected'?'<p class="kf-meta">محجوب عن الجمهور إلى حين التحقق من صفة المعلن وموافقة العامل.</p><button class="btn btn-o btn-s" onclick="verifyTransfer(\''+k.id+'\')">توثيق التحقق</button>':'');
  const actions=expired?`<p class="kf-meta">انتهت فترة الإعلان وهو غير ظاهر للزوار.</p><button class="btn btn-d btn-s" onclick="deleteKf('${k.id}','expired',this)">حذف الإعلان</button>`:rejected?`<div class="kf-actions"><button class="btn btn-d btn-s" onclick="deleteKf('${k.id}','rejected',this)">حذف الطلب</button></div>`:'<div class="kf-actions">'+(!edit&&!editError&&k.review_status==='pending_review'?'<button class="btn btn-s" onclick="reviewKf(\''+k.id+'\',\'approve\')">اعتماد ونشر</button><button class="btn btn-o btn-s" onclick="reviewKf(\''+k.id+'\',\'reject\')">رفض</button>':'')+(k.is_active?'<button class="btn btn-d btn-s" onclick="reviewKf(\''+k.id+'\',\'stop\')">إيقاف</button>':k.review_status==='approved'?'<button class="btn btn-s" onclick="reviewKf(\''+k.id+'\',\'resume\')">استئناف إن لم تنتهِ المدة</button>':'')+'</div>';
- return '<article class="kf-line"><div class="kf-line-main"><div class="kf-line-name"><strong>'+kfSafe(k.worker_name)+'</strong><small>'+kfSafe(k.profession)+' — '+kfSafe(k.emirate)+'</small></div><span class="bge '+(expired?'expired':k.is_active?'active':'pending')+'">'+status+'</span><span class="kf-line-date">'+fd(k.created_at)+'</span><button type="button" class="btn btn-o btn-s" onclick="this.closest(\'.kf-line\').classList.toggle(\'expanded\')">التفاصيل</button></div><div class="kf-line-detail">'+details+kfReviewFields(k)+verification+actions+(edit&&!expired?kfEditReview(edit):'')+'</div></article>';
+ return '<article class="kf-line"><div class="kf-line-main"><div class="kf-line-name"><strong>'+kfSafe(k.worker_name)+'</strong><small>'+kfSafe(k.profession)+' — '+kfSafe(k.emirate)+'</small></div><span class="bge '+(expired?'expired':(k.is_active&&k.launch_verified_at)?'active':'pending')+'">'+status+'</span><span class="kf-line-date">'+fd(k.created_at)+'</span><button type="button" class="btn btn-o btn-s" onclick="this.closest(\'.kf-line\').classList.toggle(\'expanded\')">التفاصيل</button></div><div class="kf-line-detail">'+details+kfReviewFields(k)+verification+actions+(edit&&!expired?kfEditReview(edit):'')+'</div></article>';
  }).join('')+'</div>';
 }
 function kfReviewFields(ad, full=false){
@@ -572,9 +581,9 @@ function kfReviewFields(ad, full=false){
   monthly_salary:'الراتب',religion:'الديانة',current_status:'الوضع الحالي'
  }:{monthly_salary:'الراتب',religion:'الديانة',current_status:'الوضع الحالي'};
  const lines=Object.entries(labels).map(([key,label])=>'<div class="kf-meta">'+label+': '+kfSafe(Array.isArray(ad[key])?ad[key].join('، '):ad[key])+'</div>').join('');
- const value=String(ad.worker_photo_url||'');
+ const value=String(ad.review_photo_url||ad.worker_photo_url||'');
  const safePhoto=(value.length<=700000&&/^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+/]+=*$/.test(value))
-   || value.startsWith(SU+'/storage/v1/object/public/saahl-kafala-photos/');
+   || value.startsWith(SU+'/storage/v1/object/sign/saahl-kafala-photos/');
  return lines+(safePhoto?'<img alt="صورة العامل" loading="lazy" style="max-width:100%;max-height:180px;object-fit:contain" src="'+kfSafe(value)+'">':'');
 }
 function kfEditReview(edit){
