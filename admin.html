@@ -307,6 +307,7 @@ body.admin-menu-open{overflow:hidden}
 
     <div id="pg-kafala" class="pg">
       <div class="pt">إعلانات نقل الكفالة</div>
+      <div class="cd"><div class="ch"><span class="ct2">طلبات التواصل والخصوصية والبلاغات</span><button class="btn btn-o btn-s" id="refreshLegalRequests" type="button">عرض أحدث الطلبات</button></div><div id="legalRequests"></div></div>
       <div class="cd" style="padding:0;overflow:hidden"><div id="kf-wrap"><div class="ld"><div class="sp"></div>جارٍ التحميل...</div></div></div>
     </div>
 
@@ -406,11 +407,9 @@ function adminShowLogin(){
 function adminTimeout(promise,ms,label){return Promise.race([promise,new Promise((_,reject)=>setTimeout(()=>reject(new Error('انتهت مهلة '+label+' بعد '+Math.round(ms/1000)+' ثوانٍ. تحقق من الاتصال أو إعدادات Supabase.')),ms))]);}
 async function adminRoleCheck(user){
  if(!user?.id)return {ok:false,reason:'لا توجد جلسة دخول صالحة.'};
- const {data,error}=await adminTimeout(db.from('profiles').select('role').eq('id',user.id).maybeSingle(),12000,'التحقق من صلاحية الإدارة');
+ const {data,error}=await adminTimeout(db.rpc('is_saahl_admin'),12000,'التحقق من صلاحية الإدارة');
  if(error)return {ok:false,reason:'تعذّر التحقق من صلاحية الإدارة: '+error.message};
- if(!data)return {ok:false,reason:'لم تظهر صلاحية الإدارة لهذا الحساب. يرجى إعادة المحاولة.'};
- if(String(data.role||'').trim().toUpperCase()!=='ADMIN')
-  return {ok:false,reason:'الحساب لا يحمل صلاحية ADMIN.',notAdmin:true};
+ if(data!==true)return {ok:false,reason:'الحساب لا يحمل صلاحية الإدارة.',notAdmin:true};
  return {ok:true};
 }
 async function doLogin(){
@@ -477,10 +476,30 @@ async function loadStats(){
   if(!aBk.length){w.innerHTML=eh('لا توجد حجوزات حتى الآن');return;}
   w.innerHTML=`<div class="tw"><table><thead><tr><th>الكفيل</th><th>العاملة</th><th>المكتب</th><th>التاريخ</th><th>الحالة</th><th>العمولة</th></tr></thead><tbody>${aBk.map(b=>`<tr><td>${b.sponsor_name||'—'}</td><td>${b.maid_name||'—'}</td><td>${b.office_name||'—'}</td><td>${fd(b.created_at)}</td><td><span class="bge ${b.status==='booked'?'booked':b.status==='completed'?'active':'pending'}">${b.status==='booked'?'محجوزة':b.status==='completed'?'مكتملة':'معلقة'}</span></td><td style="font-weight:600;color:var(--teal)">69 AED</td></tr>`).join('')}</tbody></table></div>`;
 }
-async function loadOff(){const {data,error}=await db.from('offices').select('id,name,license_number,emirate,phone,status,created_at').order('created_at',{ascending:false});if(error){document.getElementById('off-wrap').textContent='تعذر تحميل طلبات المكاتب: '+error.message;return}aOff=data||[];renderOff(aOff)}
-function renderOff(data){const w=document.getElementById('off-wrap');w.replaceChildren();if(!data.length){w.textContent='لا توجد طلبات مكاتب مسجلة';return}const table=document.createElement('table');const head=document.createElement('thead');const tr=document.createElement('tr');for(const title of ['المكتب','الإمارة','الترخيص','الهاتف','التاريخ','الحالة','الإجراء']){const th=document.createElement('th');th.textContent=title;tr.append(th)}head.append(tr);table.append(head);const body=document.createElement('tbody');for(const o of data){const row=document.createElement('tr');for(const val of [o.name,o.emirate,o.license_number,o.phone,fd(o.created_at),({pending:'بانتظار الاعتماد',approved:'معتمد',rejected:'مرفوض',suspended:'موقوف'})[o.status]||o.status]){const td=document.createElement('td');td.textContent=val||'—';row.append(td)}const actions=document.createElement('td');for(const [status,label] of [['approved','اعتماد'],['rejected','رفض'],['suspended','إيقاف']]){if(o.status===status)continue;const btn=document.createElement('button');btn.className='btn btn-s '+(status==='approved'?'btn-o':'btn-d');btn.textContent=label;btn.onclick=()=>togOff(o.id,status,o.name);actions.append(btn)}row.append(actions);body.append(row)}table.append(body);const scroll=document.createElement('div');scroll.className='tw';scroll.append(table);w.append(scroll)}
+async function loadOff(){const {data,error}=await db.from('offices').select('id,name,license_number,emirate,phone,status,created_at,declared_license_issuer,verified_license_issuer,verified_license_at,verified_license_expires,legal_agreement_at').order('created_at',{ascending:false});if(error){document.getElementById('off-wrap').textContent='تعذر تحميل طلبات المكاتب: '+error.message;return}aOff=data||[];renderOff(aOff)}
+function renderOff(data){const w=document.getElementById('off-wrap');w.replaceChildren();if(!data.length){w.textContent='لا توجد طلبات مكاتب مسجلة';return}const table=document.createElement('table');const head=document.createElement('thead');const tr=document.createElement('tr');for(const title of ['المكتب','الإمارة','الترخيص','الهاتف','التاريخ','الحالة','الإجراء']){const th=document.createElement('th');th.textContent=title;tr.append(th)}head.append(tr);table.append(head);const body=document.createElement('tbody');for(const o of data){const row=document.createElement('tr');for(const val of [o.name,o.emirate,o.license_number,o.phone,fd(o.created_at),({pending:'بانتظار الاعتماد',approved:'معتمد',rejected:'مرفوض',suspended:'موقوف'})[o.status]||o.status]){const td=document.createElement('td');td.textContent=val||'—';row.append(td)}const actions=document.createElement('td');
+ const info=document.createElement('p');
+ info.textContent=o.verified_license_at?'آخر تحقق: '+fd(o.verified_license_at)+' — '+o.verified_license_issuer+' · الانتهاء: '+(o.verified_license_expires||'—'):'الرخصة بانتظار التحقق الرسمي';
+ const verify=document.createElement('button');
+ verify.type='button';verify.className='btn btn-o btn-s';verify.textContent='توثيق الرخصة';verify.onclick=()=>verifyOffice(o.id);
+ const instructions=document.createElement('a');instructions.href='legal.html#verification';instructions.textContent='خطوات المطابقة';
+ actions.append(info,verify,instructions);
+ for(const [status,label] of [['approved','اعتماد'],['rejected','رفض'],['suspended','إيقاف']]){if(o.status===status)continue;const btn=document.createElement('button');btn.className='btn btn-s '+(status==='approved'?'btn-o':'btn-d');btn.textContent=label;btn.onclick=()=>togOff(o.id,status,o.name);actions.append(btn)}row.append(actions);body.append(row)}table.append(body);const scroll=document.createElement('div');scroll.className='tw';scroll.append(table);w.append(scroll)}
 function filterOffices(){const q=document.getElementById('off-s').value.toLowerCase(),status=document.getElementById('off-st').value;renderOff(aOff.filter(o=>(!q||o.name.toLowerCase().includes(q))&&(!status||(status==='active'?o.status==='approved':status==='pending'?o.status==='pending':o.status===status))))}
-async function togOff(id,status,name){if(!confirm('هل تؤكد '+(status==='approved'?'اعتماد':status==='rejected'?'رفض':'إيقاف')+' المكتب: '+name+'؟ تأكد من الترخيص قبل الاعتماد.'))return;const {error}=await db.from('offices').update({status}).eq('id',id);if(error){toast('فشل التحديث: '+error.message);return}toast('تم تحديث حالة المكتب');await loadOff();await loadStats()}
+async function verifyOffice(id){
+ const office=aOff.find(item=>item.id===id);
+ if(!office)return;
+ if(!confirm('هل طابقت الاسم القانوني والفرع والرقم والسريان مع القائمة الرسمية أو الجهة المصدرة؟'))return;
+ const issuer=prompt('الجهة المصدرة كما تظهر في الرخصة',office.declared_license_issuer||'');
+ if(!issuer?.trim())return;
+ const expiry=prompt('تاريخ انتهاء الرخصة (YYYY-MM-DD)',office.verified_license_expires||'');
+ if(!expiry)return;
+ if(!/^\d{4}-\d{2}-\d{2}$/.test(expiry.trim())){toast('أدخل تاريخ انتهاء صحيحًا');return;}
+ const {error}=await db.rpc('saahl2_verify_office',{p_id:id,p_issuer:issuer.trim(),p_expires:expiry.trim()});
+ if(error){toast('تعذر تسجيل التحقق: '+error.message);return;}
+ await loadOff();
+}
+async function togOff(id,status,name){if(!confirm('هل تؤكد '+(status==='approved'?'اعتماد':status==='rejected'?'رفض':'إيقاف')+' المكتب: '+name+'؟ تأكد من الترخيص قبل الاعتماد.'))return;if(status==='approved'&&!aOff.find(item=>item.id===id)?.verified_license_expires){toast('وثّق التحقق من الرخصة أولاً.');return;}const {error}=await db.from('offices').update({status}).eq('id',id);if(error){toast('فشل التحديث: '+error.message);return}toast('تم تحديث حالة المكتب');await loadOff();await loadStats()}
 async function loadSpo(){const {data}=await db.from('sponsor_profiles').select('*').order('created_at',{ascending:false});aSpo=data||[];renderSpo(aSpo);}
 function renderSpo(data){const w=document.getElementById('spo-wrap');if(!data.length){w.innerHTML=eh('لا يوجد كفلاء مسجلون');return;}w.innerHTML=`<div class="tw"><table><thead><tr><th>الكفيل</th><th>الإمارة</th><th>البريد</th><th>تاريخ التسجيل</th><th>إجراء</th></tr></thead><tbody>${data.map(s=>`<tr><td><div class="rf"><div class="av" style="background:${ac(s.full_name)}">${ini(s.full_name)}</div>${s.full_name||'—'}</div></td><td>${s.emirate||'—'}</td><td>${s.email||'—'}</td><td>${fd(s.created_at)}</td><td><button class="btn btn-d btn-s" onclick="delSpo('${s.id}')">حذف</button></td></tr>`).join('')}</tbody></table></div>`;}
 function filterSponsors(){const q=document.getElementById('spo-s').value.toLowerCase();renderSpo(aSpo.filter(s=>!q||(s.full_name||'').toLowerCase().includes(q)));}
@@ -488,10 +507,32 @@ async function delSpo(id){if(!confirm('حذف الكفيل؟'))return;await db.f
 async function loadBk(){const {data}=await db.from('bookings').select('*').order('created_at',{ascending:false});aBk=data||[];const w=document.getElementById('bk-wrap');if(!aBk.length){w.innerHTML=eh('لا توجد حجوزات');return;}w.innerHTML=`<div class="tw"><table><thead><tr><th>الكفيل</th><th>العاملة</th><th>المكتب</th><th>التاريخ</th><th>الحالة</th><th>العمولة</th></tr></thead><tbody>${aBk.map(b=>`<tr><td>${b.sponsor_name||'—'}</td><td>${b.maid_name||'—'}</td><td>${b.office_name||'—'}</td><td>${fd(b.created_at)}</td><td><span class="bge ${b.status==='booked'?'booked':b.status==='completed'?'active':'pending'}">${b.status==='booked'?'محجوزة':b.status==='completed'?'مكتملة':'معلقة'}</span></td><td style="font-weight:600;color:var(--teal)">69 AED</td></tr>`).join('')}</tbody></table></div>`;}
 async function loadPy(){const {data}=await db.from('payments').select('*').order('created_at',{ascending:false});aPy=data||[];let o=0,b=0,k=0;aPy.forEach(p=>{if(p.type==='subscription')o+=p.amount||0;else if(p.type==='booking')b+=p.amount||0;else if(p.type==='kafala_ad')k+=p.amount||0;});document.getElementById('py-off').textContent=o.toLocaleString()+' AED';document.getElementById('py-bk').textContent=b.toLocaleString()+' AED';document.getElementById('py-kf').textContent=k.toLocaleString()+' AED';const w=document.getElementById('py-wrap');if(!aPy.length){w.innerHTML=eh('لا توجد مدفوعات');return;}const tl={subscription:'اشتراك شهري',booking:'عمولة حجز',kafala_ad:'إعلان كفالة',strip_ad:'إعلان شريط'};w.innerHTML=`<div class="tw"><table><thead><tr><th>المستخدم</th><th>النوع</th><th>المبلغ</th><th>التاريخ</th><th>الحالة</th></tr></thead><tbody>${aPy.map(p=>`<tr><td>${p.user_name||'—'}</td><td>${tl[p.type]||p.type||'—'}</td><td style="font-weight:600;color:var(--teal)">${(p.amount||0).toLocaleString()} AED</td><td>${fd(p.created_at)}</td><td><span class="bge ${p.status==='paid'?'active':'expired'}">${p.status==='paid'?'مكتمل':'فشل'}</span></td></tr>`).join('')}</tbody></table></div>`;}
 const kfSafe=v=>String(v??'—').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const legalRequestKinds={privacy:'خصوصية',security:'إبلاغ أمني',complaint:'شكوى أو استفسار',transfer_contact:'تواصل بشأن إعلان',transfer_report:'بلاغ عن إعلان'};
+async function loadLegalRequests(){
+ const container=document.getElementById('legalRequests');
+ const {data,error}=await db.from('saahl2_support_requests').select('id,kind,requester_email,message,ad_id,created_at').is('closed_at',null).order('created_at',{ascending:false}).limit(60);
+ container.replaceChildren();
+ if(error||!data?.length){container.textContent=error?'تعذر تحميل طلبات الدعم':'لا توجد طلبات مفتوحة.';return;}
+ for(const item of data){
+  const entry=document.createElement('article');entry.className='kf-line';
+  const heading=document.createElement('strong');heading.textContent=legalRequestKinds[item.kind]+' · '+fd(item.created_at);
+  const ref=document.createElement('p');ref.textContent='الطلب: '+item.id+(item.ad_id?' · الإعلان: '+item.ad_id.slice(0,8).toUpperCase():'');
+  const sender=document.createElement('p');sender.textContent='بريد الرد: '+item.requester_email;
+  const content=document.createElement('p');content.textContent=item.message;content.style.overflowWrap='anywhere';
+  const close=document.createElement('button');close.type='button';close.className='btn btn-o btn-s';close.textContent='إغلاق الطلب';
+  close.onclick=async()=>{
+   const {error}=await db.from('saahl2_support_requests').update({closed_at:new Date().toISOString()}).eq('id',item.id);
+   if(error){toast('تعذر إغلاق الطلب');return;}
+   await loadLegalRequests();
+  };
+  entry.append(heading,ref,sender,content,close);container.append(entry);
+ }
+}
+document.getElementById('refreshLegalRequests').addEventListener('click',loadLegalRequests);
 async function loadKf(){
  const w=document.getElementById('kf-wrap');
  const [{data,error},{data:edits,error:editError}]=await Promise.all([
-   db.from('kafala_ads').select('id,worker_name,nationality,age,profession,experience_years,monthly_salary,religion,current_status,emirate,skills,reason,contact_phone,sponsor_display_name,ad_days,ends_at,created_at,is_active,review_status,worker_photo_url').order('created_at',{ascending:false}),
+   db.rpc('saahl2_admin_transfers'),
    db.rpc('kafala_pending_edits')
  ]);
  if(error){w.textContent='تعذر تحميل طلبات نقل الكفالة: '+error.message;const badge=document.getElementById('kf-badge');if(badge)badge.style.display='none';const total=document.getElementById('s-kf');if(total)total.textContent='—';const pendingCard=document.getElementById('s-kf-pending');if(pendingCard)pendingCard.textContent='—';const summary=document.getElementById('ss-kf');if(summary)summary.textContent='تعذر تحميل الإعلانات';return;}
@@ -519,8 +560,9 @@ async function loadKf(){
  const status=expired?'منتهي':edit?'تعديل بانتظار المراجعة':k.review_status==='rejected'?'مرفوض':k.is_active?'منشور':k.review_status==='approved'?'موقوف':'بانتظار المراجعة';
  const remaining=k.is_active&&k.ends_at?Math.max(0,Math.ceil((new Date(k.ends_at)-Date.now())/86400000)):null;
  const details='<div class="kf-meta">الجنسية: '+kfSafe(k.nationality)+' | العمر: '+kfSafe(k.age)+' | الخبرة: '+kfSafe(k.experience_years)+' سنة | المدة: '+kfSafe(k.ad_days)+' يوم</div><div class="kf-meta">المهارات: '+kfSafe((k.skills||[]).join('، ')||'غير محددة')+'</div><div class="kf-meta">سبب النقل: '+kfSafe(k.reason)+'</div><div class="kf-meta">اسم الكفيل: '+kfSafe(k.sponsor_display_name)+' | الهاتف: <span dir="ltr">'+kfSafe(k.contact_phone)+'</span></div><div class="kf-meta">تاريخ الطلب: '+fd(k.created_at)+' | انتهاء العرض: '+(k.is_active?fd(k.ends_at):'يحدد عند النشر')+(remaining!==null?' | المتبقي: '+remaining+' يوم':'')+'</div>';
+ const verification=k.launch_verified_at?'<p class="kf-meta">تم توثيق صفة المعلن وموافقة العامل في '+fd(k.launch_verified_at)+'</p>':(!expired&&k.review_status!=='rejected'?'<p class="kf-meta">محجوب عن الجمهور إلى حين التحقق من صفة المعلن وموافقة العامل.</p><button class="btn btn-o btn-s" onclick="verifyTransfer(\''+k.id+'\')">توثيق التحقق</button>':'');
  const actions=expired?`<p class="kf-meta">انتهت فترة الإعلان وهو غير ظاهر للزوار.</p><button class="btn btn-d btn-s" onclick="deleteKf('${k.id}','expired',this)">حذف الإعلان</button>`:rejected?`<div class="kf-actions"><button class="btn btn-d btn-s" onclick="deleteKf('${k.id}','rejected',this)">حذف الطلب</button></div>`:'<div class="kf-actions">'+(!edit&&!editError&&k.review_status==='pending_review'?'<button class="btn btn-s" onclick="reviewKf(\''+k.id+'\',\'approve\')">اعتماد ونشر</button><button class="btn btn-o btn-s" onclick="reviewKf(\''+k.id+'\',\'reject\')">رفض</button>':'')+(k.is_active?'<button class="btn btn-d btn-s" onclick="reviewKf(\''+k.id+'\',\'stop\')">إيقاف</button>':k.review_status==='approved'?'<button class="btn btn-s" onclick="reviewKf(\''+k.id+'\',\'resume\')">استئناف إن لم تنتهِ المدة</button>':'')+'</div>';
- return '<article class="kf-line"><div class="kf-line-main"><div class="kf-line-name"><strong>'+kfSafe(k.worker_name)+'</strong><small>'+kfSafe(k.profession)+' — '+kfSafe(k.emirate)+'</small></div><span class="bge '+(expired?'expired':k.is_active?'active':'pending')+'">'+status+'</span><span class="kf-line-date">'+fd(k.created_at)+'</span><button type="button" class="btn btn-o btn-s" onclick="this.closest(\'.kf-line\').classList.toggle(\'expanded\')">التفاصيل</button></div><div class="kf-line-detail">'+details+kfReviewFields(k)+actions+(edit&&!expired?kfEditReview(edit):'')+'</div></article>';
+ return '<article class="kf-line"><div class="kf-line-main"><div class="kf-line-name"><strong>'+kfSafe(k.worker_name)+'</strong><small>'+kfSafe(k.profession)+' — '+kfSafe(k.emirate)+'</small></div><span class="bge '+(expired?'expired':k.is_active?'active':'pending')+'">'+status+'</span><span class="kf-line-date">'+fd(k.created_at)+'</span><button type="button" class="btn btn-o btn-s" onclick="this.closest(\'.kf-line\').classList.toggle(\'expanded\')">التفاصيل</button></div><div class="kf-line-detail">'+details+kfReviewFields(k)+verification+actions+(edit&&!expired?kfEditReview(edit):'')+'</div></article>';
  }).join('')+'</div>';
 }
 function kfReviewFields(ad, full=false){
@@ -556,6 +598,14 @@ async function deleteKf(id,status,button){
   toast(data?(rejected?'تم حذف الطلب المرفوض':'تم حذف الإعلان المنتهي'):'تغيّرت حالة الطلب. راجع التفاصيل وحاول مرة أخرى.');
   await loadKf();
  } finally {button.disabled=false;}
+}
+async function verifyTransfer(id){
+ if(!confirm('هل راجعت وثيقة صفة الكفيل وأصل الموافقة المنفصلة من العامل وتأكدت من عمره والحقول المسموح بنشرها؟ قد يعود الإعلان المعتمد سابقًا للعرض فور التوثيق.'))return;
+ const reference=prompt('المرجع الداخلي لدليل التحقق والموافقة فقط، دون رقم هوية أو مستند');
+ if(!reference?.trim())return;
+ const {error}=await db.rpc('saahl2_verify_transfer',{p_id:id,p_reference:reference.trim()});
+ if(error){toast('تعذر تسجيل التحقق: '+error.message);return;}
+ await loadKf();
 }
 async function reviewKf(id,action){
  const label={approve:'الموافقة ونشر الإعلان',reject:'رفض الإعلان',stop:'إيقاف الإعلان',resume:'استئناف الإعلان'}[action];

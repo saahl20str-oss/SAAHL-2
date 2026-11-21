@@ -6,7 +6,7 @@
 <title>أعلن في ساهل 2</title>
 <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="https://js.stripe.com/v3/"></script>
+
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -219,7 +219,7 @@ body{font-family:'Tajawal',Arial,sans-serif;background:var(--bg);color:var(--tex
   <div class="hero-badges">
     <div class="hero-badge">✦ يظهر بعد تأكيد الدفع</div>
     <div class="hero-badge">👁️ شريط علوي بارز</div>
-    <div class="hero-badge">💰 10 دراهم / يوم</div>
+    <div class="hero-badge">إعلان تجريبي دون تحصيل</div>
   </div>
 </div>
 
@@ -258,19 +258,19 @@ body{font-family:'Tajawal',Arial,sans-serif;background:var(--bg);color:var(--tex
           <label>نوع المعلن <span class="required">*</span></label>
           <select id="f-type">
             <option value="office">مكتب استقدام</option>
-            <option value="sponsor">كفيل</option>
-            <option value="other">أخرى</option>
+
+
           </select>
         </div>
       </div>
       <div class="form-row">
         <div class="form-group">
-          <label>رقم الهاتف <span class="required">*</span></label>
-          <input type="tel" id="f-phone" placeholder="05XXXXXXXX">
+          <label>هاتف المكتب المسجل <span class="required">*</span></label>
+          <input type="tel" id="f-phone" placeholder="يُجلب من حساب المكتب" readonly>
         </div>
         <div class="form-group">
           <label>واتساب</label>
-          <input type="tel" id="f-whatsapp" placeholder="05XXXXXXXX">
+          <input type="tel" id="f-whatsapp" placeholder="يُجلب من حساب المكتب" readonly>
         </div>
       </div>
     </div>
@@ -295,22 +295,22 @@ body{font-family:'Tajawal',Arial,sans-serif;background:var(--bg);color:var(--tex
         <div class="day-btn" onclick="selectDays(1,this)">
           <div class="day-num">1</div>
           <div class="day-label">يوم</div>
-          <div class="day-price">10 AED</div>
+
         </div>
         <div class="day-btn selected" onclick="selectDays(3,this)">
           <div class="day-num">3</div>
           <div class="day-label">أيام</div>
-          <div class="day-price">30 AED</div>
+
         </div>
         <div class="day-btn" onclick="selectDays(7,this)">
           <div class="day-num">7</div>
           <div class="day-label">أيام</div>
-          <div class="day-price">70 AED</div>
+
         </div>
         <div class="day-btn" onclick="selectDays(30,this)">
           <div class="day-num">30</div>
           <div class="day-label">يوماً</div>
-          <div class="day-price">300 AED</div>
+
         </div>
       </div>
 
@@ -320,12 +320,8 @@ body{font-family:'Tajawal',Arial,sans-serif;background:var(--bg);color:var(--tex
           <span class="summary-value" id="sum-days">3 أيام</span>
         </div>
         <div class="summary-row">
-          <span class="summary-label">السعر / يوم</span>
-          <span class="summary-value">10 AED</span>
-        </div>
-        <div class="summary-row">
-          <span class="summary-label">الإجمالي</span>
-          <span class="summary-value summary-total" id="sum-total">30 AED</span>
+          <span class="summary-label">الرسوم</span>
+          <span class="summary-value">دون تحصيل</span>
         </div>
       </div>
 
@@ -333,7 +329,10 @@ body{font-family:'Tajawal',Arial,sans-serif;background:var(--bg);color:var(--tex
         الوضع التجريبي: لا يتم تحصيل أي مبلغ الآن. يُحفظ الطلب بانتظار مراجعة الإدارة، ولا يُنشر تلقائياً.
       </div>
 
-      <div class="err-msg" id="err-msg"></div>
+      <label style="display:flex;gap:8px;margin-block:12px">
+      <input type="checkbox" id="advertisingConsent"> <span>أقر بصحة محتوى الإعلان، وأوافق على <a href="legal.html#ads">سياسة الإعلانات</a> و<a href="legal.html#privacy">الخصوصية</a>. وأوثّق موافقة العامل قبل أي نشر لبياناته.</span>
+    </label>
+    <div class="err-msg" id="err-msg"></div>
 
       <button class="pay-btn" id="pay-btn" onclick="submitAd()">
         <div class="spinner"></div>
@@ -356,14 +355,12 @@ body{font-family:'Tajawal',Arial,sans-serif;background:var(--bg);color:var(--tex
 <script>
 const SUPA_URL = 'https://hkfxikmpfgixrbrboxeb.supabase.co';
 const SUPA_KEY = 'sb_publishable_OcWY5nY_-b2odLqQxsu2Kw_iQ4YswBz';
-const STRIPE_PK = ''; // checkout must be verified server-side before activation
-const PRICE_ID  = 'price_1Tc2t57KLniAPTryulArfSyR';
 
 const { createClient } = supabase;
 const db = createClient(SUPA_URL, SUPA_KEY);
 // Payment checkout is initiated by the server; do not instantiate Stripe until configured.
 
-let selectedDays = 1;
+let selectedDays = 3;
 let selectedWorker=null,selectedOffice=null;
 
 function selectDays(days, el){
@@ -371,21 +368,24 @@ function selectDays(days, el){
   document.querySelectorAll('.day-btn').forEach(b=>b.classList.remove('selected'));
   el.classList.add('selected');
   document.getElementById('sum-days').textContent = days + (days===1?' يوم':' أيام');
-  document.getElementById('sum-total').textContent = (days * 10) + ' AED';
 }
 
 // Check for success redirect from Stripe
 window.addEventListener('DOMContentLoaded', async ()=>{
   const params = new URLSearchParams(window.location.search);
   const workerId=params.get('worker'), officeId=params.get('office');
-  if(workerId&&officeId){try{const [wr,of]=await Promise.all([db.from('workers').select('id,office_id,display_name,worker_number,nationality,age,experience_years,photo_url,status').eq('id',workerId).eq('office_id',officeId).single(),db.from('offices').select('id,name,phone,whatsapp,emirate,status').eq('id',officeId).single()]);if(wr.error||of.error||!wr.data||!of.data)throw new Error('تعذر قراءة بيانات العاملة أو المكتب');selectedWorker=wr.data;selectedOffice=of.data;document.getElementById('f-name').value=of.data.name||'';document.getElementById('f-type').value='office';document.getElementById('f-phone').value=of.data.phone||'';document.getElementById('f-whatsapp').value=of.data.whatsapp||of.data.phone||'';document.getElementById('f-topic').value='عاملة متاحة: '+(wr.data.display_name||wr.data.worker_number||'');document.getElementById('f-details').value='المكتب: '+of.data.name+' | الإمارة: '+(of.data.emirate||'غير محددة')+' | العاملة: '+(wr.data.display_name||'')+' | الرقم: '+(wr.data.worker_number||'')+' | الجنسية: '+(wr.data.nationality||'')+' | العمر: '+(wr.data.age||'')+' | الخبرة: '+(wr.data.experience_years||0)+' سنوات';const box=document.getElementById('worker-source');box.style.display='flex';box.style.alignItems='center';box.style.gap='16px';box.replaceChildren();if(wr.data.photo_url&&/^https:\/\//.test(wr.data.photo_url)){const im=document.createElement('img');im.src=wr.data.photo_url;im.alt='صورة العاملة';im.style.cssText='width:90px;height:90px;object-fit:cover;border-radius:10px';box.append(im)}const label=document.createElement('div');label.textContent='إعلان عاملة من مكتب '+of.data.name+' — '+(wr.data.display_name||wr.data.worker_number)+' (رقم '+(wr.data.worker_number||'—')+')';box.append(label)}catch(e){document.getElementById('err-msg').textContent='تعذر تحميل العاملة المختارة: '+e.message}}
-  const sessionId = params.get('session_id');
-  if(sessionId){
-    await activateAd(sessionId);
+  const {data:{user}}=await db.auth.getUser();
+  if(user&&!workerId){
+    const {data:office}=await db.from('offices').select('id,name,phone,whatsapp').eq('owner_id',user.id).eq('status','approved').limit(1).maybeSingle();
+    if(office){
+      selectedOffice=office;
+      document.getElementById('f-name').value=office.name;
+      document.getElementById('f-phone').value=office.phone||'';
+      document.getElementById('f-whatsapp').value=office.whatsapp||office.phone||'';
+    }
   }
+  if(workerId&&officeId){try{const [wr,of]=await Promise.all([db.from('workers').select('id,office_id,display_name,worker_number,nationality,age,experience_years,photo_url,status').eq('id',workerId).eq('office_id',officeId).single(),db.from('offices').select('id,name,phone,whatsapp,emirate,status').eq('id',officeId).single()]);if(wr.error||of.error||!wr.data||!of.data)throw new Error('تعذر قراءة بيانات العاملة أو المكتب');selectedWorker=wr.data;selectedOffice=of.data;document.getElementById('f-name').value=of.data.name||'';document.getElementById('f-type').value='office';document.getElementById('f-phone').value=of.data.phone||'';document.getElementById('f-whatsapp').value=of.data.whatsapp||of.data.phone||'';document.getElementById('f-topic').value='عاملة متاحة: '+(wr.data.display_name||wr.data.worker_number||'');document.getElementById('f-details').value='المكتب: '+of.data.name+' | الإمارة: '+(of.data.emirate||'غير محددة')+' | العاملة: '+(wr.data.display_name||'')+' | الرقم: '+(wr.data.worker_number||'')+' | الجنسية: '+(wr.data.nationality||'')+' | العمر: '+(wr.data.age||'')+' | الخبرة: '+(wr.data.experience_years||0)+' سنوات';const box=document.getElementById('worker-source');box.style.display='flex';box.style.alignItems='center';box.style.gap='16px';box.replaceChildren();if(wr.data.photo_url&&/^https:\/\//.test(wr.data.photo_url)){const im=document.createElement('img');im.src=wr.data.photo_url;im.alt='صورة العاملة';im.style.cssText='width:90px;height:90px;object-fit:cover;border-radius:10px';box.append(im)}const label=document.createElement('div');label.textContent='إعلان عاملة من مكتب '+of.data.name+' — '+(wr.data.display_name||wr.data.worker_number)+' (رقم '+(wr.data.worker_number||'—')+')';box.append(label)}catch(e){document.getElementById('err-msg').textContent='تعذر تحميل العاملة المختارة: '+e.message}}
 });
-
-async function activateAd(sessionId){document.getElementById('err-msg').textContent='عاد المتصفح من صفحة الدفع. الإعلان قيد التحقق من الدفع بواسطة الخادم؛ لا يتم تفعيله من المتصفح.';}
 
 async function submitAd(){
   const name    = document.getElementById('f-name').value.trim();
@@ -397,6 +397,9 @@ async function submitAd(){
   const errEl   = document.getElementById('err-msg');
   errEl.textContent = '';
 
+  if(!document.getElementById('advertisingConsent').checked){errEl.textContent='وافق على سياسة الإعلان والخصوصية قبل الإرسال.';return;}
+  const {data:{user}}=await db.auth.getUser();
+  if(!user||!selectedOffice){errEl.textContent='سجّل الدخول بحساب مكتب معتمد لإرسال الإعلان. إعلانات نقل الكفالة تُقدّم في صفحتها المخصصة.';return;}
   if(!name){ errEl.textContent='أدخل اسم المعلن'; return; }
   if(!phone){ errEl.textContent='أدخل رقم الهاتف'; return; }
   if(!topic){ errEl.textContent='أدخل عنوان الإعلان'; return; }
@@ -410,18 +413,19 @@ async function submitAd(){
   try {
     // Save ad to Supabase first (pending)
     const {data:ad, error:insertErr} = await db.from('strip_ads').insert({
+      owner_id: user.id,
       advertiser_name: name,
       advertiser_type: type,
       phone,
       whatsapp,
       ad_topic: topic,
-      ad_details: selectedWorker ? details+' | رابط العاملة: '+new URL('search.html?worker='+encodeURIComponent(selectedWorker.id),location.href).href+' | صورة العاملة: '+(selectedWorker.photo_url||'غير متوفرة') : details,
+      ad_details: selectedWorker ? details+' | رابط العاملة: '+new URL('marketplace.html#worker='+encodeURIComponent(selectedWorker.id),location.href).href+' | صورة العاملة: '+(selectedWorker.photo_url||'غير متوفرة') : details,
       days: selectedDays,
       amount: selectedDays * 10,
       status: 'pending',
       placement: 'strip',
       worker_id: selectedWorker?.id || null,
-      office_id: selectedOffice?.id || null,
+      office_id: selectedOffice.id,
       worker_photo_url: selectedWorker?.photo_url || null
     });
 

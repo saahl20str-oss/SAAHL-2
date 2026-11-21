@@ -1,0 +1,27 @@
+*{box-sizing:border-box}
+html{scroll-padding-top:18px}
+body{margin:0;background:#f8f6f0;color:#222821;font:16px/1.85 Tahoma,Arial,sans-serif}
+.bar{padding:12px max(16px,calc((100% - 900px)/2));display:flex;align-items:center;gap:16px;justify-content:space-between;background:#fff;border-bottom:1px solid #e9ddc3}
+.bar a{display:flex;gap:8px;align-items:center;font-weight:700}
+.bar img{object-fit:contain}
+main{width:min(900px,100%);padding:22px 16px 60px;margin:auto}
+h1,h2,p{margin-block-start:0}
+h1{font-size:clamp(24px,5vw,38px);margin-bottom:4px}
+h2{font-size:clamp(20px,4vw,26px);line-height:1.4}
+.muted{color:#625b4d}
+a{color:#614716;text-underline-offset:3px}
+nav{display:flex;flex-wrap:wrap;gap:8px;margin-block:18px}
+nav a{padding:8px 12px;border:1px solid #e2d3ae;background:#fffdf8;border-radius:8px}
+section{background:#fff;border:1px solid #e9e0cf;border-radius:15px;padding:clamp(15px,4vw,26px);margin-block:16px;overflow-wrap:anywhere}
+ul,ol{padding-inline-start:22px}
+li+li{margin-top:9px}
+details{padding:12px;border:1px solid #e9e0cf;border-radius:8px}
+summary{cursor:pointer;font-weight:700}
+form{display:grid;gap:8px}
+label{font-weight:700}
+label.check{display:flex;gap:8px;align-items:flex-start;font-size:14px}
+.check input{width:18px;height:18px;flex:none}
+input,select,textarea,button{font:inherit;border:1px solid #ddd3bf;border-radius:8px;padding:9px;color:inherit;background:#fff}
+button{min-height:46px;background:#c5a556;color:#241e12;font-weight:700;cursor:pointer}
+button:disabled{opacity:.55;cursor:wait}
+:focus-visible{outline:2px solid #76571d;outline-offset:3px}

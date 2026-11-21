@@ -385,12 +385,13 @@
       el('reservedNumber').value = '';
       el('copyReservedNumber').disabled = true;
       fillFields();
-      el('agreeTerms').checked = false;
+      for(const id of declarationIds) el(id).checked = false;
     }
     showPage('form');
     reserveNumber();
   };
 
+  const declarationIds = ['agreeWorker','agreeSponsor','agreeAccuracy','agreeTerms','agreePrivacy'];
   window.processPayment = async () => {
     const msg = 'kafala-pay-msg';
     if (!validateForm()) return message(msg, 'أكمل الحقول المطلوبة.');
@@ -401,7 +402,7 @@
     const pin = el('createOwnerPin').value;
     if (!session) {
       if (!Number.isInteger(days) || days < 1 || days > 90) return message(msg, 'اختر مدة بين يوم واحد و90 يومًا.');
-      if (!el('agreeTerms').checked) return message(msg, 'وافق على الشروط والأحكام لإرسال الطلب.');
+      if (!declarationIds.every(id => el(id).checked)) return message(msg, 'أكمل جميع إقرارات الإعلان قبل الإرسال.');
       if (!validPin(pin) || pin !== el('createOwnerPinAgain').value) return message(msg, 'أدخل 6 أرقام متطابقة في خانتي الرمز.');
     }
     const button = el('kafala-pay-btn');
@@ -418,7 +419,11 @@
       } else {
         const number = await reserveNumber();
         if (!number) throw new Error('أعد محاولة تجهيز رقم الطلب قبل الإرسال.');
-        const {data,error} = await _db.rpc('kafala_submit_numbered', {p_request:requestKey,p_number:number,p_pin:pin,p_days:days,p_fields:payload});
+        const {data,error} = await _db.rpc('saahl2_submit_transfer', {
+          p_request:requestKey,p_number:number,p_pin:pin,p_days:days,p_fields:payload,
+          p_declarations:{version:'2026-11-21',worker_consent:el('agreeWorker').checked,current_sponsor:el('agreeSponsor').checked,
+            accuracy:el('agreeAccuracy').checked,official_procedure:el('agreeTerms').checked,privacy:el('agreePrivacy').checked}
+        });
         if (error?.code === 'P4100') {
           requestNumber = null;
           el('reservedNumber').value = '';
