@@ -81,6 +81,61 @@ try {
    console.log(JSON.stringify({width,workerPreview:{...good,closed}}));
    await ctx.close();
  }
+ // A lone live ad still moves, and the profile uses the current tab.
+ const stripOrigin='http://127.0.0.1:8765';
+ const workerId='87654321-4321-4321-4321-123456789abc';
+ const officeId='12345678-4321-4321-4321-123456789abc';
+ const profileUrl=stripOrigin+'/marketplace.html#worker='+workerId;
+ const office={id:officeId,name:'مكتب تجريبي',status:'approved',emirate:'دبي'};
+ const worker={id:workerId,office_id:officeId,offices:office,display_name:'عاملة تجريبية',nationality:'كينيا'};
+ const ad={id:workerId,placement:'strip',ad_topic:'عاملة متاحة: W-77',advertiser_name:'مكتب تجريبي',
+   ad_details:'الجنسية: كينيا | رابط العاملة: '+profileUrl};
+ const stripSdk=`window.supabase={createClient:()=>({from:table=>({
+   select(){return this},in(){return this},eq(){return this},not(){return this},order(){return this},
+   limit:async()=>({data:({strip_ads:[${JSON.stringify(ad)}],offices:[${JSON.stringify(office)}],workers:[${JSON.stringify(worker)}]})[table]||[]})
+ })})};`;
+ for(const width of [320,1280]){
+   const ctx=await browser.newContext({viewport:{width,height:844},reducedMotion:'no-preference'});
+   try{
+     await ctx.route('**/*',route=>new URL(route.request().url()).origin===stripOrigin?route.continue():route.abort());
+     await ctx.route(/supabase-js@2/,route=>route.fulfill({contentType:'application/javascript',body:stripSdk}));
+     const page=await ctx.newPage();
+     await page.goto(stripOrigin+'/index.html');
+     const details=page.getByRole('button',{name:'عرض التفاصيل',exact:true});
+     await details.waitFor();
+     const motion=await page.locator('.saahl-ad-message').evaluate(async message=>{
+       const animation=message.getAnimations().find(item=>item.animationName==='saahl-ad-glide');
+       if(!animation)return false;
+       animation.pause();
+       await animation.ready;
+       const details=document.getElementById('saahl-ad-open');
+       animation.currentTime=0;
+       const start=message.getBoundingClientRect().x;
+       const buttonStart=details.getBoundingClientRect().x;
+       animation.currentTime=4000;
+       const outcome=Math.abs(message.getBoundingClientRect().x-start)>5 &&
+         details.getBoundingClientRect().x===buttonStart;
+       animation.play();
+       return outcome;
+     });
+     const single=(await page.locator('#saahl-ad-next').isHidden()) &&
+       (await page.locator('#saahl-ad-meta').textContent()).includes('كينيا');
+     await details.click();
+     const link=page.getByRole('link',{name:'عرض ملف العاملة'});
+     const sameTarget=await link.getAttribute('target')==='_self';
+     if(sameTarget)await Promise.all([page.waitForURL(profileUrl),link.click()]);
+     const profileOpened=sameTarget && await page.locator('#cvModal').waitFor({state:'visible',timeout:5000}).then(()=>true,()=>false);
+     const onePage=ctx.pages().length===1;
+     if(profileOpened){
+       await page.goBack();
+       await page.locator('#adDetailOverlay').waitFor({state:'hidden',timeout:5000});
+     }
+     checks++;
+     const pass=motion&&single&&profileOpened&&onePage;
+     if(!pass)fails++;
+     console.log(JSON.stringify({width,adStrip:{motion,single,profileOpened,onePage,pass}}));
+   }finally{await ctx.close();}
+ }
  for(const asset of ['saahl-pwa-192.png','saahl-pwa-512.png','apple-touch-icon.png']){
    const ctx=await browser.newContext();
    const tab=await ctx.newPage();

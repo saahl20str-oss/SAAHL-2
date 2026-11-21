@@ -725,10 +725,17 @@ body{padding-top:calc(var(--nav-height) + var(--strip-height))}
 #ad-strip{position:fixed;top:var(--nav-height);inset-inline:0;z-index:490;background:#16171c;color:#fff;border-bottom:1px solid #c9a84c}
 .saahl-ad-inner{display:grid;grid-template-columns:minmax(0,1fr) auto auto;align-items:center;gap:8px 12px;max-width:1440px;margin:auto;padding:7px max(12px,3vw)}
 .saahl-ad-copy{min-width:0;display:flex;align-items:center;gap:8px 11px}
-.saahl-ad-copy p{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.saahl-ad-copy p{flex:1;min-width:0;overflow:hidden;white-space:nowrap}
+.saahl-ad-message{display:block;--ad-travel:clamp(14px,3vw,54px);padding-inline-end:var(--ad-travel)}
+#ad-strip[data-active] .saahl-ad-message{animation:saahl-ad-glide 8s ease-in-out infinite}
+@keyframes saahl-ad-glide{
+  0%,100%{transform:translateX(0)}
+  50%{transform:translateX(calc(0px - var(--ad-travel)))}
+}
+@media(prefers-reduced-motion:reduce){#ad-strip[data-active] .saahl-ad-message{animation:none}}
 .saahl-ad-tag{flex:none;border-radius:6px;background:#3c331f;color:#f4d481;padding:3px 8px;font-size:11px;font-weight:800}
 #saahl-ad-title{display:block;overflow:hidden;text-overflow:ellipsis;font-size:15px;line-height:1.4}
-#saahl-ad-meta{color:#e0d9cb;font-size:12px}
+#saahl-ad-meta{display:block;overflow:hidden;text-overflow:ellipsis;color:#e0d9cb;font-size:12px}
 .saahl-ad-actions{display:flex;align-items:center;gap:5px}
 .saahl-ad-actions button,.saahl-ad-cta{min-height:36px;border:1px solid #a7823b;border-radius:7px;padding:4px 10px;font:inherit;font-size:12px;font-weight:800;color:#ffe3a1;background:transparent;cursor:pointer;white-space:nowrap}
 .saahl-ad-actions button:hover,.saahl-ad-cta:hover{border-color:#ffe3a1}
@@ -744,7 +751,7 @@ body{padding-top:calc(var(--nav-height) + var(--strip-height))}
  :root{--strip-height:95px}
  .saahl-ad-inner{grid-template-columns:minmax(0,1fr) auto;gap:4px 8px;padding:7px 10px}
  .saahl-ad-copy{grid-column:1/-1;gap:6px;align-items:flex-start;flex-wrap:wrap}
- .saahl-ad-copy p{flex:1;min-width:0}
+ .saahl-ad-message{--ad-travel:12px}
  #saahl-ad-title{font-size:14px}
  #saahl-ad-meta{display:block;font-size:11px}
  .saahl-ad-cta{grid-column:2}
@@ -755,7 +762,7 @@ body{padding-top:calc(var(--nav-height) + var(--strip-height))}
  <div class="saahl-ad-inner">
   <div class="saahl-ad-copy">
    <span class="saahl-ad-tag" id="saahl-ad-type">إعلانات ساهل 2</span>
-   <p><strong id="saahl-ad-title">روّج لخدمات مكتبك</strong><span id="saahl-ad-meta" hidden></span></p>
+   <p><span class="saahl-ad-message"><strong id="saahl-ad-title">روّج لخدمات مكتبك</strong><span id="saahl-ad-meta" hidden></span></span></p>
   </div>
   <div class="saahl-ad-actions">
    <button type="button" class="saahl-ad-arrow" id="saahl-ad-prev" aria-label="الإعلان السابق" hidden>›</button>
@@ -817,9 +824,17 @@ function openSaahlAd(ad){
  document.getElementById('saahl-ad-dialog-description').textContent=copy.lines.join('\n') || 'لا توجد تفاصيل إضافية';
  const links=document.getElementById('saahl-ad-dialog-links');
  links.replaceChildren();
- const addLink=(href,label)=>{
+ const addLink=(href,label,external=false)=>{
   const link=document.createElement('a');
-  link.href=href; link.textContent=label; link.target='_blank'; link.rel='noopener noreferrer';
+  link.href=href;
+  link.textContent=label;
+  if(external){
+   link.target='_blank';
+   link.rel='noopener noreferrer';
+  }else{
+   link.target='_self';
+   link.addEventListener('click',()=>dialog.close());
+  }
   links.append(link);
  };
  try{
@@ -832,7 +847,7 @@ function openSaahlAd(ad){
   }
  }catch{}
  const whatsapp=saahlAdWhatsApp(ad);
- if(whatsapp)addLink(whatsapp,'تواصل عبر واتساب');
+ if(whatsapp)addLink(whatsapp,'تواصل عبر واتساب',true);
  if(!dialog.open)dialog.showModal();
 }
 function saahlAdType(ad){
@@ -864,6 +879,7 @@ function renderSaahlStrip(index=stripIndex){
  get('meta').hidden=!meta;
  get('prev').hidden=get('next').hidden=count<2;
  get('open').hidden=!ad;
+ document.getElementById('ad-strip').toggleAttribute('data-active',Boolean(ad));
  adjustLayoutForStrip();
 }
 function initSaahlStrip(){
