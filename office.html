@@ -109,6 +109,16 @@ main{max-width:760px;margin:0 auto 65px;padding:0 18px}
 .worker-publication-action{grid-column:1/-1}
 .worker-availability{display:grid;grid-template-columns:minmax(0,auto) minmax(104px,1fr);align-items:center;gap:8px;padding-top:8px;border-top:1px solid #eee7d9;color:#5c5343;font-size:12px}
 @media(max-width:480px){.worker-card-body{padding:13px}.worker-actions{gap:6px}}
+#workerWithdrawal{margin-top:16px}
+#workerWithdrawal>summary{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:48px;padding:10px 13px;border:1px solid #d5be88;border-radius:10px;background:#f9f3e4;color:#3e2e13;cursor:pointer;list-style:none;line-height:1.45}
+#workerWithdrawal>summary::-webkit-details-marker{display:none}
+#workerWithdrawal>summary:hover,#workerWithdrawal[open]>summary{background:#f2e7cc}
+#workerWithdrawal>summary:focus-visible{outline:2px solid #74531a;outline-offset:3px}
+.withdrawal-summary-label,.withdrawal-summary-action{font-weight:800}
+.withdrawal-summary-action{display:inline-flex;align-items:center;gap:7px;font-size:13px}
+.withdrawal-summary-action::after{content:'';flex:none;width:7px;height:7px;border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(45deg);margin-bottom:4px}
+#workerWithdrawal[open] .withdrawal-summary-action::after{transform:rotate(225deg);margin-bottom:0}
+#workerWithdrawal:not([open]) .withdrawal-summary-hide,#workerWithdrawal[open] .withdrawal-summary-show{display:none}
 </style><script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <!-- Mobile-first enhancement; isolated from existing application logic -->
 <link rel="stylesheet" href="./mobile-first.css?v=20261119d">
@@ -149,7 +159,13 @@ main{max-width:760px;margin:0 auto 65px;padding:0 18px}
 <label>المهارات أو ملاحظات إضافية</label><textarea id="description" rows="3" placeholder="مثال: الطبخ، رعاية الأطفال، التنظيف..."></textarea><p id="workerEditorFeedback" class="worker-editor-note" role="status"></p>
 <div class="editor-actions"><button id="addWorker">حفظ ومتابعة للنشر</button><button id="saveWorkerDraft" class="secondary">حفظ كمسودة</button><button id="cancelWorker2" class="secondary">إلغاء</button></div>
 <details id="workerWithdrawal" hidden>
-  <summary>تسجيل سحب موافقة العاملة</summary>
+  <summary>
+    <span class="withdrawal-summary-label">تسجيل سحب موافقة العاملة</span>
+    <span class="withdrawal-summary-action">
+      <span class="withdrawal-summary-show">عرض خيارات السحب</span>
+      <span class="withdrawal-summary-hide">إخفاء الخيارات</span>
+    </span>
+  </summary>
   <p class="muted">اختر ما طلبت العاملة إيقاف عرضه للزوار.</p>
   <button type="button" class="secondary hidden" id="withdrawWorkerPhoto">إيقاف عرض الصورة فقط</button>
   <button type="button" class="secondary" id="withdrawWorkerProfile">إيقاف نشر الملف بالكامل</button>

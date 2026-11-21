@@ -179,6 +179,22 @@ try{
   await office.locator('#closeCV').click();
   await legacy.getByRole('button',{name:'تعديل البيانات'}).click();
   assert.equal(await office.locator('#workerName').inputValue(),'ملف محفوظ');
+  const withdrawal=office.locator('#workerWithdrawal');
+  const disclosure=withdrawal.locator('summary');
+  const withdrawalActions=withdrawal.getByRole('button');
+  for(const width of [320,390,1280]){
+    await office.setViewportSize({width,height:844});
+    assert.ok(await disclosure.getByText('عرض خيارات السحب').isVisible());
+    assert.ok((await disclosure.boundingBox()).height>=48);
+    assert.equal(await withdrawalActions.count(),0);
+    await disclosure.press('Enter');
+    assert.ok(await disclosure.getByText('إخفاء الخيارات').isVisible());
+    assert.ok(await withdrawal.getByRole('button',{name:'إيقاف عرض الصورة فقط'}).isVisible());
+    assert.ok(await withdrawal.getByRole('button',{name:'إيقاف نشر الملف بالكامل'}).isVisible());
+    await noOverflow(office);
+    await disclosure.click();
+    assert.equal(await withdrawalActions.count(),0);
+  }
   await office.locator('#cancelWorker').click();
   await legacy.getByRole('combobox',{name:'حالة التوفر'}).selectOption('unavailable');
   await legacy.getByText('غير منشورة في البحث').waitFor();
