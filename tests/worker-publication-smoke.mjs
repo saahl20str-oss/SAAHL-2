@@ -14,10 +14,8 @@ window.supabase={createClient:(_url,_key,options)=>{
   const officeId='${officeId}', legacyId='${legacyId}';
   const office={id:officeId,owner_id:'owner',name:'مكتب تجربة',status:'approved'};
   const get=()=>JSON.parse(localStorage.workerFixture || JSON.stringify([{id:legacyId,office_id:officeId,
-    display_name:'ملف محفوظ',nationality:'الهند',age:31,status:'available',publication_consent_at:null}]));
+    display_name:'ملف محفوظ',nationality:'الهند',age:31,status:'available',photo_url:'https://example.com/approved.png',publication_consent_at:null}]));
   const set=rows=>{localStorage.workerFixture=JSON.stringify(rows);};
-  const readRequests=()=>JSON.parse(localStorage.consentFixture || '{}');
-  const saveRequests=r=>{localStorage.consentFixture=JSON.stringify(r);};
   const success=data=>({data,error:null});
   return {
     auth:{getUser:async()=>success({user:{id:'owner'}})},
@@ -51,32 +49,15 @@ window.supabase={createClient:(_url,_key,options)=>{
       };return q;
     },
     async rpc(name,args){
-      const rows=get(), requests=readRequests();
+      const rows=get();
       const worker=rows.find(w=>w.id===args.p_worker);
-      if(name==='saahl2_office_publication_states'){
-        return success(rows.map(w=>{const r=requests[w.id];return {worker_id:w.id,state:w.publication_consent_at?'documented':r?.state||'new',photo_allowed:r?.photo||false}}));
-      }
-      if(name==='saahl2_request_worker_publication'){
-        const token=crypto.randomUUID().replaceAll('-','').repeat(2);
-        requests[worker.id]={workerId:worker.id,token,state:'pending'};saveRequests(requests);return success({token});
-      }
-      if(name==='saahl2_set_worker_publication_preview'){
-        requests[worker.id].url=args.p_url;saveRequests(requests);return success(null);
-      }
-      if(name==='saahl2_worker_publication_link'){
-        const r=Object.values(requests).find(row=>row.token===args.p_token);
-        if(!r)return success(null);
-        if(args.p_approve!==undefined){
-          r.state=args.p_approve?'approved':'declined';r.photo=args.p_photo;
-          saveRequests(requests);return success({status:r.state});
-        }
-        const w=rows.find(row=>row.id===r.workerId);
-        return success({status:r.state,office:office.name,photo_url:r.url,profile:{name:w.display_name,number:w.worker_number,nationality:w.nationality,age:w.age}});
-      }
-      if(name==='saahl2_publish_office_worker'){
-        const r=requests[worker.id];
-        if(r?.state!=='approved')throw Error('approval missing');
-        worker.status='available';worker.publication_consent_at=new Date().toISOString();worker.photo_url=r.photo?r.url:null;
+      if(name==='saahl2_publish_with_office_attestation'){
+        if(!worker||args.p_data_confirmed!==true) throw Error('missing office attestation');
+        const photo=worker.publication_photo_draft||worker.photo_url;
+        if(args.p_include_photo&&args.p_confirmed_photo!==photo) throw Error('wrong photo');
+        worker.status='available';
+        worker.publication_consent_at=new Date().toISOString();
+        worker.photo_url=args.p_include_photo?photo:null;
         set(rows);return success(null);
       }
       throw Error('Unexpected RPC: '+name);
@@ -86,7 +67,14 @@ window.supabase={createClient:(_url,_key,options)=>{
 `;
 
 async function noOverflow(page){
-  assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1));
+  const layout=await page.evaluate(()=>({
+    width:innerWidth,scroll:document.documentElement.scrollWidth,
+    overflowing:[...document.querySelectorAll('body *')].filter(e=>{
+      const r=e.getBoundingClientRect();
+      return (r.left < -1 || r.right > innerWidth+1) && r.width > 0;
+    }).slice(0,8).map(e=>e.id||e.className||e.tagName)
+  }));
+  assert.ok(layout.scroll<=layout.width+1,JSON.stringify(layout));
 }
 
 try{
@@ -97,7 +85,7 @@ try{
   const office=await context.newPage();
   await office.goto(root+'office.html');
   const legacy=office.locator('.worker-card').filter({hasText:'ملف محفوظ'});
-  await legacy.getByRole('button',{name:'طلب موافقة النشر'}).waitFor();
+  await legacy.getByRole('button',{name:'انشر في البحث'}).waitFor();
   assert.equal(await office.locator('#availableWorkers').textContent(),'0');
   await noOverflow(office);
 
@@ -107,48 +95,41 @@ try{
   await office.locator('#nationality').selectOption({label:'الهند'});
   await office.locator('#age').fill('34');
   await office.locator('#workerPhotoFile').setInputFiles('saahl-logo.png');
-  await office.getByRole('button',{name:'حفظ ومتابعة'}).click();
-  const dialog=office.getByRole('dialog',{name:'موافقة العاملة على النشر'});
-  await dialog.getByRole('button',{name:'إنشاء رابط الموافقة'}).click();
-  await dialog.getByRole('button',{name:'نسخ الرابط'}).waitFor();
+  await office.getByRole('button',{name:'حفظ ومتابعة للنشر'}).click();
+  const dialog=office.getByRole('dialog',{name:'نشر ملف العاملة'});
+  await dialog.waitFor();
+  assert.ok(await dialog.getByRole('button',{name:'نشر في البحث'}).isDisabled());
+  assert.ok(await office.locator('#confirmPublicationPhoto').isVisible());
+  assert.ok(!(await office.locator('#confirmPublicationPhoto').isChecked()));
   await noOverflow(office);
-  const link=await office.locator('#publicationLink').inputValue();
-  assert.match(link,/#\w{64}$/);
-  await dialog.getByRole('button',{name:'العودة للوحة المكتب'}).click();
-  await office.getByText('بانتظار موافقة العاملة').waitFor();
 
   const market=await context.newPage();
   await market.goto(root+'marketplace.html');
   await market.getByText('مكتب تجربة',{exact:true}).waitFor();
   assert.equal(await market.locator('.office-count strong').textContent(),'0');
 
-  const consent=await context.newPage();
-  await consent.setViewportSize({width:320,height:740});
-  await consent.goto(link);
-  await consent.getByText('ملف تجريبي',{exact:true}).waitFor();
-  await consent.locator('#photoPreview').waitFor();
-  await noOverflow(consent);
-  assert.ok(await consent.locator('#approve').isDisabled());
-  await consent.locator('#consentLanguage').selectOption('en');
-  await consent.getByText('I also agree to have this photo published (optional).').waitFor();
-  await consent.locator('#profileConsent').check();
-  await consent.getByRole('button',{name:'Record my consent'}).click();
-  await consent.getByText(/Your consent has been recorded/).waitFor();
-
-  const refresh=office.getByRole('button',{name:'تحديث حالة النشر'});
-  if(await refresh.isVisible()) await refresh.click();
-  await office.getByText('جاهزة للنشر').waitFor();
-  await office.getByRole('button',{name:'انشر في البحث'}).click();
+  await office.setViewportSize({width:320,height:740});
+  await noOverflow(office);
+  await office.locator('#confirmPublicationData').check();
+  await dialog.getByRole('button',{name:'نشر في البحث'}).click();
   await office.getByText('منشورة في بحث الكفيل').waitFor();
   await market.reload();
   await market.getByText('مكتب تجربة',{exact:true}).waitFor();
   assert.equal(await market.locator('.office-count strong').textContent(),'1');
   assert.equal(await office.evaluate(()=>JSON.parse(localStorage.workerFixture).find(w=>w.worker_number==='TEST-102').photo_url),null);
-  assert.equal(await market.getByText('ملف محفوظ',{exact:true}).count(),0);
 
+  await legacy.getByRole('button',{name:'انشر في البحث'}).click();
+  await office.locator('#confirmPublicationData').check();
+  await office.locator('#confirmPublicationPhoto').check();
+  await dialog.getByRole('button',{name:'نشر في البحث'}).click();
+  await legacy.getByText('منشورة في بحث الكفيل').waitFor();
+  await market.reload();
+  await market.getByText('مكتب تجربة',{exact:true}).waitFor();
+  assert.equal(await market.locator('.office-count strong').textContent(),'2');
+  assert.equal(await office.evaluate(()=>JSON.parse(localStorage.workerFixture).find(w=>w.display_name==='ملف محفوظ').photo_url),'https://example.com/approved.png');
   await office.setViewportSize({width:1280,height:800});
   await noOverflow(office);
-  console.log('Office draft, legacy entry, private photo preview, optional photo, publication and public search passed (320px, 390px and desktop).');
+  console.log('Office attestation, required checkbox, optional photo, existing profile and public search passed (320px, 390px and desktop).');
   await context.close();
 }finally{
   await browser.close();
