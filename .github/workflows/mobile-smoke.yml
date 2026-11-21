@@ -3,14 +3,10 @@ on:
   pull_request:
     paths:
       - '**.html'
-      - 'mobile-first.css'
-      - 'manifest.webmanifest'
-      - 'sw.js'
-      - 'kafala-owner.js'
-      - 'pwa-install.js'
-      - 'notifications-inbox.js'
-      - 'tests/office-announcement-smoke.mjs'
-      - 'saahl-pwa-icon.svg'
+      - '**.css'
+      - '**.js'
+      - '**.webmanifest'
+      - 'supabase/migrations/**'
       - 'tests/**'
       - '.github/workflows/mobile-smoke.yml'
   workflow_dispatch:
@@ -26,10 +22,13 @@ jobs:
       - run: npm install --no-save playwright
       - run: npx playwright install --with-deps chromium
       - run: node --check kafala-owner.js
+      - run: node --check kafala-whatsapp.js
       - run: node --check pwa-install.js
       - run: node --check notifications-inbox.js
       - run: node tests/mobile-smoke.mjs
       - run: node tests/office-announcement-smoke.mjs
+      - run: node tests/worker-publication-smoke.mjs
+      - run: node tests/transfer-public-profile-smoke.mjs
       - uses: actions/upload-artifact@v4
         if: always()
         with:
