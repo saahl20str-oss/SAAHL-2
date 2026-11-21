@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<meta name="referrer" content="no-referrer">
+<title>موافقة النشر | ساهل‑2</title>
+<link rel="stylesheet" href="legal.css">
+<style>
+main{max-width:660px}
+.bar a{font-size:14px}
+#consentLanguage{max-width:110px}
+#review[hidden],#photoConsent[hidden]{display:none}
+#profilePreview{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:12px 0 18px}
+#profilePreview>div{background:#faf8f2;border-radius:9px;padding:8px 10px;min-width:0}
+#profilePreview dt{font-size:13px;color:#625b4d}
+#profilePreview dd{margin:0;white-space:pre-wrap;overflow-wrap:anywhere}
+#photoPreview{display:block;max-height:240px;width:100%;object-fit:contain;background:#f5f1e8;border-radius:10px;margin-block:12px}
+#photoPreview[hidden]{display:none}
+.consent-actions{display:flex;flex-wrap:wrap;gap:8px;margin-block-start:12px}
+.consent-actions button{flex:1 1 140px}
+.consent-actions .secondary{background:#fff}
+.consent-actions button:disabled{cursor:default}
+@media(max-width:340px){#profilePreview{grid-template-columns:1fr}}
+</style>
+<script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script defer src="worker-publication.js"></script>
+</head>
+<body>
+<header class="bar">
+  <a href="index.html"><img src="saahl-logo.png" width="30" height="38" alt="">ساهل‑2</a>
+  <select id="consentLanguage" aria-label="اللغة / Language"><option value="ar">العربية</option><option value="en">English</option></select>
+</header>
+<main>
+  <h1 id="heading">موافقة نشر الملف</h1>
+  <p id="status" role="status">جارٍ تحميل الطلب…</p>
+  <section id="review" hidden aria-labelledby="officeName">
+    <h2 id="officeName"></h2>
+    <p id="intro"></p>
+    <dl id="profilePreview"></dl>
+    <img id="photoPreview" referrerpolicy="no-referrer" hidden alt="">
+    <form id="consentForm">
+      <label class="check"><input type="checkbox" id="profileConsent"> <span id="profileLabel"></span></label>
+      <label class="check" id="photoConsent" hidden><input type="checkbox" id="allowPhoto" disabled> <span id="photoLabel"></span></label>
+      <div class="consent-actions">
+        <button type="submit" id="approve" disabled></button>
+        <button type="button" id="decline" class="secondary"></button>
+      </div>
+    </form>
+  </section>
+  <p><a id="policy" href="legal.html#worker-consent"></a></p>
+</main>
+</body>
+</html>

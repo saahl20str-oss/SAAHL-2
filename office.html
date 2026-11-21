@@ -68,6 +68,22 @@ main{max-width:760px;margin:0 auto 65px;padding:0 18px}
 .legal-checks label:has(input[type=checkbox]){display:block;font-size:14px;line-height:1.7}
 .legal-checks input[type=checkbox]{display:inline-block;width:18px;height:18px;margin-inline-end:5px;vertical-align:middle}
 .legal-checks a{color:#664b18;text-decoration:underline}
+.publication-status{display:block;margin-top:8px;color:#6c5732;font-size:13px;line-height:1.6}
+.worker-publication-action{grid-column:1/-1}
+.worker-publication-action[hidden],#refreshPublicationStates[hidden]{display:none}
+#refreshPublicationStates{margin:0;min-height:44px}
+.worker-optional-photo{grid-column:1/-1}
+#clearWorkerPhoto[hidden]{display:none}
+.worker-optional-photo summary{margin:8px 0;color:#68512c;cursor:pointer}
+.publication-dialog{width:min(510px,calc(100% - 28px));max-height:85dvh;overflow:auto;margin:auto;background:#fff;border:1px solid #e6d8b8;border-radius:16px;padding:clamp(16px,4vw,26px);color:#272924}
+.publication-dialog::backdrop{background:#201b15a6}
+.publication-dialog h3{margin:0 0 9px}
+.publication-dialog p{line-height:1.7}
+.publication-dialog input{width:100%;min-width:0}
+.publication-dialog .editor-actions{align-items:stretch}
+.publication-dialog button,.publication-dialog input{min-height:44px}
+.worker-editor-note{min-height:1.6em;color:#99402d;margin:7px 0;line-height:1.7}
+@media(max-width:480px){.publication-dialog .editor-actions button{flex:1 1 auto}.worker-publication-action{min-height:44px!important}}
 </style><script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <!-- Mobile-first enhancement; isolated from existing application logic -->
 <link rel="stylesheet" href="./mobile-first.css?v=20261119d">
@@ -92,14 +108,35 @@ main{max-width:760px;margin:0 auto 65px;padding:0 18px}
       <label><input id="officeLegalResponsibility" type="checkbox"> أتحمل مسؤولية العقود والاستقدام والتزام المكتب بالأنظمة.</label>
       <label><input id="officeLegalFees" type="checkbox"> أوافق على سياسة <a href="legal.html#ads">الإعلانات</a> و<a href="legal.html#fees">الرسوم</a> الحالية.</label>
     </div><button id="saveOffice">إرسال طلب الاعتماد</button></section>
-<section class="panel hidden" id="officeHome"><div class="dash-header"><div><h2>إدارة العاملات</h2><p>أضف العاملات وتابع حالتهن من مكان واحد.</p></div><button id="newWorker">+ إضافة عاملة</button></div><div id="officeOwnershipNotice" class="office-ownership-notice hidden"></div><div class="stat-grid"><div class="stat"><strong id="totalWorkers">0</strong><span>إجمالي العاملات</span></div><div class="stat"><strong id="availableWorkers">0</strong><span>متاحة</span></div><div class="stat"><strong id="draftWorkers">0</strong><span>مسودة أو غير متاحة</span></div></div><div class="office-worker-filters"><label>البحث عن عاملة <input id="officeWorkerSearch" type="search" placeholder="الاسم أو رقم العاملة"></label><label>الحالة <select id="officeWorkerStatus"><option value="">جميع الحالات</option><option value="available">متاحة</option><option value="unavailable">غير متاحة</option><option value="draft">مسودة</option></select></label><span id="officeWorkerMatchCount"></span></div><div id="workerList" class="workers-grid"></div><div id="officeWorkerPages" class="office-worker-pages"></div></section>
+<section class="panel hidden" id="officeHome"><div class="dash-header"><div><h2>إدارة العاملات</h2><p>أضف العاملات وتابع حالتهن من مكان واحد.</p></div><button id="newWorker">+ إضافة عاملة</button></div><div id="officeOwnershipNotice" class="office-ownership-notice hidden"></div><div class="stat-grid"><div class="stat"><strong id="totalWorkers">0</strong><span>إجمالي العاملات</span></div><div class="stat"><strong id="availableWorkers">0</strong><span>منشورة في البحث</span></div><div class="stat"><strong id="draftWorkers">0</strong><span>غير منشورة</span></div></div><div class="office-worker-filters"><label>البحث عن عاملة <input id="officeWorkerSearch" type="search" placeholder="الاسم أو رقم العاملة"></label><label>الحالة <select id="officeWorkerStatus"><option value="">جميع الحالات</option><option value="available">متاحة</option><option value="unavailable">غير متاحة</option><option value="draft">مسودة</option></select></label><span id="officeWorkerMatchCount"></span><button type="button" id="refreshPublicationStates" class="secondary" hidden>تحديث حالة النشر</button></div><div id="workerList" class="workers-grid"></div><div id="officeWorkerPages" class="office-worker-pages"></div></section>
 <section class="panel hidden" id="workerEditor"><div class="dash-header"><div><div class="eyebrow">ملف العاملة</div><h2 id="editorTitle">إضافة عاملة جديدة</h2><p>أدخل البيانات الأساسية ثم الخبرات السابقة حسب الدولة.</p></div><button id="cancelWorker" class="secondary">العودة للوحة المكتب</button></div>
-<div class="grid"><div><label>اسم أو رمز العاملة *</label><input id="workerName" required></div><div><label>الرقم الخاص بالعاملة *</label><input id="workerNumber" maxlength="40" placeholder="مثال: 21966"></div><div><label>الديانة (اختياري، بموافقة العاملة)</label><select id="religion"><option value="">غير محدد</option><option>الإسلام</option><option>المسيحية</option><option>الهندوسية</option><option>البوذية</option><option>أخرى</option></select></div><div><label>الجنسية *</label><select id="nationality" required><option value="">اختر الجنسية</option></select></div><div><label>العمر (18 سنة فأكثر) *</label><input id="age" type="number" min="18" max="75"></div><div><label>الراتب الشهري بالدرهم</label><input id="salary" type="number" min="0"></div><div><div class="legal-checks"><label for="workerConsentRef">المرجع الداخلي لموافقة العاملة</label>
-    <input id="workerConsentRef" maxlength="80" placeholder="رمز الوثيقة فقط، دون رقم هوية">
-    <label><input id="workerConsentConfirmed" type="checkbox"> وثّقت موافقة العاملة المنفصلة على البيانات المعروضة، وعلى الصورة إن أُرفقت. <a href="legal.html#worker-consent">تفاصيل الموافقة</a></label></div>
-    <label>صورة العاملة (JPG / PNG / WebP)</label><input id="workerPhotoFile" type="file" accept="image/jpeg,image/png,image/webp"><div id="workerPhotoPreview" class="upload-preview"><span>اختر صورة لمعاينتها هنا قبل الحفظ</span></div><div class="photo-tools"><button type="button" id="saveWorkerPhoto" class="secondary" disabled>رفع وحفظ صورة العاملة الحالية</button><small id="photoHelp" class="muted">للعاملة المسجلة: اضغط «إعدادات وتعديل»، واختر صورة ثم «رفع وحفظ صورة العاملة الحالية». للعاملة الجديدة: اختر الصورة ثم احفظ بياناتها.</small></div></div><div><label>رابط صورة HTTPS (بديل اختياري)</label><input id="photo" type="url" placeholder="https://..."></div></div>
+<div class="grid"><div><label>اسم أو رمز العاملة *</label><input id="workerName" required></div><div><label>الرقم الخاص بالعاملة *</label><input id="workerNumber" maxlength="40" placeholder="مثال: 21966"></div><div><label>الديانة (اختياري، بموافقة العاملة)</label><select id="religion"><option value="">غير محدد</option><option>الإسلام</option><option>المسيحية</option><option>الهندوسية</option><option>البوذية</option><option>أخرى</option></select></div><div><label>الجنسية *</label><select id="nationality" required><option value="">اختر الجنسية</option></select></div><div><label>العمر (18 سنة فأكثر) *</label><input id="age" type="number" min="18" max="75"></div><div><label>الراتب الشهري بالدرهم</label><input id="salary" type="number" min="0"></div><div class="worker-optional-photo">
+  <label for="workerPhotoFile">صورة العاملة (اختياري)</label>
+  <input id="workerPhotoFile" type="file" accept="image/jpeg,image/png,image/webp">
+  <div id="workerPhotoPreview" class="upload-preview"></div>
+  <button type="button" id="clearWorkerPhoto" class="secondary" hidden>إزالة الصورة من الملف</button>
+  <details><summary>استخدام رابط صورة موجود على الإنترنت</summary>
+    <label for="photo">رابط الصورة</label><input id="photo" type="url" placeholder="https://...">
+  </details>
+  <p class="muted">تبقى الصورة المختارة من الجهاز خاصة حتى توافق العاملة على إظهارها.</p>
+</div></div>
 <div class="experience-box"><div class="dash-header"><div><h3>الخبرات السابقة</h3><p>أضف كل دولة عملت بها العاملة وعدد السنوات.</p></div><button id="addExperience" class="secondary">+ إضافة دولة</button></div><div id="experienceRows"></div><div class="muted" id="experienceTotal">إجمالي الخبرة: 0 سنة</div></div>
-<label>المهارات أو ملاحظات إضافية</label><textarea id="description" rows="3" placeholder="مثال: الطبخ، رعاية الأطفال، التنظيف..."></textarea><div class="visibility-choice" style="margin:20px 0;padding:18px;border:1px solid #d7c59e;border-radius:14px;background:#faf7ef"><strong style="display:block;margin-bottom:9px">هل تريد إظهار العاملة للجمهور؟ *</strong><p class="muted" style="margin:0 0 12px">اختر حالة العاملة قبل الحفظ. يمكنك تغييرها لاحقاً من بطاقة العاملة في لوحة المكتب.</p><div style="display:flex;gap:20px;flex-wrap:wrap"><label style="display:flex;align-items:center;gap:7px;cursor:pointer"><input type="radio" name="workerVisibility" value="available"> نعم، متاحة للجمهور</label><label style="display:flex;align-items:center;gap:7px;cursor:pointer"><input type="radio" name="workerVisibility" value="unavailable"> لا، غير متاحة للجمهور</label></div><p id="visibilityWarning" style="color:#a43b2b;font-weight:700" hidden>يجب تحديد حالة ظهور العاملة قبل الحفظ.</p></div><div class="editor-actions"><button id="addWorker">حفظ البيانات والعودة للوحة المكتب</button><button id="cancelWorker2" class="secondary">إلغاء</button></div><p class="muted">لن تظهر العاملة للزوار إلا إذا كان المكتب معتمداً واخترت «متاحة للجمهور». تأكد من موافقتها على نشر بياناتها.</p></section></section></main><div id="cvModal" class="cv-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="cvTitle"><div class="cv-dialog"><button id="closeCV" class="secondary">إغلاق ×</button><div class="cv-profile-header"><div id="cvPhoto" class="cv-photo"></div><div class="cv-profile-info"><span class="cv-eyebrow">الملف التعريفي للعاملة</span><h2 id="cvTitle">السيرة الذاتية</h2><p id="cvNationality"></p><span id="cvWorkerNumber"></span></div></div><div class="cv-office-label">مكتب الاستقدام: <strong id="cvOffice"></strong></div><h3 class="cv-section-title">البيانات والخبرات</h3><div id="cvBody"></div></div></div><script>
+<label>المهارات أو ملاحظات إضافية</label><textarea id="description" rows="3" placeholder="مثال: الطبخ، رعاية الأطفال، التنظيف..."></textarea><p id="workerEditorFeedback" class="worker-editor-note" role="status"></p>
+<div class="editor-actions"><button id="addWorker">حفظ ومتابعة</button><button id="saveWorkerDraft" class="secondary">حفظ كمسودة</button><button id="cancelWorker2" class="secondary">إلغاء</button></div>
+<p class="muted">بعد الحفظ تستطيع إرسال رابط الموافقة للعاملة. يظهر الملف في البحث عند موافقتها ونشره من لوحة المكتب.</p></section></section></main>
+<dialog id="workerPublication" class="publication-dialog" aria-labelledby="publicationTitle">
+  <h3 id="publicationTitle">موافقة العاملة على النشر</h3>
+  <p id="publicationInfo"></p>
+  <label id="publicationLinkLabel" for="publicationLink" hidden>رابط الموافقة الخاص بالعاملة</label>
+  <input id="publicationLink" type="url" dir="ltr" readonly hidden>
+  <div class="editor-actions">
+    <button type="button" id="createPublicationLink">إنشاء رابط الموافقة</button>
+    <button type="button" id="copyPublicationLink" class="secondary" hidden>نسخ الرابط</button>
+    <button type="button" id="closePublication" class="secondary">العودة للوحة المكتب</button>
+  </div>
+  <p id="publicationFeedback" class="worker-editor-note" role="status"></p>
+</dialog>
+<div id="cvModal" class="cv-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="cvTitle"><div class="cv-dialog"><button id="closeCV" class="secondary">إغلاق ×</button><div class="cv-profile-header"><div id="cvPhoto" class="cv-photo"></div><div class="cv-profile-info"><span class="cv-eyebrow">الملف التعريفي للعاملة</span><h2 id="cvTitle">السيرة الذاتية</h2><p id="cvNationality"></p><span id="cvWorkerNumber"></span></div></div><div class="cv-office-label">مكتب الاستقدام: <strong id="cvOffice"></strong></div><h3 class="cv-section-title">البيانات والخبرات</h3><div id="cvBody"></div></div></div><script>
 window.addEventListener('load',()=>{
 const $=id=>document.getElementById(id),v=id=>$(id).value.trim(),show=(id,on)=>$(id).classList.toggle('hidden',!on);
 const db=supabase.createClient('https://hkfxikmpfgixrbrboxeb.supabase.co','sb_publishable_OcWY5nY_-b2odLqQxsu2Kw_iQ4YswBz');
@@ -175,47 +212,326 @@ $('saveOffice').onclick=async()=>{
 function openEditor(){if(!office)return;show('officeSettings',false);show('officeHome',false);show('workerEditor',true);$('workerEditor').scrollIntoView({behavior:'smooth',block:'start'})}
 function closeEditor(){show('workerEditor',false);show('officeHome',true);$('officeHome').scrollIntoView({behavior:'smooth',block:'start'})}
 $('newWorker').onclick=()=>{resetWorkerForm();openEditor()};$('cancelWorker').onclick=closeEditor;$('cancelWorker2').onclick=closeEditor;
-function resetWorkerForm(){document.querySelectorAll('input[name="workerVisibility"]').forEach(x=>x.checked=false);$('visibilityWarning').hidden=true;editingWorkerId=null;$('workerConsentConfirmed').checked=false;$('workerConsentRef').value='';$('editorTitle').textContent='إضافة عاملة جديدة';for(const f of ['workerName','workerNumber','religion','nationality','age','salary','photo','description','workerPhotoFile'])$(f).value='';$('experienceRows').innerHTML='';addExperienceRow();updateExperience();updatePhotoPreview()}
+let editingWorker = null;
+let removeWorkerPhoto = false;
+const workerPhotoBucket = 'saahl-worker-drafts';
+const publicationStates = new Map();
+let publicationWorker = null;
+let workerLoadVersion = 0;
+const copiedPublicationLinks = new Map();
+
+function resetWorkerForm(){
+  editingWorkerId = null;
+  editingWorker = null;
+  removeWorkerPhoto = false;
+  $('editorTitle').textContent = 'إضافة عاملة جديدة';
+  $('saveWorkerDraft').textContent = 'حفظ كمسودة';
+  $('workerEditorFeedback').textContent = '';
+  for(const id of ['workerName','workerNumber','religion','nationality','age','salary','photo','description','workerPhotoFile']) $(id).value = '';
+  $('experienceRows').replaceChildren();
+  addExperienceRow();
+  updateExperience();
+  updatePhotoPreview();
+}
 function updateExperience(){let total=0;document.querySelectorAll('.exp-row').forEach(row=>{total+=Math.max(0,Number(row.querySelector('.exp-years').value)||0)});$('experienceTotal').textContent='إجمالي الخبرة: '+total+' سنة'}
 function addExperienceRow(){const row=document.createElement('div');row.className='exp-row';const select=document.createElement('select');select.className='exp-country';for(const c of countries){let o=document.createElement('option');o.value=c;o.textContent=c;select.appendChild(o)}const years=document.createElement('input');years.type='number';years.min='1';years.max='60';years.placeholder='عدد السنوات';years.className='exp-years';years.oninput=updateExperience;const remove=document.createElement('button');remove.type='button';remove.className='secondary';remove.textContent='حذف';remove.onclick=()=>{row.remove();updateExperience()};row.append(select,years,remove);$('experienceRows').appendChild(row)}
 $('addExperience').onclick=addExperienceRow;addExperienceRow();
-$('addWorker').onclick=async()=>{if(!office)return message('أكمل تسجيل المكتب أولاً',true);let name=v('workerName'),number=v('workerNumber'),religion=v('religion'),nationality=v('nationality'),age=Number(v('age')),salary=Number(v('salary')||0),photo=v('photo');if(!name||!nationality||!Number.isInteger(age)||age<18||age>75)return message('أدخل اسم العاملة والجنسية والعمر الصحيح (18 سنة فأكثر).',true);const chosenVisibility=document.querySelector('input[name="workerVisibility"]:checked')?.value;if(!chosenVisibility){$('visibilityWarning').hidden=false;$('visibilityWarning').scrollIntoView({behavior:'smooth',block:'center'});return message('حدد أولاً هل العاملة متاحة للجمهور أو غير متاحة.',true)}$('visibilityWarning').hidden=true;const consentRef = v('workerConsentRef');
-if((chosenVisibility==='available'||photo||$('workerPhotoFile').files[0])&&(!$('workerConsentConfirmed').checked||consentRef.length<4))return message('وثّق موافقة العاملة وأدخل مرجعها قبل النشر أو إرفاق صورة.',true);
-if(!number)number=name;if(photo&&!/^https:\/\//i.test(photo))return message('رابط الصورة يجب أن يبدأ بـ https://',true);let experience=[],total=0;for(const row of document.querySelectorAll('.exp-row')){const country=row.querySelector('.exp-country').value,years=Number(row.querySelector('.exp-years').value);if(!row.querySelector('.exp-years').value)continue;if(!Number.isInteger(years)||years<1||years>60)return message('أدخل عدد سنوات صحيحاً لكل دولة خبرة',true);experience.push({country,years});total+=years}if(total>60)return message('إجمالي سنوات الخبرة غير منطقي',true);$('addWorker').disabled=true;try{const file=$('workerPhotoFile').files[0];if(file){$('addWorker').textContent='جارٍ رفع الصورة...';photo=await uploadOfficeImage(file,'workers');message('تم رفع الصورة بنجاح. جارٍ حفظ البيانات...')} $('addWorker').textContent='جارٍ حفظ بيانات العاملة...';const payload={display_name:name,worker_number:number,religion:religion||null,nationality,age,salary_aed:salary,experience_years:total,country_experience:experience,photo_url:photo||null,description:v('description'),status:chosenVisibility,publication_consent_ref:$('workerConsentConfirmed').checked?consentRef||null:null};let result=editingWorkerId?await db.from('workers').update(payload).eq('id',editingWorkerId).eq('office_id',office.id):await db.from('workers').insert({...payload,office_id:office.id});let {error}=result;if(error)throw error;editingWorkerId=null;await loadWorkers();closeEditor();resetWorkerForm();message(file?'تم حفظ العاملة وصورتها بنجاح.':'تم حفظ بيانات العاملة بنجاح. يمكنك إضافة الصورة لاحقاً من إعدادات وتعديل.')}catch(e){message('فشل الحفظ: '+e.message+' — لم تُحفظ التغييرات. صحح الخطأ ثم أعد المحاولة.',true);$('workerEditor').scrollIntoView({behavior:'smooth',block:'start'})}finally{$('addWorker').disabled=false;$('addWorker').textContent='حفظ البيانات والعودة للوحة المكتب'}};
-async function editWorker(id){if(!office)return;let {data,error}=await db.from('workers').select('*').eq('office_id',office.id).eq('id',id).single();if(error||!data)return message('تعذر فتح بيانات العاملة: '+(error?.message||''),true);editingWorkerId=id;$('workerConsentConfirmed').checked=false;$('workerConsentRef').value=data.publication_consent_ref||'';document.querySelectorAll('input[name="workerVisibility"]').forEach(x=>x.checked=x.value===(data.status==='available'?'available':'unavailable'));$('visibilityWarning').hidden=true;$('editorTitle').textContent='تعديل بيانات العاملة';$('workerName').value=data.display_name||'';$('workerNumber').value=data.worker_number||data.display_name||'';$('religion').value=data.religion||'';$('nationality').value=data.nationality||'';$('age').value=data.age||'';$('salary').value=data.salary_aed||'';$('photo').value=data.photo_url||'';$('description').value=data.description||'';$('experienceRows').innerHTML='';const experiences=Array.isArray(data.country_experience)?data.country_experience:[];if(experiences.length){for(const e of experiences){addExperienceRow();const row=$('experienceRows').lastElementChild;row.querySelector('.exp-country').value=e.country||'أخرى';row.querySelector('.exp-years').value=e.years||''}}else addExperienceRow();updateExperience();openEditor();updatePhotoPreview()}
-$('officeWorkerSearch').addEventListener('input',()=>{workerPage=1;loadWorkers()});$('officeWorkerStatus').addEventListener('change',()=>{workerPage=1;loadWorkers()});async function loadWorkers(){if(!office)return;let {data,error}=await db.from('workers').select('id,display_name,worker_number,religion,nationality,status,experience_years,country_experience,age,salary_aed,photo_url').eq('office_id',office.id).order('created_at',{ascending:false});if(error)return message('تعذر تحميل العاملات: '+error.message,true);let rows=data||[];allOfficeWorkers=rows;const warning=$('officeOwnershipNotice');if(office.status==='rejected'){warning.textContent='تنبيه: طلب اعتماد هذا المكتب مرفوض، والعاملات المعروضات هنا محفوظات سابقاً في حساب هذا المكتب. لا تظهر العاملات للزوار حتى تتم الموافقة على المكتب. إذا كنت تتوقع مكتباً جديداً خالياً، فتأكد أنك دخلت بالبريد الإلكتروني الخاص بالمكتب الجديد.';warning.classList.remove('hidden')}else{warning.classList.add('hidden');warning.textContent=''}$('totalWorkers').textContent=rows.length;$('availableWorkers').textContent=rows.filter(x=>x.status==='available').length;$('draftWorkers').textContent=rows.filter(x=>x.status!=='available').length;const list=$('workerList');list.replaceChildren();const term=($('officeWorkerSearch').value||'').trim().toLowerCase(),filterStatus=$('officeWorkerStatus').value;rows=rows.filter(w=>(!filterStatus||w.status===filterStatus)&&(!term||[w.display_name,w.worker_number,w.nationality].some(x=>String(x||'').toLowerCase().includes(term))));$('officeWorkerMatchCount').textContent=rows.length+' نتيجة';const pageCount=Math.max(1,Math.ceil(rows.length/6));workerPage=Math.min(workerPage,pageCount);const pageBar=$('officeWorkerPages');pageBar.replaceChildren();if(pageCount>1){const prev=document.createElement('button');prev.textContent='السابق';prev.disabled=workerPage<=1;prev.onclick=()=>{workerPage--;loadWorkers()};const label=document.createElement('span');label.textContent='صفحة '+workerPage+' من '+pageCount;const next=document.createElement('button');next.textContent='التالي';next.disabled=workerPage>=pageCount;next.onclick=()=>{workerPage++;loadWorkers()};pageBar.append(prev,label,next)}if(!rows.length){list.innerHTML='<div class="empty-workers">لم تُضف أي عاملة بعد. اضغط «إضافة عاملة» لبدء التسجيل.</div>';return}for(const w of rows.slice((workerPage-1)*6,workerPage*6)){const card=document.createElement('article');card.className='worker-card';const photo=document.createElement('div');photo.className='worker-avatar';if(w.photo_url&&/^https:\/\//i.test(w.photo_url)){const img=document.createElement('img');img.src=w.photo_url;img.alt='صورة العاملة';img.loading='lazy';img.onerror=()=>{photo.replaceChildren();photo.textContent='◈'};photo.append(img)}else photo.textContent='◈';const details=document.createElement('div');details.className='worker-details';const title=document.createElement('strong');title.textContent=w.display_name;const desc=document.createElement('p');desc.textContent=[w.nationality,w.age?w.age+' سنة':null,(w.experience_years||0)+' سنوات خبرة'].filter(Boolean).join(' · ');const fields=document.createElement('div');fields.className='worker-fields';for(const [k,val] of [['رقم العاملة',w.worker_number||'—'],['العمر',w.age?w.age+' سنة':'—'],['الديانة',w.religion||'غير محدد'],['الخبرة',(w.experience_years||0)+' سنوات']]){const line=document.createElement('div');const label=document.createElement('span');label.textContent=k;const value=document.createElement('strong');value.textContent=val;line.append(label,value);fields.append(line)}const status=document.createElement('span');status.className='worker-status '+(w.status==='available'?'active':'');status.textContent=({draft:'مسودة',available:'متاحة',unavailable:'غير متاحة'})[w.status]||w.status;details.append(title,desc,fields,status);const actions=document.createElement('div');actions.className='worker-actions';const edit=document.createElement('button');edit.textContent='⚙ إعدادات وتعديل';edit.className='secondary';edit.onclick=()=>editWorker(w.id);const select=document.createElement('select');select.setAttribute('aria-label','حالة العاملة');for(const [value,label] of [['draft','مسودة'],['available','متاحة'],['unavailable','غير متاحة']]){let o=document.createElement('option');o.value=value;o.textContent=label;o.selected=w.status===value;select.append(o)}select.onchange=async()=>{let {error}=await db.from('workers').update({status:select.value}).eq('id',w.id).eq('office_id',office.id);if(error){message('تعذر تحديث الحالة: '+error.message,true);select.value=w.status}else{message('تم تحديث حالة العاملة');await loadWorkers()}};const cv=document.createElement('button');cv.textContent='عرض السيرة الذاتية';cv.className='cv-button';cv.onclick=()=>showCV(w.id);const spotlight=document.createElement('button');spotlight.type='button';spotlight.className='spotlight-action';spotlight.textContent='📢 إعلان في الشريط العلوي';spotlight.onclick=()=>{const p=new URLSearchParams({worker:w.id,office:office.id});window.location.href='advertise.html?'+p.toString()};actions.append(edit,select,spotlight);card.append(photo,details,actions,cv);list.append(card)}}
-async function showCV(id){const {data:w,error}=await db.from('workers').select('*').eq('office_id',office.id).eq('id',id).single();if(error||!w)return message('تعذر تحميل السيرة الذاتية',true);const modal=$('cvModal');const body=$('cvBody');body.replaceChildren();$('cvTitle').textContent='السيرة الذاتية — '+w.display_name;const entries=[['رقم العاملة',w.worker_number||'—'],['الاسم',w.display_name],['الجنسية',w.nationality],['العمر',w.age+' سنة'],['الديانة',w.religion||'غير محدد'],['إجمالي الخبرة',(w.experience_years||0)+' سنوات'],['الراتب',w.salary_aed?w.salary_aed+' درهم':'حسب الاتفاق'],['المهارات والملاحظات',w.description||'—'],['حالة العاملة',w.status==='available'?'متاحة':'غير متاحة']];for(const e of Array.isArray(w.country_experience)?w.country_experience:[])entries.push(['خبرة في '+e.country,e.years+' سنوات']);for(const [label,val] of entries){const row=document.createElement('div');row.className='cv-line';const l=document.createElement('span');l.textContent=label;const v=document.createElement('strong');v.textContent=val;row.append(l,v);body.append(row)}const cvPhoto=$('cvPhoto');cvPhoto.replaceChildren();if(w.photo_url){const img=document.createElement('img');img.src=w.photo_url;img.alt='صورة العاملة';cvPhoto.append(img)}else{cvPhoto.textContent='لا توجد صورة مرفوعة'}$('cvNationality').textContent=w.nationality||'';$('cvOffice').textContent=office.name;$('cvWorkerNumber').textContent='رقم العاملة: '+(w.worker_number||'غير محدد');modal.classList.remove('hidden');modal.scrollTop=0}
-$('closeCV').onclick=()=>show('cvModal',false);$('cvModal').onclick=e=>{if(e.target===$('cvModal'))show('cvModal',false)};
-function updatePhotoPreview(){
-  const file=$('workerPhotoFile').files[0],box=$('workerPhotoPreview');
-  if(box.dataset.url){URL.revokeObjectURL(box.dataset.url);delete box.dataset.url}
-  box.replaceChildren();
-  if(file){
-    if(!['image/jpeg','image/png','image/webp'].includes(file.type)){box.textContent='نوع الصورة غير مدعوم. استخدم JPG أو PNG أو WebP';$('saveWorkerPhoto').disabled=true;return}
-    const url=URL.createObjectURL(file);box.dataset.url=url;
-    const img=document.createElement('img');img.src=url;img.alt='معاينة صورة العاملة قبل الحفظ';box.append(img);
-    const hint=document.createElement('small');hint.textContent='الصورة المختارة: '+file.name+' ('+(file.size/1024/1024).toFixed(1)+' ميجابايت)';box.append(hint);
-  }else if($('photo').value&&/^https:\/\//.test($('photo').value)){
-    const img=document.createElement('img');img.src=$('photo').value;img.alt='صورة العاملة المحفوظة';box.append(img)
-  }else box.textContent='لم يتم اختيار صورة بعد';
-  $('saveWorkerPhoto').disabled=!editingWorkerId||!file;
+function workerFormError(text, field){
+  $('workerEditorFeedback').textContent = text;
+  if(field) $(field).focus();
 }
-$('workerPhotoFile').addEventListener('change',updatePhotoPreview);
-$('saveWorkerPhoto').onclick=async()=>{
-  if(!editingWorkerId||!office)return message('احفظ بيانات العاملة أولاً ثم افتح «إعدادات وتعديل» لإضافة الصورة.',true);
-  const file=$('workerPhotoFile').files[0];if(!file)return message('اختر صورة أولاً',true);if(!$('workerConsentConfirmed').checked||v('workerConsentRef').length<4)return message('وثّق موافقة العاملة على نشر الصورة قبل الرفع.',true);
-  const button=$('saveWorkerPhoto');button.disabled=true;button.textContent='جارٍ رفع الصورة وحفظها...';
+
+$('addWorker').onclick = () => saveWorker(true);
+$('saveWorkerDraft').onclick = () => saveWorker(false);
+
+async function saveWorker(continueToPublication){
+  if(!office) return;
+  const display_name = v('workerName'), nationality = v('nationality'), age = Number(v('age'));
+  const photoUrl = v('photo'), file = $('workerPhotoFile').files[0];
+  if(!display_name) return workerFormError('اكتب اسم العاملة أو رمزها.', 'workerName');
+  if(!nationality) return workerFormError('اختر الجنسية.', 'nationality');
+  if(!Number.isInteger(age) || age < 18 || age > 75) return workerFormError('أدخل عمرًا من 18 إلى 75 سنة.', 'age');
+  if(photoUrl && !/^https:\/\//i.test(photoUrl)) return workerFormError('أدخل رابطًا يبدأ بـ https://.', 'photo');
+
+  const country_experience = [];
+  let experience_years = 0;
+  for(const row of document.querySelectorAll('.exp-row')){
+    const input = row.querySelector('.exp-years');
+    if(!input.value) continue;
+    const years = Number(input.value);
+    if(!Number.isInteger(years) || years < 1 || years > 60) return workerFormError('أدخل عدد سنوات صحيحًا لكل دولة خبرة.');
+    country_experience.push({country:row.querySelector('.exp-country').value,years});
+    experience_years += years;
+  }
+  if(experience_years > 60) return workerFormError('إجمالي سنوات الخبرة يجب ألا يتجاوز 60 سنة.');
+
+  $('addWorker').disabled = $('saveWorkerDraft').disabled = true;
+  workerFormError('جارٍ الحفظ…');
+  let uploadedPath = null;
   try{
-    const photoUrl=await uploadOfficeImage(file,'workers');
-    const {data,error}=await db.from('workers').update({photo_url:photoUrl}).eq('id',editingWorkerId).eq('office_id',office.id).select('id,photo_url').single();
-    if(error)throw Error('تم رفع الصورة لكن تعذر ربطها بالعاملة: '+error.message);
-    if(!data?.photo_url)throw Error('لم تؤكد قاعدة البيانات حفظ رابط الصورة');
-    $('photo').value=photoUrl;$('workerPhotoFile').value='';updatePhotoPreview();await loadWorkers();
-    message('تم رفع صورة العاملة وحفظها. ستظهر في بطاقة العاملة وفي صفحة الكفيل إذا كانت حالتها متاحة.');
-  }catch(e){message('تعذر حفظ الصورة: '+e.message,true)}
-  finally{button.textContent='رفع وحفظ صورة العاملة الحالية';updatePhotoPreview()}
+    const keepPrivatePhoto = !removeWorkerPhoto && photoUrl === (editingWorker?.photo_url || '');
+    let selectedImage = file;
+    if(!file && photoUrl && !keepPrivatePhoto){
+      try{
+        const response = await fetch(photoUrl,{credentials:'omit',referrerPolicy:'no-referrer',redirect:'error',signal:AbortSignal.timeout(12000)});
+        if(!response.ok) throw Error();
+        selectedImage = await response.blob();
+      }catch{
+        throw Error('تعذر استيراد الصورة من الرابط. حمّلها من جهازك.');
+      }
+    }
+    if(selectedImage) uploadedPath = await uploadOfficeImage(selectedImage, 'workers', workerPhotoBucket);
+    const payload = {
+      display_name, worker_number:v('workerNumber') || editingWorker?.worker_number || (editingWorker ? null : display_name),
+      religion:v('religion') || null, nationality, age,
+      salary_aed:v('salary') ? Number(v('salary')) : null,
+      experience_years:!country_experience.length && editingWorker && !editingWorker.country_experience?.length
+        ? editingWorker.experience_years : experience_years,
+      country_experience, description:v('description') || (editingWorker?.description==='' ? '' : null),
+      photo_url:uploadedPath ? null : photoUrl || null,
+      publication_photo_draft:uploadedPath || (keepPrivatePhoto ? editingWorker?.publication_photo_draft || null : null)
+    };
+    const query = editingWorkerId
+      ? db.from('workers').update(payload).eq('id',editingWorkerId).eq('office_id',office.id)
+      : db.from('workers').insert({...payload,office_id:office.id,status:'draft'});
+    const {data,error} = await query.select('id,display_name,status,publication_photo_draft,publication_consent_at').single();
+    if(error) throw error;
+    uploadedPath = null;
+    copiedPublicationLinks.delete(data.id);
+    closeEditor();
+    resetWorkerForm();
+    await loadWorkers();
+    if(continueToPublication) openPublication(data);
+    else message(data.publication_consent_at ? 'تم حفظ البيانات.' : 'تم الحفظ. يمكنك طلب الموافقة من بطاقة العاملة.');
+  }catch(error){
+    if(uploadedPath && /^(22|23|42501)/.test(error.code || '')) await db.storage.from(workerPhotoBucket).remove([uploadedPath]).catch(()=>{});
+    workerFormError('تعذر حفظ بيانات العاملة. '+error.message);
+  }finally{
+    $('addWorker').disabled = $('saveWorkerDraft').disabled = false;
+  }
+}
+
+async function editWorker(id){
+  if(!office) return;
+  const {data,error} = await db.from('workers').select('*').eq('office_id',office.id).eq('id',id).single();
+  if(error||!data) return message('تعذر فتح بيانات العاملة.',true);
+  resetWorkerForm();
+  editingWorkerId = id;
+  editingWorker = data;
+  $('editorTitle').textContent = 'تعديل بيانات العاملة';
+  $('saveWorkerDraft').textContent = 'حفظ والعودة';
+  for(const [field,key] of Object.entries({workerName:'display_name',workerNumber:'worker_number',religion:'religion',
+    nationality:'nationality',age:'age',salary:'salary_aed',photo:'photo_url',description:'description'})){
+    $(field).value = data[key] ?? '';
+  }
+  if(Array.isArray(data.country_experience) && data.country_experience.length){
+    $('experienceRows').replaceChildren();
+    for(const e of data.country_experience){
+      addExperienceRow();
+      const row = $('experienceRows').lastElementChild;
+      row.querySelector('.exp-country').value = e.country || 'أخرى';
+      row.querySelector('.exp-years').value = e.years || '';
+    }
+  }
+  updateExperience();
+  openEditor();
+  updatePhotoPreview();
+}
+
+function openPublication(worker){
+  const status = publicationStates.get(worker.id)?.state;
+  if(worker.publication_consent_at || status === 'approved'){
+    message('موافقة النشر مسجلة. راجع حالة العاملة على بطاقتها.');
+    return;
+  }
+  publicationWorker = worker;
+  $('publicationInfo').textContent = worker.display_name+' — أرسل هذا الرابط للعاملة لتراجع بياناتها وتختار الموافقة. الرابط صالح لمدة 7 أيام.';
+  $('publicationFeedback').textContent = '';
+  $('publicationLink').value = '';
+  for(const id of ['publicationLink','publicationLinkLabel','copyPublicationLink']) $(id).hidden = true;
+  $('createPublicationLink').hidden = false;
+  $('createPublicationLink').textContent = status==='pending' ? 'إنشاء رابط جديد' : 'إنشاء رابط الموافقة';
+  const saved = copiedPublicationLinks.get(worker.id);
+  if(status==='pending' && saved){
+    $('publicationLink').value = saved;
+    for(const id of ['publicationLink','publicationLinkLabel','copyPublicationLink']) $(id).hidden = false;
+    $('createPublicationLink').hidden = true;
+  }
+  $('workerPublication').showModal();
+}
+
+$('closePublication').onclick = () => $('workerPublication').close();
+$('createPublicationLink').onclick = async () => {
+  const worker = publicationWorker;
+  if(!worker) return;
+  const button = $('createPublicationLink');
+  button.disabled = true;
+  $('publicationFeedback').textContent = 'جارٍ تجهيز الرابط…';
+  try{
+    let preview = null;
+    if(worker.publication_photo_draft){
+      const {data,error} = await db.storage.from(workerPhotoBucket).createSignedUrl(worker.publication_photo_draft, 7*24*60*60+120);
+      if(error) throw error;
+      preview = data.signedUrl;
+    }
+    const {data,error} = await db.rpc('saahl2_request_worker_publication',{p_worker:worker.id});
+    if(error) throw error;
+    if(preview){
+      const result = await db.rpc('saahl2_set_worker_publication_preview',{p_worker:worker.id,p_token:data.token,p_url:preview});
+      if(result.error) throw result.error;
+    }
+    if(!$('workerPublication').open || publicationWorker!==worker) return;
+    const link = new URL('worker-publication.html',location.href);
+    link.hash = data.token;
+    $('publicationLink').value = link.href;
+    copiedPublicationLinks.set(worker.id,link.href);
+    for(const id of ['publicationLink','publicationLinkLabel','copyPublicationLink']) $(id).hidden = false;
+    button.hidden = true;
+    $('publicationFeedback').textContent = 'انسخ الرابط وأرسله للعاملة فقط.';
+    await loadWorkers();
+  }catch(error){
+    $('publicationFeedback').textContent = 'تعذر تجهيز الرابط. حاول مرة أخرى.';
+    console.warn('Worker publication request:',error.message);
+  }finally{
+    button.disabled = false;
+  }
 };
-async function uploadOfficeImage(file,folder){if(!file||!['image/jpeg','image/png','image/webp'].includes(file.type))throw Error('الصورة يجب أن تكون JPG أو PNG أو WebP');if(file.size>5*1024*1024)throw Error('حجم الصورة '+(file.size/1024/1024).toFixed(1)+' ميجابايت، والحد الأقصى 5 ميجابايت. صغّر الصورة وحاول مجدداً.');if(!office)throw Error('المكتب غير مسجل');const ext=file.type==='image/png'?'png':file.type==='image/webp'?'webp':'jpg';const path=office.id+'/'+folder+'/'+crypto.randomUUID()+'.'+ext;const {error}=await db.storage.from('saahl-office-media').upload(path,file,{contentType:file.type,upsert:false});if(error)throw Error('فشل رفع الملف إلى التخزين: '+error.message);const publicUrl=db.storage.from('saahl-office-media').getPublicUrl(path).data.publicUrl;if(!publicUrl)throw Error('لم يتم إنشاء رابط للصورة بعد رفعها');return publicUrl}
+$('copyPublicationLink').onclick = async () => {
+  const input = $('publicationLink');
+  try{
+    await navigator.clipboard.writeText(input.value);
+    $('publicationFeedback').textContent = 'تم نسخ الرابط.';
+  }catch{
+    input.select();
+    $('publicationFeedback').textContent = 'تم تحديد الرابط. انسخه لإرساله للعاملة.';
+  }
+};
+
+async function publishWorker(worker, button){
+  button.disabled = true;
+  try{
+    const state = publicationStates.get(worker.id);
+    if(state?.photo_allowed && worker.publication_photo_draft){
+      const {data,error} = await db.storage.from(workerPhotoBucket).download(worker.publication_photo_draft);
+      if(error) throw error;
+      const name = worker.publication_photo_draft.split('/')[1];
+      const {error:uploadError} = await db.storage.from('saahl-office-media').upload(office.id+'/workers/'+name,data,{contentType:data.type,upsert:false});
+      if(uploadError && !['409','Duplicate'].includes(String(uploadError.statusCode)) && !/already exists/i.test(uploadError.message)) throw uploadError;
+    }
+    const {error} = await db.rpc('saahl2_publish_office_worker',{p_worker:worker.id});
+    if(error) throw error;
+    await loadWorkers();
+    message('نُشر ملف العاملة في صفحة البحث.');
+  }catch(error){
+    message('تعذر نشر الملف. حدّث حالة النشر ثم أعد المحاولة.',true);
+    console.warn('Publish worker:',error.message);
+  }finally{
+    button.disabled = false;
+  }
+}
+
+function isWorkerPublished(worker){
+  return office?.status==='approved' && worker.status==='available' && Boolean(worker.publication_consent_at);
+}
+
+function appendPublicationControls(worker, details, actions){
+  const state = publicationStates.get(worker.id)?.state;
+  const published = isWorkerPublished(worker);
+  const labels = {new:'لم تُطلب الموافقة',pending:'بانتظار موافقة العاملة',approved:'جاهزة للنشر',
+    declined:'لم توافق العاملة على النشر',expired:'انتهت صلاحية الرابط',documented:'موافقة النشر مسجلة'};
+  const status = document.createElement('span');
+  status.className = 'publication-status';
+  status.textContent = published ? 'منشورة في بحث الكفيل'
+    : worker.publication_consent_at && office.status!=='approved' ? 'بانتظار اعتماد المكتب'
+    : labels[state] || 'تعذر التحقق من حالة النشر';
+  details.append(status);
+  if(published || !state || state==='documented' && office.status!=='approved') return;
+  const button = document.createElement('button');
+  button.type = 'button';
+  button.className = 'worker-publication-action';
+  if(state==='approved' || state==='documented'){
+    button.textContent = office.status==='approved' ? 'انشر في البحث' : 'بانتظار اعتماد المكتب';
+    button.disabled = office.status!=='approved';
+    button.onclick = () => publishWorker(worker,button);
+  }else{
+    button.textContent = state==='pending' ? 'رابط الموافقة' : 'طلب موافقة النشر';
+    button.onclick = () => openPublication(worker);
+  }
+  actions.prepend(button);
+}
+
+$('officeWorkerSearch').addEventListener('input',()=>{workerPage=1;loadWorkers()});$('officeWorkerStatus').addEventListener('change',()=>{workerPage=1;loadWorkers()});$('refreshPublicationStates').onclick = () => loadWorkers();
+document.addEventListener('visibilitychange',()=>{
+  if(!document.hidden && office && !$('officeHome').classList.contains('hidden')) loadWorkers();
+});
+async function loadWorkers(){if(!office)return;
+const version=++workerLoadVersion, officeId=office.id;
+let {data,error}=await db.from('workers').select('id,display_name,worker_number,religion,nationality,status,experience_years,country_experience,age,salary_aed,photo_url,publication_photo_draft,publication_consent_at').eq('office_id',officeId).order('created_at',{ascending:false});
+if(version!==workerLoadVersion || office?.id!==officeId)return;
+if(error)return message('تعذر تحميل العاملات: '+error.message,true);
+let rows=data||[];
+const stateResult=rows.length ? await db.rpc('saahl2_office_publication_states',{p_office:officeId}) : {data:[]};
+if(version!==workerLoadVersion || office?.id!==officeId)return;
+allOfficeWorkers=rows;
+publicationStates.clear();
+for(const entry of stateResult.data||[]){
+  publicationStates.set(entry.worker_id,entry);
+  if(entry.state!=='pending') copiedPublicationLinks.delete(entry.worker_id);
+}
+$('refreshPublicationStates').hidden=!stateResult.error&&!Array.from(publicationStates.values()).some(entry=>entry.state==='pending');
+const warning=$('officeOwnershipNotice');if(office.status==='rejected'){warning.textContent='تنبيه: طلب اعتماد هذا المكتب مرفوض، والعاملات المعروضات هنا محفوظات سابقاً في حساب هذا المكتب. لا تظهر العاملات للزوار حتى تتم الموافقة على المكتب. إذا كنت تتوقع مكتباً جديداً خالياً، فتأكد أنك دخلت بالبريد الإلكتروني الخاص بالمكتب الجديد.';warning.classList.remove('hidden')}else{warning.classList.add('hidden');warning.textContent=''}$('totalWorkers').textContent=rows.length;$('availableWorkers').textContent=rows.filter(isWorkerPublished).length;$('draftWorkers').textContent=rows.filter(x=>!isWorkerPublished(x)).length;const list=$('workerList');list.replaceChildren();const term=($('officeWorkerSearch').value||'').trim().toLowerCase(),filterStatus=$('officeWorkerStatus').value;rows=rows.filter(w=>(!filterStatus||w.status===filterStatus)&&(!term||[w.display_name,w.worker_number,w.nationality].some(x=>String(x||'').toLowerCase().includes(term))));$('officeWorkerMatchCount').textContent=rows.length+' نتيجة';const pageCount=Math.max(1,Math.ceil(rows.length/6));workerPage=Math.min(workerPage,pageCount);const pageBar=$('officeWorkerPages');pageBar.replaceChildren();if(pageCount>1){const prev=document.createElement('button');prev.textContent='السابق';prev.disabled=workerPage<=1;prev.onclick=()=>{workerPage--;loadWorkers()};const label=document.createElement('span');label.textContent='صفحة '+workerPage+' من '+pageCount;const next=document.createElement('button');next.textContent='التالي';next.disabled=workerPage>=pageCount;next.onclick=()=>{workerPage++;loadWorkers()};pageBar.append(prev,label,next)}if(!rows.length){list.innerHTML='<div class="empty-workers">لم تُضف أي عاملة بعد. اضغط «إضافة عاملة» لبدء التسجيل.</div>';return}for(const w of rows.slice((workerPage-1)*6,workerPage*6)){const card=document.createElement('article');card.className='worker-card';const photo=document.createElement('div');photo.className='worker-avatar';if(!w.publication_photo_draft&&w.photo_url&&/^https:\/\//i.test(w.photo_url)){const img=document.createElement('img');img.src=w.photo_url;img.alt='صورة العاملة';img.loading='lazy';img.onerror=()=>{photo.replaceChildren();photo.textContent='◈'};photo.append(img)}else photo.textContent=w.publication_photo_draft?'صورة خاصة':'◈';const details=document.createElement('div');details.className='worker-details';const title=document.createElement('strong');title.textContent=w.display_name;const desc=document.createElement('p');desc.textContent=[w.nationality,w.age?w.age+' سنة':null,(w.experience_years||0)+' سنوات خبرة'].filter(Boolean).join(' · ');const fields=document.createElement('div');fields.className='worker-fields';for(const [k,val] of [['رقم العاملة',w.worker_number||'—'],['العمر',w.age?w.age+' سنة':'—'],['الديانة',w.religion||'غير محدد'],['الخبرة',(w.experience_years||0)+' سنوات']]){const line=document.createElement('div');const label=document.createElement('span');label.textContent=k;const value=document.createElement('strong');value.textContent=val;line.append(label,value);fields.append(line)}const status=document.createElement('span');status.className='worker-status '+(isWorkerPublished(w)?'active':'');status.textContent=({draft:'مسودة',available:'متاحة',unavailable:'غير متاحة'})[w.status]||w.status;details.append(title,desc,fields,status);const actions=document.createElement('div');actions.className='worker-actions';const edit=document.createElement('button');edit.textContent='⚙ إعدادات وتعديل';edit.className='secondary';edit.onclick=()=>editWorker(w.id);const select=document.createElement('select');select.setAttribute('aria-label','حالة العاملة');for(const [value,label] of [['draft','مسودة'],['available','متاحة'],['unavailable','غير متاحة']]){let o=document.createElement('option');o.value=value;o.textContent=label;o.selected=w.status===value;o.disabled=value==='available'&&!w.publication_consent_at&&w.status!=='available';select.append(o)}select.onchange=async()=>{let {error}=await db.from('workers').update({status:select.value}).eq('id',w.id).eq('office_id',office.id);if(error){message('تعذر تحديث الحالة: '+error.message,true);select.value=w.status}else{message('تم تحديث حالة العاملة');await loadWorkers()}};const cv=document.createElement('button');cv.textContent='عرض السيرة الذاتية';cv.className='cv-button';cv.onclick=()=>showCV(w.id);const spotlight=document.createElement('button');spotlight.type='button';spotlight.className='spotlight-action';spotlight.textContent='📢 إعلان في الشريط العلوي';spotlight.onclick=()=>{const p=new URLSearchParams({worker:w.id,office:office.id});window.location.href='advertise.html?'+p.toString()};actions.append(edit,select,spotlight);appendPublicationControls(w,details,actions);card.append(photo,details,actions,cv);list.append(card)}}
+async function showCV(id){const {data:w,error}=await db.from('workers').select('*').eq('office_id',office.id).eq('id',id).single();if(error||!w)return message('تعذر تحميل السيرة الذاتية',true);const modal=$('cvModal');const body=$('cvBody');body.replaceChildren();$('cvTitle').textContent='السيرة الذاتية — '+w.display_name;const entries=[['رقم العاملة',w.worker_number||'—'],['الاسم',w.display_name],['الجنسية',w.nationality],['العمر',w.age+' سنة'],['الديانة',w.religion||'غير محدد'],['إجمالي الخبرة',(w.experience_years||0)+' سنوات'],['الراتب',w.salary_aed?w.salary_aed+' درهم':'حسب الاتفاق'],['المهارات والملاحظات',w.description||'—'],['حالة العاملة',w.status==='available'?'متاحة':'غير متاحة']];for(const e of Array.isArray(w.country_experience)?w.country_experience:[])entries.push(['خبرة في '+e.country,e.years+' سنوات']);for(const [label,val] of entries){const row=document.createElement('div');row.className='cv-line';const l=document.createElement('span');l.textContent=label;const v=document.createElement('strong');v.textContent=val;row.append(l,v);body.append(row)}const cvPhoto=$('cvPhoto');cvPhoto.replaceChildren();const preview=w.publication_photo_draft?(await db.storage.from(workerPhotoBucket).createSignedUrl(w.publication_photo_draft,300)).data?.signedUrl:w.photo_url;if(preview){const img=document.createElement('img');img.referrerPolicy='no-referrer';img.src=preview;img.alt='صورة العاملة';cvPhoto.append(img)}else{cvPhoto.textContent='لا توجد صورة مرفوعة'}$('cvNationality').textContent=w.nationality||'';$('cvOffice').textContent=office.name;$('cvWorkerNumber').textContent='رقم العاملة: '+(w.worker_number||'غير محدد');modal.classList.remove('hidden');modal.scrollTop=0}
+$('closeCV').onclick=()=>show('cvModal',false);$('cvModal').onclick=e=>{if(e.target===$('cvModal'))show('cvModal',false)};
+async function updatePhotoPreview(){
+  const file = $('workerPhotoFile').files[0], box = $('workerPhotoPreview');
+  if(box.dataset.url) URL.revokeObjectURL(box.dataset.url);
+  delete box.dataset.url;
+  box.replaceChildren();
+  let url = v('photo');
+  $('clearWorkerPhoto').hidden = !file && !url && (!editingWorker?.publication_photo_draft || removeWorkerPhoto);
+  if(file){
+    if(!['image/jpeg','image/png','image/webp'].includes(file.type) || file.size > 5*1024*1024){
+      box.textContent = 'اختر صورة JPG أو PNG أو WebP بحجم لا يتجاوز 5 ميغابايت.';
+      return;
+    }
+    url = URL.createObjectURL(file);
+    box.dataset.url = url;
+  }else if(!removeWorkerPhoto && editingWorker?.publication_photo_draft && url === (editingWorker.photo_url || '')){
+    const worker = editingWorker;
+    box.textContent = 'جارٍ تحميل الصورة الخاصة…';
+    const {data} = await db.storage.from(workerPhotoBucket).createSignedUrl(worker.publication_photo_draft,300);
+    if(worker !== editingWorker || removeWorkerPhoto || $('workerPhotoFile').files[0] || v('photo') !== url) return;
+    url = data?.signedUrl || '';
+    box.replaceChildren();
+  }
+  if(/^(https:\/\/|blob:)/i.test(url)){
+    const img = document.createElement('img');
+    img.src = url;
+    img.referrerPolicy = 'no-referrer';
+    img.alt = 'معاينة صورة العاملة';
+    img.onerror = () => {if(img.parentNode===box) box.textContent = 'تعذر تحميل معاينة الصورة.';};
+    box.append(img);
+  }else box.textContent = 'لم يتم اختيار صورة بعد';
+}
+$('clearWorkerPhoto').onclick = () => {
+  removeWorkerPhoto = true;
+  $('workerPhotoFile').value = $('photo').value = '';
+  updatePhotoPreview();
+};
+$('workerPhotoFile').addEventListener('change',updatePhotoPreview);
+$('photo').addEventListener('change',updatePhotoPreview);
+
+async function uploadOfficeImage(file,folder,bucket='saahl-office-media'){
+  if(!file||!['image/jpeg','image/png','image/webp'].includes(file.type)) throw Error('الصورة يجب أن تكون JPG أو PNG أو WebP');
+  if(file.size>5*1024*1024) throw Error('الحد الأقصى لحجم الصورة 5 ميغابايت.');
+  if(!office) throw Error('المكتب غير مسجل');
+  const ext = file.type==='image/png'?'png':file.type==='image/webp'?'webp':'jpg';
+  const path = office.id+'/'+(bucket===workerPhotoBucket?'':folder+'/')+crypto.randomUUID()+'.'+ext;
+  const storage = db.storage.from(bucket);
+  const {error} = await storage.upload(path,file,{contentType:file.type,upsert:false});
+  if(error) throw error;
+  return bucket===workerPhotoBucket ? path : storage.getPublicUrl(path).data.publicUrl;
+}
 function updateOfficeLogoPreview(){const box=$('officeLogoPreview');if(!box)return;box.replaceChildren();const file=$('officeLogoFile').files[0];if(file){if(!['image/png','image/jpeg','image/webp'].includes(file.type)||file.size>5*1024*1024){box.textContent='يجب اختيار صورة PNG أو JPG أو WebP بحجم لا يتجاوز 5 ميغابايت';return}const img=document.createElement('img');img.src=URL.createObjectURL(file);img.alt='معاينة شعار المكتب';img.onload=()=>URL.revokeObjectURL(img.src);box.append(img)}else if(office?.logo_url){const img=document.createElement('img');img.src=office.logo_url;img.alt='الشعار الحالي';box.append(img)}else box.textContent='لم يُرفع شعار المكتب بعد'}
 $('officeLogoFile').onchange=updateOfficeLogoPreview;
 function showOfficeSettings(){if(!office)return;show('workerEditor',false);show('officeSettings',true);$('officeSettings').scrollIntoView({behavior:'smooth',block:'start'})}
