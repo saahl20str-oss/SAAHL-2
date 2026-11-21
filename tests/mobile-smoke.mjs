@@ -42,6 +42,14 @@ try {
    viewport:{width:390,height:844},isMobile:true,hasTouch:true,locale:'ar-AE',
    userAgent:'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1'
  });
+ // A Chromium user-agent override does not disable Chromium-only install capabilities.
+ await iphone.addInitScript(() => {
+   Object.defineProperty(navigator,'install',{value:undefined,configurable:true});
+   window.addEventListener('beforeinstallprompt',event=>{
+     event.preventDefault();
+     event.stopImmediatePropagation();
+   },{capture:true});
+ });
  const iosPage=await iphone.newPage();
  await iosPage.goto('http://127.0.0.1:8765/index.html',{waitUntil:'domcontentloaded'});
  const install=iosPage.locator('#mainNav .nav-login + .nav-install .saahl-install-btn');
