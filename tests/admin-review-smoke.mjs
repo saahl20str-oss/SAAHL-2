@@ -6,7 +6,6 @@ const html = await readFile('admin.html', 'utf8');
 const script = html.match(/<script>([\s\S]*?)<\/script>/)[1];
 const elements = new Map();
 const responses = new Map();
-const queries = [];
 const filters = [];
 const element = id => {
   if (!elements.has(id)) elements.set(id, {
@@ -17,10 +16,11 @@ const element = id => {
 };
 const db = {
   from(table) {
-    queries.push(table);
     const query = {
       select() { return query; },
       order() { return query; },
+      gte() { return query; },
+      limit() { return query; },
       update() { return query; },
       eq(...args) { filters.push(args); return query; },
       then(resolve, reject) {
@@ -37,18 +37,20 @@ const context = vm.createContext({
   localStorage: { getItem() { return null; } },
   window: { addEventListener() {} },
   confirm: () => true,
+  Chart: class {},
   setTimeout() {},
 });
 vm.runInContext(script, context);
 const run = code => vm.runInContext(code, context);
 
-assert.doesNotMatch(html, /data-p="(?:bookings|payments)"|id="ads-rev"|تم حفظ الأسعار/);
+for (const id of ['pg-bookings', 'pg-payments', 's-rev', 'ads-rev', 'pr-off', 'pr-bk', 'pr-ad']) {
+  assert.ok(html.includes(`id="${id}"`), `Missing existing admin element ${id}`);
+}
 for (const [, handler] of html.matchAll(/onclick="(navTo\('kafala'\))"/g)) new vm.Script(handler);
 responses.set('offices', { data: null, count: null, error: { message: 'offline' } });
 responses.set('sponsor_profiles', { data: null, error: { message: 'offline' } });
 responses.set('strip_ads', { data: [], error: null });
 await run('loadAll()');
-assert.doesNotMatch(queries.join(' '), /bookings|payments/);
 assert.equal(element('s-off').textContent, '—');
 assert.match(element('off-wrap').textContent, /تعذر تحميل/);
 run('filterOffices();filterSponsors()');
