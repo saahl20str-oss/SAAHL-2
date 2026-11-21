@@ -63,6 +63,7 @@ try {
     assert.equal(page.url(),site+'kafala.html');
     await page.goto(site+'kafala.html#ad='+firstId);
     await modal.getByText('إعلان 11223344',{exact:true}).waitFor();
+    assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1));
     const destination = page.waitForRequest(url => url.url().startsWith('https://wa.me/'));
     const download = page.waitForEvent('download');
     await whatsappButton.click();
@@ -77,7 +78,6 @@ try {
     assert.match(url.searchParams.get('text'),/11223344/);
     assert.match(url.searchParams.get('text'),new RegExp(firstId));
     assert.match(url.searchParams.get('text'),/أعمال السباكة/);
-    assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1));
     assert.deepEqual(errors,[]);
     await page.close();
   }
