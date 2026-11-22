@@ -70,8 +70,8 @@ try {
      window.supabase={createClient:()=>({
        auth:{getSession:async()=>({data:{session:null}})},
        rpc:async name=>({data:name==='saahl2_office_license_review'
-         ? {has_attachment:true,contact_email:'office@example.com'}:[],error:null}),
-       storage:{from:()=>({download:async()=>({data:new Blob(['%PDF-1.4'],{type:'application/pdf'}),error:null})})},
+         ? {has_attachment:true,contact_email:'office@example.com',attachment_path:'office-2/revision-qa',submitted_at:'2026-11-22'}:[],error:null}),
+       storage:{from:()=>({download:async path=>({data:path==='office-2/revision-qa'?new Blob(['%PDF-1.4'],{type:'application/pdf'}):null,error:null})})},
        from(table){
          let head=false, status;
          const query={

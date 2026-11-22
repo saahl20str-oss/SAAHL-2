@@ -176,7 +176,14 @@ main{max-width:760px;margin:0 auto 65px;padding:0 18px}
     </div><button class="secondary hidden" id="signup">إنشاء حساب المكتب</button><p id="signupFeedback" class="office-signup-feedback" role="status" aria-live="polite" hidden></p></div><p class="muted">قد يُطلب منك تأكيد البريد قبل الدخول. لا تُدخل كلمة المرور في أي صفحة أخرى.</p></section><section id="dashboard" class="hidden"><div id="newOfficeWelcome" class="new-office-welcome hidden" role="status"></div><div class="office-hero office-hero-clean"><div class="office-hero-copy"><span class="hero-kicker">لوحة إدارة المكتب</span><h1 id="officeTitle">إدارة أسهل، وعاملاتك في مكان واحد</h1><p>أضف العاملات، حدّث حالة التوفر، واستعرض طلبات الترويج من لوحة منظمة.</p><div id="officeStatus" class="office-status"></div></div></div><div class="office-toolbar"><div class="toolbar-tabs"><button id="tabHome" class="tab-active">العاملات</button><button id="tabSettings">إعدادات المكتب</button></div><button id="logout" class="secondary">تبديل المكتب / تسجيل الخروج</button></div><div id="officeSettings" class="panel hidden"><div class="dash-header"><div><h2>إعدادات المكتب</h2><p>تحديث بيانات التواصل والمعلومات الأساسية.</p></div><button id="closeSettings" class="secondary">إغلاق</button></div><section class="office-license-panel hidden" id="officeLicenseSettings" aria-labelledby="officeLicenseTitle">
   <h3 id="officeLicenseTitle" tabindex="-1">إرفاق نسخة رخصة المكتب</h3>
   <p id="pendingLicenseFeedback" class="office-license-status" role="status" aria-atomic="true">جارٍ التحقق من المرفق…</p>
+  <button type="button" class="secondary hidden" id="editOfficeLicense">تعديل بيانات الرخصة ورفع نسخة جديدة</button>
   <div id="pendingLicenseUpload" class="hidden">
+    <div class="grid">
+      <div><label for="revisionLicenseNumber">رقم الرخصة</label><input id="revisionLicenseNumber" maxlength="120"></div>
+      <div><label for="revisionLicenseIssuer">اسم الجهة المصدرة</label><input id="revisionLicenseIssuer" maxlength="120"></div>
+    </div>
+    <p id="licenseRevisionNotice" class="muted hidden">إرسال نسخة بديلة أو تغيير بيانات الرخصة يعيد الطلب إلى انتظار الاعتماد. يتوقف عرض المكتب للزوار حتى تكتمل المراجعة.</p>
+    <p id="officeLicenseError" class="error hidden" role="alert"></p>
     <div class="office-license-buttons">
       <label for="pendingLicenseFile" class="btn secondary">اختيار ملف الرخصة</label>
       <input type="file" id="pendingLicenseFile" class="office-license-input" accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png" aria-describedby="pendingLicenseHelp pendingLicenseFeedback">
@@ -184,7 +191,7 @@ main{max-width:760px;margin:0 auto 65px;padding:0 18px}
     </div>
     <p id="pendingLicenseHelp" class="muted">PDF أو JPG أو PNG حتى 5 ميغابايت. يطّلع عليه مسؤول الاعتماد فقط.</p>
   </div>
-</section><div class="grid"><div><label>اسم المكتب</label><input id="settingsName"></div><div><label>الإمارة</label><select id="settingsEmirate"><option>أبوظبي</option><option>دبي</option><option>الشارقة</option><option>عجمان</option><option>أم القيوين</option><option>رأس الخيمة</option><option>الفجيرة</option></select></div><div><label>رقم الهاتف</label><input id="settingsPhone"></div><div><label>رقم الترخيص</label><input id="settingsLicense" readonly title="لتغيير رقم الترخيص تواصل مع الإدارة"></div><div><label>رقم واتساب المكتب</label><input id="settingsWhatsapp" inputmode="tel" placeholder="9715xxxxxxxx"></div><div class="logo-upload-field"><label for="officeLogoFile">شعار المكتب (PNG / JPG / WebP)</label><div id="officeLogoPreview" class="office-logo-preview"><span>لم يُرفع شعار المكتب بعد</span></div><input type="file" id="officeLogoFile" accept="image/png,image/jpeg,image/webp"><p class="muted">اختر صورة الشعار التي ستظهر للزوار. ارفع الرخصة في قسم إرفاق نسخة رخصة المكتب أعلى الإعدادات.</p></div><div><label>البريد الإلكتروني للحساب</label><input type="email" id="settingsEmail" dir="ltr"></div><div><label>كلمة مرور جديدة (8 أحرف على الأقل)</label><input type="password" id="settingsPassword" autocomplete="new-password"><label class="show-password"><input type="checkbox" id="showSettingsPassword"> إظهار كلمة المرور</label></div></div><label>نبذة عن المكتب</label><textarea id="settingsDescription" rows="3" maxlength="1500"></textarea><div class="settings-account-actions"><button id="saveEmail" class="secondary">تغيير البريد الإلكتروني</button><button id="savePassword" class="secondary">تغيير كلمة المرور</button></div><button id="saveSettings">حفظ التغييرات</button><p class="muted">تغيير الترخيص أو حالة الاعتماد يتطلب مراجعة الإدارة.</p></div><section class="panel" id="officeForm" aria-labelledby="officeFormTitle">
+</section><div class="grid"><div><label>اسم المكتب</label><input id="settingsName"></div><div><label>الإمارة</label><select id="settingsEmirate"><option>أبوظبي</option><option>دبي</option><option>الشارقة</option><option>عجمان</option><option>أم القيوين</option><option>رأس الخيمة</option><option>الفجيرة</option></select></div><div><label>رقم الهاتف</label><input id="settingsPhone"></div><div><label>رقم الترخيص</label><input id="settingsLicense" readonly title="يمكن تعديل رقم الترخيص من قسم إرفاق نسخة رخصة المكتب"></div><div><label>رقم واتساب المكتب</label><input id="settingsWhatsapp" inputmode="tel" placeholder="9715xxxxxxxx"></div><div class="logo-upload-field"><label for="officeLogoFile">شعار المكتب (PNG / JPG / WebP)</label><div id="officeLogoPreview" class="office-logo-preview"><span>لم يُرفع شعار المكتب بعد</span></div><input type="file" id="officeLogoFile" accept="image/png,image/jpeg,image/webp"><p class="muted">اختر صورة الشعار التي ستظهر للزوار. ارفع الرخصة في قسم إرفاق نسخة رخصة المكتب أعلى الإعدادات.</p></div><div><label>البريد الإلكتروني للحساب</label><input type="email" id="settingsEmail" dir="ltr"></div><div><label>كلمة مرور جديدة (8 أحرف على الأقل)</label><input type="password" id="settingsPassword" autocomplete="new-password"><label class="show-password"><input type="checkbox" id="showSettingsPassword"> إظهار كلمة المرور</label></div></div><label>نبذة عن المكتب</label><textarea id="settingsDescription" rows="3" maxlength="1500"></textarea><div class="settings-account-actions"><button id="saveEmail" class="secondary">تغيير البريد الإلكتروني</button><button id="savePassword" class="secondary">تغيير كلمة المرور</button></div><button id="saveSettings">حفظ التغييرات</button><p class="muted">تغيير الترخيص أو حالة الاعتماد يتطلب مراجعة الإدارة.</p></div><section class="panel" id="officeForm" aria-labelledby="officeFormTitle">
   <header class="office-apply-heading">
     <h2 id="officeFormTitle">طلب اعتماد المكتب</h2>
     <p>أكمل بيانات الرخصة والتواصل، ثم أرسل الطلب للمراجعة.</p>
@@ -412,7 +419,7 @@ function licenseFileError(file){
     return 'اختر نسخة رخصة بصيغة PDF أو JPG أو PNG وبحجم لا يتجاوز 5 ميغابايت.';
   }
 }
-async function uploadOfficeLicense(id,file){
+async function uploadOfficeLicense(id,file,path=id+'/license'){
   const contentType=licenseFileType(file);
   const bytes=new Uint8Array(await file.slice(0,8).arrayBuffer());
   const signatures={'application/pdf':[37,80,68,70,45],'image/jpeg':[255,216,255],
@@ -423,9 +430,9 @@ async function uploadOfficeLicense(id,file){
     throw error;
   }
   const {error}=await db.storage.from('saahl2-office-licenses')
-    .upload(id+'/license',file,{contentType,upsert:false});
+    .upload(path,file,{contentType,upsert:false});
   if(!error)return 'أُرفقت نسخة الرخصة وأصبحت متاحة للإدارة.';
-  if(Number(error.statusCode||error.status)===409)return 'توجد نسخة رخصة مرفقة بهذا الطلب.';
+  if(path===id+'/license'&&Number(error.statusCode||error.status)===409)return 'توجد نسخة رخصة مرفقة بهذا الطلب.';
   throw error;
 }
 function setLicenseFeedback(text,state=''){
@@ -436,10 +443,24 @@ function setLicenseFeedback(text,state=''){
 
 let licenseUploadBusy=false;
 let licenseSettingsOfficeId=null;
+let replacingOfficeLicense=false;
+let stagedLicense=null;
+
+$('editOfficeLicense').onclick=()=>{
+  show('pendingLicenseUpload',true);
+  show('licenseRevisionNotice',true);
+  show('editOfficeLicense',false);
+  $('revisionLicenseNumber').focus();
+};
+for(const field of ['revisionLicenseNumber','revisionLicenseIssuer']){
+  $(field).oninput=()=>show('officeLicenseError',false);
+}
+
 
 function showSelectedLicense(){
   const file=$('pendingLicenseFile').files[0];
   const error=licenseFileError(file);
+  show('officeLicenseError',false);
   $('attachPendingLicense').disabled=!file||Boolean(error)||licenseUploadBusy;
   if(error)setLicenseFeedback(error,'error');
   else if(file)setLicenseFeedback('الملف المختار: '+file.name+'. اضغط «رفع نسخة الرخصة» لإرساله.');
@@ -456,16 +477,24 @@ async function refreshOfficeLicense(){
     licenseSettingsOfficeId=current.id;
   }
   show('pendingLicenseUpload',false);
+  show('editOfficeLicense',false);
+  show('licenseRevisionNotice',false);
+  show('officeLicenseError',false);
+  $('revisionLicenseNumber').value=current.license_number||'';
+  $('revisionLicenseIssuer').value=current.declared_license_issuer||'';
   setLicenseFeedback('جارٍ التحقق من المرفق…');
   try{
     const {data,error}=await db.rpc('saahl2_office_license_review',{p_office:current.id});
     if(error||!data)throw error||new Error('Missing review status');
     if(office?.id!==current.id)return;
+    replacingOfficeLicense=data.has_attachment;
     show('pendingLicenseUpload',!data.has_attachment);
+    show('editOfficeLicense',data.has_attachment);
     if(data.has_attachment)setLicenseFeedback('نسخة الرخصة مرفقة ومتاحة للإدارة.','success');
     else showSelectedLicense();
   }catch{
     if(office?.id!==current.id)return;
+    replacingOfficeLicense=false;
     show('pendingLicenseUpload',true);
     showSelectedLicense();
     if(!$('pendingLicenseFile').files.length)setLicenseFeedback('تعذّر التحقق من المرفق. يمكنك محاولة الإرفاق.','error');
@@ -477,14 +506,42 @@ $('attachPendingLicense').onclick=async()=>{
   const currentId=office.id;
   const button=$('attachPendingLicense'),input=$('pendingLicenseFile'),file=input.files[0];
   if(!file||licenseFileError(file))return;
+  const number=v('revisionLicenseNumber'),issuer=v('revisionLicenseIssuer');
+  const isRevision=replacingOfficeLicense||number!==(office.license_number||'')||issuer!==(office.declared_license_issuer||'');
+  if(isRevision&&(!number||issuer.length<4)){
+    $('officeLicenseError').textContent='أدخل رقم الرخصة والاسم الكامل للجهة المصدرة كما يظهران في النسخة الجديدة.';
+    show('officeLicenseError',true);
+    $(number?'revisionLicenseIssuer':'revisionLicenseNumber').focus();
+    return;
+  }
+  if(isRevision&&office.status==='approved'&&!confirm('إرسال نسخة جديدة للمراجعة؟ سيتوقف ظهور المكتب للزوار حتى تعيد الإدارة اعتماده.'))return;
   licenseUploadBusy=true;
-  button.disabled=input.disabled=true;
+  button.disabled=input.disabled=$('revisionLicenseNumber').disabled=$('revisionLicenseIssuer').disabled=true;
   setLicenseFeedback('جارٍ رفع نسخة الرخصة…');
   try{
-    const feedback=await uploadOfficeLicense(currentId,file);
+    let feedback;
+    if(isRevision){
+      if(stagedLicense?.file!==file||stagedLicense.officeId!==currentId){
+        const path=currentId+'/revision-'+crypto.randomUUID();
+        await uploadOfficeLicense(currentId,file,path);
+        stagedLicense={file,officeId:currentId,path};
+      }
+      const {error}=await db.rpc('saahl2_submit_office_license_revision',{
+        p_office:currentId,p_path:stagedLicense.path,p_number:number,p_issuer:issuer
+      });
+      if(error)throw error;
+      stagedLicense=null;
+      feedback='تم حفظ بيانات الرخصة والنسخة الجديدة. الطلب بانتظار اعتماد الإدارة.';
+      if(office?.id===currentId){
+        office={...office,license_number:number,declared_license_issuer:issuer,status:'pending'};
+        officeView();
+      }
+    }else feedback=await uploadOfficeLicense(currentId,file);
     if(office?.id!==currentId)return;
     input.value='';
+    replacingOfficeLicense=true;
     show('pendingLicenseUpload',false);
+    show('editOfficeLicense',true);
     setLicenseFeedback(feedback,'success');
   }catch(error){
     if(office?.id===currentId)setLicenseFeedback(
@@ -492,7 +549,7 @@ $('attachPendingLicense').onclick=async()=>{
       'تعذّر إرفاق نسخة الرخصة. حاول مجددًا.','error');
   }finally{
     licenseUploadBusy=false;
-    input.disabled=false;
+    input.disabled=$('revisionLicenseNumber').disabled=$('revisionLicenseIssuer').disabled=false;
     button.disabled=!input.files.length;
     if(office?.id!==currentId)refreshOfficeLicense();
   }

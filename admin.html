@@ -719,7 +719,10 @@ function renderOfficeDetails(office){
   instructions.href='legal.html#verification';
   instructions.className='btn btn-o btn-s';
   instructions.textContent='خطوات المطابقة';
-  tools.append(officeAction('توثيق الرخصة','btn-o',()=>verifyOffice(office.id)),instructions);
+  const verify=officeAction('توثيق الرخصة','btn-o',null);
+  verify.dataset.officeVerify='true';
+  verify.disabled=true;
+  tools.append(verify,instructions);
   license.append(verification,tools,attachmentStatus,attachmentTools,preview);
   const contact=document.createElement('div');
   contact.className='office-card-actions';
@@ -750,10 +753,15 @@ async function loadOfficeReviewContact(office,status,tools,preview,contact){
   const {data,error}=await db.rpc('saahl2_office_license_review',{p_office:office.id});
   if(!status.isConnected)return;
   if(error||!data)throw error||new Error('Missing review details');
-  status.textContent=data.has_attachment?'أُرفقت نسخة الرخصة.':'لا توجد نسخة رخصة مرفقة.';
+  status.textContent=data.submitted_at?'وصلت نسخة رخصة جديدة بتاريخ '+fd(data.submitted_at)+'.':
+   data.has_attachment?'أُرفقت نسخة الرخصة.':'لا توجد نسخة رخصة مرفقة.';
+  const activePath=data.attachment_path||office.id+'/license';
+  const verify=tools.parentElement.querySelector('[data-office-verify]');
+  verify.disabled=Boolean(data.submitted_at&&!data.attachment_path);
+  verify.onclick=()=>verifyOffice(office.id,data.submitted_at?data.attachment_path:null);
   if(data.has_attachment){
-   const view=officeAction('عرض الرخصة','btn-p',()=>openOfficeLicense(office.id,view,preview,status,false));
-   const download=officeAction('تنزيل نسخة الرخصة','btn-o',()=>openOfficeLicense(office.id,download,preview,status,true));
+   const view=officeAction('عرض الرخصة','btn-p',()=>openOfficeLicense(office.id,activePath,view,preview,status,false));
+   const download=officeAction('تنزيل نسخة الرخصة','btn-o',()=>openOfficeLicense(office.id,activePath,download,preview,status,true));
    tools.append(view,download);
   }
   if(typeof data.contact_email==='string'&&/^[^\s@?&#]+@[^\s@?&#]+\.[^\s@?&#]+$/.test(data.contact_email)){
@@ -773,11 +781,11 @@ async function loadOfficeReviewContact(office,status,tools,preview,contact){
  }
 }
 
-async function openOfficeLicense(id,button,preview,status,download){
+async function openOfficeLicense(id,path,button,preview,status,download){
  button.disabled=true;
  status.textContent='جارٍ فتح نسخة الرخصة…';
  try{
-  const {data,error}=await db.storage.from('saahl2-office-licenses').download(id+'/license');
+  const {data,error}=await db.storage.from('saahl2-office-licenses').download(path);
   if(!preview.isConnected)return;
   if(error)throw error;
   const mime=data.type.split(';')[0];
@@ -815,7 +823,7 @@ async function openOfficeLicense(id,button,preview,status,download){
   button.disabled=false;
  }
 }
-async function verifyOffice(id){
+async function verifyOffice(id,expectedPath){
  const office=aOff.find(item=>item.id===id);
  if(!office)return;
  if(!confirm('هل طابقت الاسم القانوني والفرع والرقم والسريان مع القائمة الرسمية أو الجهة المصدرة؟'))return;
@@ -824,7 +832,8 @@ async function verifyOffice(id){
  const expiry=prompt('تاريخ انتهاء الرخصة (YYYY-MM-DD)',office.verified_license_expires||'');
  if(!expiry)return;
  if(!/^\d{4}-\d{2}-\d{2}$/.test(expiry.trim())){toast('أدخل تاريخ انتهاء صحيحًا');return;}
- const {error}=await db.rpc('saahl2_verify_office',{p_id:id,p_issuer:issuer.trim(),p_expires:expiry.trim()});
+ const {error}=await db.rpc('saahl2_verify_office_revision',{p_id:id,p_issuer:issuer.trim(),p_expires:expiry.trim(),p_expected_path:expectedPath});
+ if(error?.code==='40001'){toast('وصلت نسخة جديدة. افتحها وراجعها قبل التوثيق.');await loadOff();return;}
  if(error){toast('تعذر تسجيل التحقق: '+error.message);return;}
  await loadOff();
 }
