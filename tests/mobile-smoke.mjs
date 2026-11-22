@@ -63,10 +63,54 @@ try {
    const ctx=await browser.newContext({viewport:{width,height:844}});
    await ctx.route('**/*supabase-js@2*',route=>route.fulfill({
      contentType:'application/javascript',
-     body:'window.supabase={createClient:()=>({auth:{getSession:async()=>({data:{session:null}})}})};'
+     body:`window.adminOfficeRows=[
+       {id:'office-1',name:'مكتب معتمد',license_number:'QA-11',status:'approved'},
+       {id:'office-2',name:'مكتب جديد',license_number:'QA-22',status:'pending'}
+     ];
+     window.supabase={createClient:()=>({
+       auth:{getSession:async()=>({data:{session:null}})},
+       rpc:async()=>({data:[],error:null}),
+       from(table){
+         let head=false, status;
+         const query={
+           select(_fields,options){head=options?.head;return query;},
+           eq(key,value){if(key==='status')status=value;return query;},
+           gte(){return query;}, order(){return query;}, limit(){return query;},
+           then(resolve,reject){
+             const rows=table==='offices'?window.adminOfficeRows.filter(o=>!status||o.status===status):[];
+             return Promise.resolve({data:head?null:rows,count:rows.length,error:null}).then(resolve,reject);
+           }
+         };
+         return query;
+       }
+     })};`
    }));
    const page=await ctx.newPage();
    await page.goto('http://127.0.0.1:8765/admin.html',{waitUntil:'domcontentloaded'});
+   await page.evaluate(()=>showApp());
+   const queue=page.getByRole('button',{name:'مراجعة طلبات المكاتب'});
+   await queue.waitFor();
+   const firstBadge=await page.locator('#office-pending-badge').textContent();
+   await queue.click();
+   const newOffice=page.locator('.office-card').filter({hasText:'مكتب جديد'});
+   await newOffice.waitFor();
+   const officeControls=(await newOffice.getByRole('button',{name:'توثيق الرخصة'}).isVisible())&&
+     (await newOffice.getByRole('button',{name:'تنزيل نسخة الرخصة'}).isVisible());
+   const onlyPending=await page.locator('.office-card').count()===1;
+   await page.evaluate(async()=>{
+     window.adminOfficeRows[1].status='approved';
+     await refreshOfficeQueue();
+   });
+   await page.locator('#office-pending-badge').waitFor({state:'hidden'});
+   await page.getByText('لا توجد مكاتب تطابق البحث أو الحالة المختارة.').waitFor();
+   await page.getByLabel('حالة المكتب').selectOption('');
+   await page.getByRole('searchbox',{name:'البحث عن مكتب'}).fill('QA-22');
+   await newOffice.getByText('معتمد',{exact:true}).waitFor();
+   const officeFits=await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+2);
+   const officePass=firstBadge==='1'&&onlyPending&&officeControls&&officeFits&&await page.locator('.office-card').count()===1;
+   checks++;
+   if(!officePass)fails++;
+   console.log(JSON.stringify({width,officeApprovalCards:officePass}));
    await page.evaluate(async()=>{
       const result={office_id:'12345678-4321-4321-4321-123456789abc',name:'مكتب نموذجي',emirate:'دبي',display_name:'عاملة تجريبية',nationality:'كينيا',worker_number:'W-77',age:29,experience_years:3};
       const chain={select:()=>chain,eq:()=>chain,maybeSingle:async()=>({data:result})};
