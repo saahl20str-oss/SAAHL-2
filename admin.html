@@ -221,6 +221,12 @@ body.dark .office-card{background:color-mix(in srgb,var(--office-accent) 16%,var
 .office-details-header{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px}
 .office-details-header h2{font-size:16px;margin:0}
 .office-details-body{display:grid;gap:12px;overflow-wrap:anywhere}
+.office-license-preview{display:grid;gap:8px}
+.office-license-preview :is(img,iframe){width:100%;max-height:45dvh;border:1px solid var(--border);border-radius:8px}
+.office-license-preview img{object-fit:contain}
+.office-license-preview iframe{height:40dvh}
+.office-license-preview a{justify-self:start}
+
 .office-details-header button{min-height:40px}
 .office-card-facts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:0}
 .office-card-facts div{min-width:0}
@@ -541,8 +547,11 @@ const officeTones=[
  ['#f6f1e5','#aa8a4d'],['#edf6f1','#629881'],['#eef3fa','#688ab2'],['#f5eff8','#9875aa'],
  ['#faf0ed','#b48173'],['#edf5f5','#62999b'],['#f6f4ed','#96905a'],['#f1f0f9','#817fba']
 ];
+let officePreviewUrl=null;
 const officeDialog=document.getElementById('office-details-dialog');
 officeDialog.addEventListener('close',()=>{
+ clearOfficeLicensePreview();
+ document.getElementById('office-details-body').replaceChildren();
  const card=Array.from(document.querySelectorAll('.office-card')).find(item=>item.dataset.officeId===officeDetailsId);
  officeDetailsId=null;
  (card?.querySelector('button')||document.getElementById('off-s')).focus();
@@ -678,6 +687,7 @@ function officeCardHeading(office){
 }
 
 function renderOfficeDetails(office){
+  clearOfficeLicensePreview();
   const facts=document.createElement('dl');
   facts.className='office-card-facts';
   for(const [label,value] of [
@@ -698,20 +708,29 @@ function renderOfficeDetails(office){
    : 'الرخصة بانتظار التحقق الرسمي';
   const tools=document.createElement('div');
   tools.className='office-card-actions';
-  const attachment=officeAction('تنزيل نسخة الرخصة','btn-o',()=>downloadOfficeLicense(office.id,attachment));
+  const attachmentStatus=document.createElement('p');
+  attachmentStatus.setAttribute('role','status');
+  attachmentStatus.textContent='جارٍ التحقق من نسخة الرخصة…';
+  const preview=document.createElement('div');
+  preview.className='office-license-preview';
+  const attachmentTools=document.createElement('div');
+  attachmentTools.className='office-card-actions';
   const instructions=document.createElement('a');
   instructions.href='legal.html#verification';
   instructions.className='btn btn-o btn-s';
   instructions.textContent='خطوات المطابقة';
-  tools.append(attachment,officeAction('توثيق الرخصة','btn-o',()=>verifyOffice(office.id)),instructions);
-  license.append(verification,tools);
+  tools.append(officeAction('توثيق الرخصة','btn-o',()=>verifyOffice(office.id)),instructions);
+  license.append(verification,tools,attachmentStatus,attachmentTools,preview);
+  const contact=document.createElement('div');
+  contact.className='office-card-actions';
 
   const actions=document.createElement('div');
   actions.className='office-card-actions';
   for(const [next,label] of [['approved','اعتماد المكتب'],['rejected','رفض الطلب'],['suspended','إيقاف المكتب']]){
    if(office.status!==next)actions.append(officeAction(label,next==='approved'?'btn-p':'btn-d',()=>togOff(office.id,next,office.name)));
   }
-  document.getElementById('office-details-body').replaceChildren(officeCardHeading(office),facts,license,actions);
+  document.getElementById('office-details-body').replaceChildren(officeCardHeading(office),facts,license,contact,actions);
+  loadOfficeReviewContact(office,attachmentStatus,attachmentTools,preview,contact);
 }
 
 function filterOffices(){
@@ -721,22 +740,77 @@ function filterOffices(){
  renderOff(aOff.filter(office=>(!status||office.status===status)&&
    (!q||[office.name,office.license_number].some(value=>String(value||'').toLowerCase().includes(q)))));
 }
-async function downloadOfficeLicense(id,button){
+function clearOfficeLicensePreview(){
+ if(officePreviewUrl)URL.revokeObjectURL(officePreviewUrl);
+ officePreviewUrl=null;
+}
+
+async function loadOfficeReviewContact(office,status,tools,preview,contact){
+ try{
+  const {data,error}=await db.rpc('saahl2_office_license_review',{p_office:office.id});
+  if(!status.isConnected)return;
+  if(error||!data)throw error||new Error('Missing review details');
+  status.textContent=data.has_attachment?'أُرفقت نسخة الرخصة.':'لا توجد نسخة رخصة مرفقة.';
+  if(data.has_attachment){
+   const view=officeAction('عرض الرخصة','btn-p',()=>openOfficeLicense(office.id,view,preview,status,false));
+   const download=officeAction('تنزيل نسخة الرخصة','btn-o',()=>openOfficeLicense(office.id,download,preview,status,true));
+   tools.append(view,download);
+  }
+  if(typeof data.contact_email==='string'&&/^[^\s@?&#]+@[^\s@?&#]+\.[^\s@?&#]+$/.test(data.contact_email)){
+   const email=document.createElement('a');
+   email.className='btn btn-o btn-s';
+   email.textContent='مراسلة المكتب بالبريد';
+   const subject='ساهل‑2 | مراجعة طلب مكتب '+(office.name||'');
+   const body='السلام عليكم،\n\nبخصوص طلب اعتماد مكتب '+(office.name||'')+'، نرجو تعديل أو إضافة التالي:\n\n\nيرجى الرد على هذه الرسالة بعد استكمال المطلوب.\nإدارة ساهل‑2';
+   email.href='mailto:'+encodeURIComponent(data.contact_email).replace('%40','@')+
+    '?subject='+encodeURIComponent(subject)+'&body='+encodeURIComponent(body);
+   contact.append(email);
+  }else{
+   contact.textContent='لا يوجد بريد حساب مؤكّد لهذا المكتب.';
+  }
+ }catch{
+  if(status.isConnected)status.textContent='تعذّر تحميل حالة الرخصة والبريد. أغلق التفاصيل وافتحها مجددًا.';
+ }
+}
+
+async function openOfficeLicense(id,button,preview,status,download){
  button.disabled=true;
+ status.textContent='جارٍ فتح نسخة الرخصة…';
  try{
   const {data,error}=await db.storage.from('saahl2-office-licenses').download(id+'/license');
-  if(error){
-   if(Number(error.statusCode||error.status)===404||error.error==='not_found'){toast('لم تُرفق نسخة رخصة بهذا الطلب.');return;}
-   throw error;
-  }
-  const extension={'application/pdf':'pdf','image/jpeg':'jpg','image/png':'png'}[data.type];
+  if(!preview.isConnected)return;
+  if(error)throw error;
+  const mime=data.type.split(';')[0];
+  const extension={'application/pdf':'pdf','image/jpeg':'jpg','image/png':'png'}[mime];
+  if(!extension)throw new Error('Unsupported license attachment');
+  if(mime==='application/pdf'&&await data.slice(0,5).text()!=='%PDF-')throw new Error('Invalid PDF');
+  if(!preview.isConnected)return;
   const url=URL.createObjectURL(data);
   const link=document.createElement('a');
-  link.href=url;link.download='office-license-'+id+(extension?'.'+extension:'');
-  document.body.append(link);link.click();link.remove();
-  setTimeout(()=>URL.revokeObjectURL(url),30000);
+  link.href=url;
+  if(download){
+   link.download='office-license-'+id+'.'+extension;
+   document.body.append(link);link.click();link.remove();
+   setTimeout(()=>URL.revokeObjectURL(url),30000);
+  }else{
+   clearOfficeLicensePreview();
+   officePreviewUrl=url;
+   const media=document.createElement(mime==='application/pdf'?'iframe':'img');
+   if(mime==='application/pdf'){
+    media.title='معاينة نسخة الرخصة PDF';
+
+   }else media.alt='معاينة نسخة الرخصة';
+   media.src=url;
+   link.className='btn btn-o btn-s';
+   link.target='_blank';
+   link.rel='noopener noreferrer';
+   link.textContent='فتح الرخصة في تبويب جديد';
+   preview.replaceChildren(link,media);
+   preview.scrollIntoView({block:'nearest'});
+  }
+  status.textContent='أُرفقت نسخة الرخصة.';
  }catch{
-  toast('تعذّر تنزيل نسخة الرخصة. حاول مجددًا.');
+  if(status.isConnected)status.textContent='تعذّر فتح نسخة الرخصة. حاول مجددًا.';
  }finally{
   button.disabled=false;
  }

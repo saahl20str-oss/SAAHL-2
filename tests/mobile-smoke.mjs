@@ -69,7 +69,9 @@ try {
      ];
      window.supabase={createClient:()=>({
        auth:{getSession:async()=>({data:{session:null}})},
-       rpc:async()=>({data:[],error:null}),
+       rpc:async name=>({data:name==='saahl2_office_license_review'
+         ? {has_attachment:true,contact_email:'office@example.com'}:[],error:null}),
+       storage:{from:()=>({download:async()=>({data:new Blob(['%PDF-1.4'],{type:'application/pdf'}),error:null})})},
        from(table){
          let head=false, status;
          const query={
@@ -99,6 +101,12 @@ try {
    await newOffice.getByRole('button',{name:'التفاصيل'}).click();
    const officeDialog=page.getByRole('dialog',{name:'تفاصيل طلب المكتب'});
    await officeDialog.waitFor();
+   const mailOffice=officeDialog.getByRole('link',{name:'مراسلة المكتب بالبريد'});
+   await mailOffice.waitFor();
+   const emailReady=(await mailOffice.getAttribute('href')).startsWith('mailto:office@example.com?');
+   await officeDialog.getByRole('button',{name:'عرض الرخصة'}).click();
+   await officeDialog.getByRole('link',{name:'فتح الرخصة في تبويب جديد'}).waitFor();
+   const pdfPreview=await officeDialog.locator('iframe[title="معاينة نسخة الرخصة PDF"]').isVisible();
    const officeControls=(await officeDialog.getByRole('button',{name:'توثيق الرخصة'}).isVisible())&&
      (await officeDialog.getByRole('button',{name:'تنزيل نسخة الرخصة'}).isVisible())&&
      (await officeDialog.getByRole('button',{name:'اعتماد المكتب'}).isVisible())&&
@@ -119,7 +127,7 @@ try {
    await page.getByRole('searchbox',{name:'البحث عن مكتب'}).fill('QA-22');
    await newOffice.getByText('معتمد',{exact:true}).waitFor();
    const officeFits=await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+2);
-   const officePass=firstBadge==='1'&&onlyPending&&compact&&officeControls&&focusRestored&&distinctTones&&officeFits&&await page.locator('.office-card').count()===1;
+   const officePass=firstBadge==='1'&&onlyPending&&compact&&officeControls&&emailReady&&pdfPreview&&focusRestored&&distinctTones&&officeFits&&await page.locator('.office-card').count()===1;
    checks++;
    if(!officePass)fails++;
    console.log(JSON.stringify({width,officeApprovalCards:officePass}));
