@@ -184,10 +184,32 @@ try{
     for(const [id,value] of Object.entries({name:'مكتب تجريبي',license:'TEST-123',licenseIssuer:'جهة تجريبية',phone:'0500000010'})){
       await registration.locator('#'+id).fill(value);
     }
-    for(const checkbox of await registration.locator('#officeForm input[type=checkbox]').all())await checkbox.check();
     assert.ok(await registration.getByLabel('إرفاق نسخة الرخصة (اختياري)',{exact:true}).isVisible());
     const pdf={name:'license.pdf',mimeType:'application/pdf',buffer:Buffer.from('%PDF-1.4')};
     if(withFile)await registration.locator('#officeLicenseFile').setInputFiles(pdf);
+    if(withFile){
+      await registration.setViewportSize({width:320,height:844});
+      await registration.locator('#licenseIssuer').fill('دبي');
+      await registration.locator('#nextOfficeApplication').click();
+      assert.equal(await registration.locator('#licenseIssuer').getAttribute('aria-invalid'),'true');
+      assert.ok(await registration.getByText('يجب أن يكون الاسم بين 4 و120 حرفًا.',{exact:false}).isVisible());
+      assert.equal(await registration.locator('#officeApplicationReview').isVisible(),false);
+      await noOverflow(registration);
+      await registration.locator('#licenseIssuer').fill('جهة تجريبية');
+    }
+    await registration.locator('#nextOfficeApplication').click();
+    await registration.getByRole('heading',{name:'راجع بيانات المكتب'}).waitFor();
+    assert.ok(await registration.locator('#officeApplicationSummary').getByText('جهة تجريبية',{exact:true}).isVisible());
+    await noOverflow(registration);
+    if(withFile){
+      await registration.locator('#backOfficeApplication').click();
+      assert.equal(await registration.locator('#licenseIssuer').inputValue(),'جهة تجريبية');
+      assert.equal(await registration.locator('#officeLicenseFile').evaluate(input=>input.files[0].name),'license.pdf');
+      await registration.locator('#nextOfficeApplication').click();
+    }
+    await registration.locator('#saveOffice').click();
+    assert.ok(await registration.getByText('راجع إقرارات المكتب وأكّد جميع الخانات قبل الإرسال.').isVisible());
+    for(const checkbox of await registration.locator('#officeForm input[type=checkbox]').all())await checkbox.check();
     await registration.locator('#saveOffice').click();
     await registration.getByText('حالة المكتب: بانتظار اعتماد الإدارة',{exact:true}).waitFor();
     await noOverflow(registration);
