@@ -219,9 +219,23 @@ try{
       await registration.getByText('تعذّر رفع نسخة الرخصة.',{exact:false}).waitFor();
       assert.ok((await registration.getByRole('link',{name:'مراسلة الإدارة بشأن طلب الاعتماد'}).getAttribute('href')).startsWith('mailto:'));
       await registration.getByRole('button',{name:'إرفاق الرخصة أو متابعة المرفق'}).click();
+      const status=registration.locator('#pendingLicenseFeedback');
+      const upload=registration.getByRole('button',{name:'رفع نسخة الرخصة',exact:true});
+      await status.getByText('لم تُرفع نسخة الرخصة بعد.',{exact:false}).waitFor();
+      assert.ok(await upload.isDisabled());
+      assert.ok(await registration.getByText('اختيار ملف الرخصة',{exact:true}).isVisible());
       await registration.locator('#pendingLicenseFile').setInputFiles(pdf);
+      await status.getByText('الملف المختار: license.pdf.',{exact:false}).waitFor();
+      assert.ok(await upload.isEnabled());
       await registration.locator('#attachPendingLicense').click();
       await registration.locator('#pendingLicenseFeedback').getByText('أُرفقت نسخة الرخصة وأصبحت متاحة للإدارة.').waitFor();
+      assert.equal(await status.getAttribute('data-state'),'success');
+      assert.equal(await upload.isVisible(),false);
+      await registration.locator('#closeSettings').click();
+      await registration.locator('#tabSettings').click();
+      await status.getByText('نسخة الرخصة مرفقة ومتاحة للإدارة.').waitFor();
+      assert.equal(await status.getAttribute('data-state'),'success');
+      await noOverflow(registration);
     }
     await registration.close();
   }
