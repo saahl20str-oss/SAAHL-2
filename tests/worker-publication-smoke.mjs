@@ -31,9 +31,10 @@ window.supabase={createClient:(_url,_key,options)=>{
     },
     storage:{from:bucket=>({upload:async(path,file,options)=>{
       if(bucket!=='saahl2-office-licenses')return success({});
-      if(path!==officeId+'/license'||options.contentType!=='application/pdf'||options.upsert!==false)throw Error('Invalid private license upload');
+      if((path!==officeId+'/license'&&!path.startsWith(officeId+'/revision-'))||options.contentType!=='application/pdf'||options.upsert!==false)throw Error('Invalid private license upload');
       window.licenseUploadAttempts=(window.licenseUploadAttempts||0)+1;
       if(window.licenseUploadAttempts===1)return {error:{message:'temporary upload failure'}};
+      window.lastLicenseUploadPath=path;
       return success({});
     },remove:async()=>success({}),
       createSignedUrl:async()=>success({signedUrl:location.origin+'/saahl-logo.png'}),
@@ -71,7 +72,14 @@ window.supabase={createClient:(_url,_key,options)=>{
       };return q;
     },
     async rpc(name,args){
-      if(name==='saahl2_office_license_review')return success({has_attachment:(window.licenseUploadAttempts||0)>1});
+      if(name==='saahl2_office_license_review')return success({has_attachment:Boolean(window.lastLicenseUploadPath)});
+      if(name==='saahl2_submit_office_license_revision'){
+        if(args.p_office!==officeId||args.p_path!==window.lastLicenseUploadPath||!args.p_path.startsWith(officeId+'/revision-'))
+          throw Error('Wrong license revision attachment');
+        pendingOffice={...pendingOffice,status:'pending',license_number:args.p_number,declared_license_issuer:args.p_issuer};
+        window.lastLicenseRevision={number:args.p_number,issuer:args.p_issuer};
+        return success(null);
+      }
       const rows=get();
       const worker=rows.find(w=>w.id===args.p_worker);
       if(name==='saahl2_publish_with_office_attestation'){
@@ -234,6 +242,14 @@ try{
       await registration.locator('#closeSettings').click();
       await registration.locator('#tabSettings').click();
       await status.getByText('نسخة الرخصة مرفقة ومتاحة للإدارة.').waitFor();
+      await registration.getByRole('button',{name:'تعديل بيانات الرخصة ورفع نسخة جديدة'}).click();
+      await registration.locator('#revisionLicenseNumber').fill('TEST-456');
+      await registration.getByLabel('اسم الجهة المصدرة',{exact:true}).fill('جهة تجريبية جديدة');
+      await registration.locator('#pendingLicenseFile').setInputFiles(pdf);
+      await upload.click();
+      await status.getByText('تم حفظ بيانات الرخصة والنسخة الجديدة.',{exact:false}).waitFor();
+      assert.deepEqual(await registration.evaluate(()=>window.lastLicenseRevision),{number:'TEST-456',issuer:'جهة تجريبية جديدة'});
+
       assert.equal(await status.getAttribute('data-state'),'success');
       await noOverflow(registration);
     }
