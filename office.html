@@ -321,10 +321,10 @@ async function showOfficeAnnouncements(accountId){
  try{const saved=JSON.parse(localStorage.getItem(key)||'[]');if(Array.isArray(saved))dismissed=saved.filter(id=>typeof id==='string').slice(-200);}catch{}
  const {data,error}=await db.from('notifications').select('id,title,body,sent_at').in('target',['all','offices']).order('sent_at',{ascending:true}).limit(100);
  if(error){console.warn('SAAHL-2 notices unavailable:',error.message);return;}
+ if(user?.id!==accountId||office?.owner_id!==accountId||officeAnnouncementOpen)return;
  const queue=(data||[]).filter(n=>!dismissed.includes(n.id));
  if(!queue.length)return;
  officeAnnouncementOpen=true;
- let pos=0;
  const overlay=document.createElement('div');overlay.className='saahl2-office-notice-overlay';
  overlay.setAttribute('role','presentation');
  const box=document.createElement('section');box.className='saahl2-office-notice';
@@ -336,17 +336,34 @@ async function showOfficeAnnouncements(accountId){
  const close=document.createElement('button');close.type='button';close.textContent='إغلاق';
  close.className='saahl2-office-notice-close';
  function next(){
-  if(pos>=queue.length){overlay.remove();officeAnnouncementOpen=false;return;}
-  const n=queue[pos];title.textContent=n.title;message.textContent=n.body;
+  if(!queue.length){clearInterval(refreshTimer);overlay.remove();officeAnnouncementOpen=false;return;}
+  const n=queue[0];title.textContent=n.title;message.textContent=n.body;
   date.textContent=new Date(n.sent_at).toLocaleString('ar-AE',{dateStyle:'medium',timeStyle:'short'});
-  close.textContent=pos<queue.length-1?'إغلاق وعرض الإشعار التالي':'إغلاق';
+  close.textContent=queue.length>1?'إغلاق وعرض الإشعار التالي':'إغلاق';
   close.focus();
  }
  close.onclick=()=>{
-  const n=queue[pos++];dismissed.push(n.id);
+  dismissed.push(queue.shift().id);
   try{localStorage.setItem(key,JSON.stringify(dismissed.slice(-200)));}catch{}
   next();
  };
+ let refreshing=false;
+ const refreshTimer=setInterval(async()=>{
+  if(refreshing||document.hidden)return;
+  if(user?.id!==accountId||office?.owner_id!==accountId){queue.length=0;next();return;}
+  refreshing=true;
+  try{
+   const {data,error}=await db.from('notifications').select('id').in('id',queue.map(n=>n.id));
+   if(error||!overlay.isConnected)return;
+   const visible=new Set(data.map(n=>n.id));
+   const previous=queue[0];
+   for(let i=queue.length-1;i>=0;i--){
+    if(!visible.has(queue[i].id))queue.splice(i,1);
+   }
+   if(previous!==queue[0])next();
+   else close.textContent=queue.length>1?'إغلاق وعرض الإشعار التالي':'إغلاق';
+  }finally{refreshing=false;}
+ },30000);
  box.append(label,title,message,date,close);overlay.append(box);document.body.append(overlay);
  next();
 }
