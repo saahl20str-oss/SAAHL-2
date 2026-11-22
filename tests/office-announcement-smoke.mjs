@@ -14,7 +14,7 @@ const sdk=`window.supabase={createClient:()=>({
        signOut:async()=>({error:null}),signInWithPassword:async()=>({data:{user:{id:'office-test-user'}},error:null})},
  from:(table)=>{
    const q={
-     select(){return q;},eq(){return q;},in(){return q;},order(){return q;},limit(){return q;},
+     select(){return q;},eq(){return q;},in(){return q;},is(){return q;},order(){return q;},limit(){return q;},
      maybeSingle:async()=>({data:table==='offices'?{id:'office-1',owner_id:'office-test-user',name:'مكتب تجربة',phone:'0500000000',status:'approved'}:null,error:null}),
      then(ok,bad){return Promise.resolve({data:table==='notifications'&&!window.noticeStopped?
        [{id:'notice-test-1',title:'إشعار اختبار المكتب',body:'مضمون الإشعار',sent_at:'2026-11-19T10:00:00Z'}]:[],error:null}).then(ok,bad)}

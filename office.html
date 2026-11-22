@@ -319,7 +319,7 @@ async function showOfficeAnnouncements(accountId){
  const key='saahl2-office-read-notices:'+accountId;
  let dismissed=[];
  try{const saved=JSON.parse(localStorage.getItem(key)||'[]');if(Array.isArray(saved))dismissed=saved.filter(id=>typeof id==='string').slice(-200);}catch{}
- const {data,error}=await db.from('notifications').select('id,title,body,sent_at').in('target',['all','offices']).order('sent_at',{ascending:true}).limit(100);
+ const {data,error}=await db.from('notifications').select('id,title,body,sent_at').in('target',['all','offices']).is('stopped_at',null).order('sent_at',{ascending:true}).limit(100);
  if(error){console.warn('SAAHL-2 notices unavailable:',error.message);return;}
  if(user?.id!==accountId||office?.owner_id!==accountId||officeAnnouncementOpen)return;
  const queue=(data||[]).filter(n=>!dismissed.includes(n.id));
@@ -353,7 +353,7 @@ async function showOfficeAnnouncements(accountId){
   if(user?.id!==accountId||office?.owner_id!==accountId){queue.length=0;next();return;}
   refreshing=true;
   try{
-   const {data,error}=await db.from('notifications').select('id').in('id',queue.map(n=>n.id));
+   const {data,error}=await db.from('notifications').select('id').in('id',queue.map(n=>n.id)).is('stopped_at',null);
    if(error||!overlay.isConnected)return;
    const visible=new Set(data.map(n=>n.id));
    const previous=queue[0];
