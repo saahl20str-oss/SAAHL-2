@@ -23,6 +23,31 @@ try {
     await tab.waitForTimeout(600);
     const obj=await tab.evaluate(()=>({overflow:Math.max(document.documentElement.scrollWidth,document.body?.scrollWidth??0)-innerWidth,meta:!!document.querySelector('link[rel="manifest"]'),css:!!document.querySelector('link[href*="mobile-first.css"]')}));
     overflow=obj.overflow;meta=obj.meta&&obj.css;
+    if(page==='index.html'){
+      const layout=await tab.evaluate(()=>{
+        const rules=document.getElementById('saahl-home-mobile-layout').sheet;
+        const sections=['#how','#types','.cta-section','footer'];
+        const heights=()=>sections.map(selector=>document.querySelector(selector).offsetHeight);
+        const after=heights();
+        const routes=[...document.querySelectorAll('#types a.type-card')].map(card=>[
+          card.getAttribute('href'),card.querySelectorAll('.type-feat').length,card.querySelector('.type-btn').offsetHeight
+        ]);
+        rules.disabled=true;
+        const before=heights();
+        rules.disabled=false;
+        return {before,after,routes,footerLinks:document.querySelectorAll('footer a').length};
+      });
+      const small=width<=700;
+      const routes=layout.routes.map(([route])=>route).join(',')==='marketplace.html,office.html?register=1,kafala.html';
+      const complete=routes&&layout.routes.every(([,features,tapHeight])=>features===4&&(!small||tapHeight>=44))&&layout.footerLinks===14;
+      const sectionsFit=small
+        ? layout.after.every((height,index)=>height<layout.before[index])
+        : layout.after.every((height,index)=>height===layout.before[index]);
+      const landingPass=complete&&sectionsFit;
+      if(!landingPass)fails++;
+      checks++;
+      console.log(JSON.stringify({width,landingLayout:layout,pass:landingPass}));
+    }
     if(width===390 || width===1280) await tab.screenshot({path:'mobile-preview/'+page.replace('.html','')+'-'+width+'.png',fullPage:true});
     if(status!==200 || overflow>2 || !meta)fails++;
     checks++;
