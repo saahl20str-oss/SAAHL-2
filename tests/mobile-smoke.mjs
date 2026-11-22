@@ -56,6 +56,49 @@ try {
    await context.close();
   }
  }
+ // Check secondary entry points and mobile-only styles, including signed-out pages.
+ const secondary=['legal.html','reset-password.html','worker-consent.html','worker-publication.html','worker.html','admin-offices.html','login.html','office-dashboard.html','search.html','office-login.html','contracts.html','register-office.html','register-sponsor.html','sponsor-dashboard.html','search-choice.html','ai-search.html'];
+ const compactPages=['marketplace.html','office.html','kafala.html','advertise.html','admin.html'];
+ const origin='http://127.0.0.1:8765';
+ const toolchain=['.site-header','.office-navbar','.list-hero','.hero','.ct'];
+ for(const width of [320,390,1280]){
+   const ctx=await browser.newContext({viewport:{width,height:740},hasTouch:width<500});
+   try{
+     await ctx.route('**/*',route=>new URL(route.request().url()).origin===origin?route.continue():route.abort());
+     const page=await ctx.newPage();
+     for(const name of [...compactPages,...secondary]){
+       const response=await page.goto(origin+'/'+name,{waitUntil:'domcontentloaded'});
+       const state=await page.evaluate(({selector,checkFilter})=>{
+         const style=document.getElementById('saahl-phone-layout')?.sheet;
+         const target=selector?document.querySelector(selector):null;
+         const snapshot=()=> target?[
+           target.offsetHeight,getComputedStyle(target).padding,
+           getComputedStyle(target).display,getComputedStyle(target).gap
+         ].join('|'):null;
+         const current=snapshot();
+         if(style)style.disabled=true;
+         const original=snapshot();
+         if(style)style.disabled=false;
+         let filterFits=true;
+         if(checkFilter){
+           const dialog=document.getElementById('filterSheet');
+           dialog.showModal();
+           const box=dialog.getBoundingClientRect();
+           filterFits=box.width<=innerWidth+1&&box.height<=innerHeight+1&&dialog.scrollWidth<=dialog.clientWidth+2;
+           dialog.close();
+         }
+         return {overflow:document.documentElement.scrollWidth-innerWidth,
+           desktopStable:!style||current===original,
+           styleApplied:!!style&&matchMedia('(max-width:600px)').matches,filterFits};
+       },{selector:toolchain[compactPages.indexOf(name)]??null,checkFilter:name==='marketplace.html'});
+       const pass=response?.ok()&&state.overflow<=2&&state.filterFits&&
+         (width>600?state.desktopStable:!compactPages.includes(name)||state.styleApplied);
+       if(!pass)fails++;
+       checks++;
+       console.log(JSON.stringify({page:name,width,phoneScope:state,pass}));
+     }
+   }finally{await ctx.close();}
+ }
  const context=await browser.newContext({viewport:{width:390,height:844}});
  const tab=await context.newPage();
  await tab.goto('http://127.0.0.1:8765/index.html');

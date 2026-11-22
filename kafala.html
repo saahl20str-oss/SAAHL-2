@@ -372,6 +372,26 @@ select.inp{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.
 <meta name="apple-mobile-web-app-title" content="ساهل 2">
 <link rel="stylesheet" href="./pwa-install.css?v=1">
 <script defer src="./pwa-install.js?v=20261119d"></script>
+<style id="saahl-phone-layout">
+@media screen and (max-width:600px){
+  body>nav{height:auto;min-height:56px;padding:5px 12px;gap:4px 8px;flex-wrap:wrap}
+  body>nav .nav-r{gap:5px}
+  body>nav .nav-link{padding:5px 8px;display:inline-flex;align-items:center;min-height:40px}
+  #page-list .list-hero{padding:20px 12px}
+  #page-list .lh-badge{margin-bottom:8px}
+  #page-list .lh-sub{margin-bottom:12px}
+  #page-list .lh-btns{gap:7px}
+  #page-list .filters-bar{position:static;padding:8px 12px;gap:7px}
+  #page-list .search-inp{flex-basis:100%;min-width:0;font-size:16px;min-height:42px}
+  #page-list .listings-wrap{padding-block:12px}
+  .detail-modal{max-height:calc(100dvh - 24px);overscroll-behavior:contain}
+  .dm-head,.dm-body{padding:14px}
+  .dm-avatar{width:84px;height:84px;margin-bottom:8px}
+  .dm-close{width:44px;height:44px;top:8px;left:8px}
+  .dm-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .dm-item{overflow-wrap:anywhere}
+}
+</style>
 </head>
 <body>
 

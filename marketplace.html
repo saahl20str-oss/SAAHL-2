@@ -122,6 +122,22 @@ body:has(.filter-sheet[open]){overflow:hidden}
 <meta name="apple-mobile-web-app-title" content="ساهل 2">
 <link rel="stylesheet" href="./pwa-install.css?v=1">
 <script defer src="./pwa-install.js?v=20261119d"></script>
+<style id="saahl-phone-layout">
+@media screen and (max-width:600px){
+  .site-header{padding:8px 12px;min-height:0}
+  .site-header nav{gap:4px 10px}
+  .site-header nav a{display:inline-flex;align-items:center;min-height:40px}
+  main{padding:12px 12px 32px}
+  .hero{padding:14px;gap:10px;margin-bottom:14px}
+  .results-toolbar{gap:8px;margin-block:10px}
+  .results-toolbar .sort-label{min-width:0}
+  .worker-grid .card .photo{height:clamp(156px,52vw,210px)}
+  .cardbody{padding:14px}
+  .card h3{margin-block:8px 10px}
+  .filter-sheet{max-height:calc(100dvh - 10px)}
+  .filter-sheet-body{min-height:0}
+}
+</style>
 </head><body><header class="site-header"><a class="brand" href="index.html"><span class="brand-mark"><img src="saahl-logo.png" alt="شعار ساهل 2" class="nav-brand-image"></span><span>ساهل 2 <small>منصة الاستقدام</small></span></a><nav aria-label="التنقل"><a href="index.html">الرئيسية</a><a href="#workers">العاملات المتاحات</a><a href="#how">كيف تختار؟</a></nav></header><main><section class="hero" aria-labelledby="marketplaceTitle">
   <div class="hero-copy">
     <h1 id="marketplaceTitle">ابحث عن عاملة تناسب بيتك</h1>

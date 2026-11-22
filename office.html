@@ -169,6 +169,22 @@ main{max-width:760px;margin:0 auto 65px;padding:0 18px}
 <meta name="apple-mobile-web-app-title" content="ساهل 2">
 <link rel="stylesheet" href="./pwa-install.css?v=1">
 <script defer src="./pwa-install.js?v=20261119d"></script>
+<style id="saahl-phone-layout">
+@media screen and (max-width:600px){
+  .office-navbar{padding:8px 12px;gap:4px 10px}
+  .office-navbar nav{gap:4px 8px}
+  .office-navbar nav a,.office-navbar nav button{min-height:40px}
+  main{padding-inline:12px;margin-bottom:30px}
+  .welcome{padding-block:16px 10px}
+  #auth,#officeForm,#officeHome,#workerEditor{padding:14px}
+  .dash-top,.dash-header{gap:8px}
+  .editor-actions>button{flex:1 1 135px;min-height:44px}
+  .worker-avatar{height:clamp(136px,43vw,186px)}
+  .worker-card-body{gap:9px}
+  .worker-actions>button{min-height:44px}
+  .saahl2-office-notice,.publication-dialog{max-height:calc(100dvh - 24px)}
+}
+</style>
 </head><body><header class="office-navbar"><div class="office-brand"><span class="office-logo"><img id="navOfficeLogo" src="./saahl-logo.png" alt="شعار ساهل-2" width="43" height="43"></span><div><strong id="navOfficeName">ساهل-2</strong><small>بوابة مكاتب الاستقدام</small></div></div><nav><a href="index.html">الرئيسية</a><a href="marketplace.html">تصفح العاملات</a><button id="navSettings" class="nav-action hidden" type="button">إعدادات المكتب</button><button id="navLogout" class="nav-action hidden" type="button">خروج</button></nav></header><main><section class="welcome" id="welcome"><h1>بوابة مكاتب الاستقدام</h1><p>حساب واحد لإدارة مكتبك وعرض العاملات المتاحات والتواصل المباشر مع العملاء.</p><div class="welcome-features"><span>◈ تسجيل مبسط</span><span>◈ إدارة العاملات</span><span>◈ تواصل مباشر</span></div></section><p id="msg" role="status"></p><section id="auth" class="panel"><div class="auth-heading"><span class="auth-icon"><img src="./saahl-logo.png" alt="" width="27" height="38"></span><div><h2>مرحباً بك في ساهل 2</h2><p>سجّل الدخول إلى حساب مكتبك أو أنشئ حساباً جديداً.</p></div></div><div class="auth-tabs"><button type="button" id="tabLogin" class="active">تسجيل الدخول</button><button type="button" id="tabSignup">إنشاء حساب جديد</button></div><div class="grid"><div><label>البريد الإلكتروني</label><input type="email" id="email" autocomplete="email" placeholder="name@example.com" inputmode="email" required></div><div><label>كلمة المرور (8 أحرف على الأقل)</label><input type="password" id="password" autocomplete="current-password" placeholder="أدخل كلمة المرور" required><div class="auth-help"><label class="show-password"><input type="checkbox" id="showPass"> <span>إظهار كلمة المرور</span></label><a id="officeForgotPassword" href="./reset-password.html">نسيت كلمة المرور؟</a></div></div></div><p id="loginFeedback" role="alert" style="display:none;padding:14px;border:1px solid #e6c5a6;border-radius:10px;background:#fff5e9;color:#633d20;font-weight:700"></p><div class="auth-actions"><button type="button" id="login">الدخول إلى حساب المكتب</button><div id="signupLegal" class="hidden legal-checks">
       <label><input id="officeTerms" type="checkbox"> أوافق على <a href="legal.html#terms">شروط الاستخدام</a>.</label>
       <label><input id="officePrivacyRead" type="checkbox"> قرأت <a href="legal.html#privacy">سياسة الخصوصية</a>.</label>
