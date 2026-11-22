@@ -31,7 +31,7 @@ window.supabase={createClient:(_url,_key,options)=>{
     },
     storage:{from:bucket=>({upload:async(path,file,options)=>{
       if(bucket!=='saahl2-office-licenses')return success({});
-      if(path!==officeId+'/license'||file.type!=='application/pdf'||options.upsert!==false)throw Error('Invalid private license upload');
+      if(path!==officeId+'/license'||options.contentType!=='application/pdf'||options.upsert!==false)throw Error('Invalid private license upload');
       window.licenseUploadAttempts=(window.licenseUploadAttempts||0)+1;
       if(window.licenseUploadAttempts===1)return {error:{message:'temporary upload failure'}};
       return success({});
@@ -71,6 +71,7 @@ window.supabase={createClient:(_url,_key,options)=>{
       };return q;
     },
     async rpc(name,args){
+      if(name==='saahl2_office_license_review')return success({has_attachment:(window.licenseUploadAttempts||0)>1});
       const rows=get();
       const worker=rows.find(w=>w.id===args.p_worker);
       if(name==='saahl2_publish_with_office_attestation'){
@@ -185,7 +186,7 @@ try{
       await registration.locator('#'+id).fill(value);
     }
     assert.ok(await registration.getByLabel('إرفاق نسخة الرخصة (اختياري)',{exact:true}).isVisible());
-    const pdf={name:'license.pdf',mimeType:'application/pdf',buffer:Buffer.from('%PDF-1.4')};
+    const pdf={name:'license.pdf',mimeType:'application/octet-stream',buffer:Buffer.from('%PDF-1.4')};
     if(withFile)await registration.locator('#officeLicenseFile').setInputFiles(pdf);
     if(withFile){
       await registration.setViewportSize({width:320,height:844});
@@ -216,9 +217,11 @@ try{
     assert.equal(await registration.evaluate(()=>window.licenseUploadAttempts||0),withFile?1:0);
     if(withFile){
       await registration.getByText('تعذّر رفع نسخة الرخصة.',{exact:false}).waitFor();
+      assert.ok((await registration.getByRole('link',{name:'مراسلة الإدارة بشأن طلب الاعتماد'}).getAttribute('href')).startsWith('mailto:'));
+      await registration.getByRole('button',{name:'إرفاق الرخصة أو متابعة المرفق'}).click();
       await registration.locator('#pendingLicenseFile').setInputFiles(pdf);
       await registration.locator('#attachPendingLicense').click();
-      await registration.locator('#pendingLicenseFeedback').getByText('أُرفقت نسخة الرخصة بطلب الاعتماد.').waitFor();
+      await registration.locator('#pendingLicenseFeedback').getByText('أُرفقت نسخة الرخصة وأصبحت متاحة للإدارة.').waitFor();
     }
     await registration.close();
   }
