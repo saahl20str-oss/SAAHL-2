@@ -63,7 +63,7 @@ window.supabase={createClient:(_url,_key,options)=>{
         return success(rows.filter(w=>(!filters.id||filters.id===w.id)&&(!filters.status||filters.status===w.status)
           &&(!needsConsent||w.publication_consent_at)).map(w=>({...w,offices:office})));
       };
-      const q={select(){return q},eq(key,value){filters[key]=value;return q},in(){return q},order(){return q},limit(){return q},
+      const q={select(){return q},eq(key,value){filters[key]=value;return q},in(){return q},is(){return q},order(){return q},limit(){return q},
         not(key,comparison,value){needsConsent=key==='publication_consent_at'&&comparison==='is'&&value===null;return q},
         insert(data){mode='insert';payload=data;return q},update(data){mode='update';payload=data;return q},
         maybeSingle:async()=>success(result().data[0]||null),
