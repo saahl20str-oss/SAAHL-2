@@ -198,6 +198,30 @@ body.admin-menu-open{overflow:hidden}
 #pg-notifications .nt-entry small{font-size:11px;color:var(--muted)}
 
 
+[data-p=offices] .office-pending-badge{margin-inline-start:auto;min-width:22px;padding:1px 6px;border-radius:99px;background:#b45309;color:#fff;text-align:center;font-size:11px;font-weight:800}
+.office-queue{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin:0 0 16px;padding:12px 16px;border:1px solid #d29a3f;border-radius:12px;background:var(--al);color:var(--text)}
+.office-queue[hidden]{display:none}
+.office-queue strong{display:block;font-size:15px}
+.office-queue p{margin-top:2px;font-size:12px}
+.office-filter{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:0 0 14px}
+.office-filter :is(input,select){min-width:0;min-height:42px}
+.office-filter input{flex:1 1 215px}
+.office-filter select{flex:0 1 190px}
+.office-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,350px),1fr));gap:14px}
+.office-card{min-width:0;padding:16px;border:1px solid var(--border);border-radius:14px;background:var(--white);display:grid;gap:13px}
+.office-card[data-status=pending]{border-inline-start:4px solid #d29a3f}
+.office-card-heading{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;flex-wrap:wrap}
+.office-card-heading h2{font-size:17px;margin:0;overflow-wrap:anywhere}
+.office-card-heading .bge{white-space:normal}
+.office-card-facts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:0}
+.office-card-facts div{min-width:0}
+.office-card-facts dt{font-size:11px;color:var(--muted)}
+.office-card-facts dd{margin:2px 0 0;font-size:13px;overflow-wrap:anywhere;font-weight:700}
+.office-card-license{padding:10px;background:var(--bg);border-radius:9px;display:grid;gap:6px;font-size:12px;overflow-wrap:anywhere}
+.office-card-actions{display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+.office-card-actions :is(button,a),.office-queue button{min-height:40px;display:inline-flex;align-items:center;justify-content:center}
+.office-card-actions a{text-decoration:none}
+.office-list-message{padding:20px;border:1px solid var(--border);border-radius:12px;background:var(--white);font-size:14px}
 </style>
 
 <!-- Mobile-first enhancement; isolated from existing application logic -->
@@ -248,7 +272,7 @@ body.admin-menu-open{overflow:hidden}
     <div class="ns">الرئيسية</div>
     <div class="ni active" data-p="overview" onclick="navTo('overview')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>نظرة عامة</div>
     <div class="ns">الإدارة</div>
-    <div class="ni" data-p="offices" onclick="navTo('offices')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 21h18M5 21V7l7-4 7 4v14M9 21v-4h6v4"/></svg>المكاتب</div>
+    <div class="ni" data-p="offices" onclick="navTo('offices')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 21h18M5 21V7l7-4 7 4v14M9 21v-4h6v4"/></svg>المكاتب<span id="office-pending-badge" class="office-pending-badge" hidden></span></div>
     <div class="ni" data-p="sponsors" onclick="navTo('sponsors')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>الكفلاء</div>
     <div class="ni" data-p="bookings" onclick="navTo('bookings')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/><path d="M9 16l2 2 4-4"/></svg>الحجوزات</div>
     <div class="ns">المالية</div>
@@ -263,6 +287,10 @@ body.admin-menu-open{overflow:hidden}
   <div class="ct">
     <div id="pg-overview" class="pg active">
       <div class="pt">نظرة عامة</div>
+      <div id="office-queue-alert" class="office-queue" hidden>
+        <div role="status"><strong id="office-queue-count"></strong><p>طلبات اعتماد المكاتب التي تحتاج إلى مراجعتك.</p></div>
+        <button type="button" class="btn btn-p btn-s" onclick="openPendingOffices()">مراجعة طلبات المكاتب</button>
+      </div>
       <div class="sg">
         <div class="sc"><div class="si teal">🏢</div><div class="sl">المكاتب المسجلة</div><div class="sv" id="s-off">—</div><div class="ss" id="ss-off">جارٍ التحميل...</div></div>
         <div class="sc" style="display:none" data-hidden-reason="not-part-of-current-saahl2-workflow"><div class="si blue">👥</div><div class="sl">حسابات الكفلاء</div><div class="sv" id="s-spo">—</div><div class="ss" id="ss-spo">جارٍ التحميل...</div></div>
@@ -280,8 +308,16 @@ body.admin-menu-open{overflow:hidden}
 
     <div id="pg-offices" class="pg">
       <div class="pt">إدارة المكاتب</div>
-      <div class="fb"><input type="text" id="off-s" placeholder="🔍 بحث..." oninput="filterOffices()"><select id="off-st" onchange="filterOffices()"><option value="">الكل</option><option value="active">معتمد</option><option value="pending">بانتظار الاعتماد</option><option value="expired">منتهي</option></select></div>
-      <div class="cd" style="padding:0;overflow:hidden"><div id="off-wrap"><div class="ld"><div class="sp"></div>جارٍ التحميل...</div></div></div>
+      <div class="fb office-filter">
+        <input type="search" id="off-s" aria-label="البحث عن مكتب" placeholder="ابحث بالاسم أو رقم الرخصة" oninput="filterOffices()">
+        <select id="off-st" aria-label="حالة المكتب" onchange="filterOffices()">
+          <option value="">كل الحالات</option><option value="pending">بانتظار الاعتماد</option>
+          <option value="approved">معتمد</option><option value="rejected">مرفوض</option>
+          <option value="suspended">موقوف</option><option value="expired">منتهي</option>
+        </select>
+        <button type="button" class="btn btn-o btn-s" onclick="loadOff();refreshOfficeQueue()">تحديث القائمة</button>
+      </div>
+      <div id="off-wrap" class="office-cards"><div class="ld"><div class="sp"></div>جارٍ التحميل...</div></div>
     </div>
 
     <div id="pg-sponsors" class="pg">
@@ -389,7 +425,7 @@ const fd=d=>{if(!d)return'—';return new Date(d).toLocaleDateString('ar-AE',{ye
 const eh=m=>`<div class="es"><div class="ei">📭</div><p>${m}<br><small>ستظهر هنا عند أول تسجيل</small></p></div>`;
 function toast(m,d=2500){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),d);}
 function toggleAdminMenu(force){const open=typeof force==='boolean'?force:!document.body.classList.contains('admin-menu-open');document.body.classList.toggle('admin-menu-open',open);const btn=document.querySelector('.mobile-admin-menu');if(btn)btn.setAttribute('aria-expanded',String(open));}
-function navTo(id){toggleAdminMenu(false);document.querySelectorAll('.pg').forEach(p=>p.classList.remove('active'));document.querySelectorAll('.ni').forEach(n=>n.classList.remove('active'));document.getElementById('pg-'+id).classList.add('active');document.querySelector('[data-p='+id+']')?.classList.add('active');if(id==='notifications')loadNotif();}
+function navTo(id){toggleAdminMenu(false);document.querySelectorAll('.pg').forEach(p=>p.classList.remove('active'));document.querySelectorAll('.ni').forEach(n=>n.classList.remove('active'));document.getElementById('pg-'+id).classList.add('active');document.querySelector('[data-p='+id+']')?.classList.add('active');if(id==='notifications')loadNotif();if(id==='offices'){loadOff();refreshOfficeQueue();}}
 function toggleDark(){isDark=!isDark;document.body.classList.toggle('dark',isDark);localStorage.setItem('saahl_dark',isDark?'1':'0');const cb=document.getElementById('dk-cb');if(cb)cb.checked=isDark;document.getElementById('dkb').textContent=isDark?'☀️':'🌙';}
 function toggleAdminPassword(){const el=document.getElementById('le-pass'),eye=document.getElementById('le-eye');const visible=el.type==='password';el.type=visible?'text':'password';eye.setAttribute('aria-label',visible?'إخفاء كلمة المرور':'إظهار كلمة المرور');eye.title=eye.getAttribute('aria-label');eye.style.color=visible?'var(--teal)':'var(--muted)';}
 let adminAuthBusy=false;
@@ -438,6 +474,7 @@ async function doLogin(){
  }
 }
 async function doLogout(){
+ stopOfficeQueue();
  await db.auth.signOut();
  adminLoginMessage('');
  adminShowLogin();
@@ -451,6 +488,7 @@ function showApp(){
   document.getElementById('dkb').textContent='☀️';
   const cb=document.getElementById('dk-cb');if(cb)cb.checked=true;
  }
+ startOfficeQueue();
  Promise.resolve().then(loadAll).catch(error=>{console.error('Admin dashboard load failed',error);toast('تم الدخول، لكن تعذر تحميل بعض البيانات. أعد تحديث الصفحة.',5000);});
 }
 window.addEventListener('DOMContentLoaded',()=>{
@@ -476,19 +514,155 @@ async function loadStats(){
   if(!aBk.length){w.innerHTML=eh('لا توجد حجوزات حتى الآن');return;}
   w.innerHTML=`<div class="tw"><table><thead><tr><th>الكفيل</th><th>العاملة</th><th>المكتب</th><th>التاريخ</th><th>الحالة</th><th>العمولة</th></tr></thead><tbody>${aBk.map(b=>`<tr><td>${b.sponsor_name||'—'}</td><td>${b.maid_name||'—'}</td><td>${b.office_name||'—'}</td><td>${fd(b.created_at)}</td><td><span class="bge ${b.status==='booked'?'booked':b.status==='completed'?'active':'pending'}">${b.status==='booked'?'محجوزة':b.status==='completed'?'مكتملة':'معلقة'}</span></td><td style="font-weight:600;color:var(--teal)">69 AED</td></tr>`).join('')}</tbody></table></div>`;
 }
-async function loadOff(){const {data,error}=await db.from('offices').select('id,name,license_number,emirate,phone,status,created_at,declared_license_issuer,verified_license_issuer,verified_license_at,verified_license_expires,legal_agreement_at').order('created_at',{ascending:false});if(error){document.getElementById('off-wrap').textContent='تعذر تحميل طلبات المكاتب: '+error.message;return}aOff=data||[];renderOff(aOff)}
-function renderOff(data){const w=document.getElementById('off-wrap');w.replaceChildren();if(!data.length){w.textContent='لا توجد طلبات مكاتب مسجلة';return}const table=document.createElement('table');const head=document.createElement('thead');const tr=document.createElement('tr');for(const title of ['المكتب','الإمارة','الترخيص','الهاتف','التاريخ','الحالة','الإجراء']){const th=document.createElement('th');th.textContent=title;tr.append(th)}head.append(tr);table.append(head);const body=document.createElement('tbody');for(const o of data){const row=document.createElement('tr');for(const val of [o.name,o.emirate,o.license_number,o.phone,fd(o.created_at),({pending:'بانتظار الاعتماد',approved:'معتمد',rejected:'مرفوض',suspended:'موقوف'})[o.status]||o.status]){const td=document.createElement('td');td.textContent=val||'—';row.append(td)}const actions=document.createElement('td');
- const info=document.createElement('p');
- info.textContent=o.verified_license_at?'آخر تحقق: '+fd(o.verified_license_at)+' — '+o.verified_license_issuer+' · الانتهاء: '+(o.verified_license_expires||'—'):'الرخصة بانتظار التحقق الرسمي';
- const verify=document.createElement('button');
- verify.type='button';verify.className='btn btn-o btn-s';verify.textContent='توثيق الرخصة';verify.onclick=()=>verifyOffice(o.id);
- const instructions=document.createElement('a');instructions.href='legal.html#verification';instructions.textContent='خطوات المطابقة';
- const attachment=document.createElement('button');
- attachment.type='button';attachment.className='btn btn-o btn-s';attachment.textContent='تنزيل نسخة الرخصة';
- attachment.onclick=()=>downloadOfficeLicense(o.id,attachment);
- actions.append(info,verify,instructions,attachment);
- for(const [status,label] of [['approved','اعتماد'],['rejected','رفض'],['suspended','إيقاف']]){if(o.status===status)continue;const btn=document.createElement('button');btn.className='btn btn-s '+(status==='approved'?'btn-o':'btn-d');btn.textContent=label;btn.onclick=()=>togOff(o.id,status,o.name);actions.append(btn)}row.append(actions);body.append(row)}table.append(body);const scroll=document.createElement('div');scroll.className='tw';scroll.append(table);w.append(scroll)}
-function filterOffices(){const q=document.getElementById('off-s').value.toLowerCase(),status=document.getElementById('off-st').value;renderOff(aOff.filter(o=>(!q||o.name.toLowerCase().includes(q))&&(!status||(status==='active'?o.status==='approved':status==='pending'?o.status==='pending':o.status===status))))}
+const officeStatusLabels={pending:'بانتظار الاعتماد',approved:'معتمد',rejected:'مرفوض',suspended:'موقوف',expired:'منتهي'};
+let officeQueueTimer=null;
+let officeQueueVersion=0;
+let officeQueueCount=0;
+let officeListVersion=0;
+let officeListLoaded=false;
+
+function showOfficeQueue(count){
+ officeQueueCount=count;
+ const badge=document.getElementById('office-pending-badge');
+ badge.hidden=count<1;
+ badge.textContent=count>99?'99+':String(count);
+ badge.setAttribute('aria-label',count+' طلب اعتماد مكتب بانتظار المراجعة');
+ document.getElementById('office-queue-alert').hidden=count<1;
+ document.getElementById('office-queue-count').textContent=count===1?'طلب اعتماد مكتب بانتظار المراجعة':count+' طلبات اعتماد مكاتب بانتظار المراجعة';
+}
+
+async function refreshOfficeQueue(){
+ if(officeQueueTimer===null||document.hidden)return;
+ const version=++officeQueueVersion;
+ try{
+  const {count,error}=await db.from('offices').select('id',{count:'exact',head:true}).eq('status','pending');
+  if(error||typeof count!=='number'||version!==officeQueueVersion)return;
+  const changed=count!==officeQueueCount;
+  showOfficeQueue(count);
+  if(changed&&document.getElementById('pg-offices').classList.contains('active'))loadOff();
+ }catch(error){
+  console.warn('Office approvals count could not be refreshed',error?.code);
+ }
+}
+
+function startOfficeQueue(){
+ stopOfficeQueue();
+ officeQueueTimer=setInterval(refreshOfficeQueue,30000);
+ refreshOfficeQueue();
+}
+
+function stopOfficeQueue(){
+ clearInterval(officeQueueTimer);
+ officeQueueTimer=null;
+ officeQueueVersion++;
+ showOfficeQueue(0);
+}
+
+document.addEventListener('visibilitychange',refreshOfficeQueue);
+
+function openPendingOffices(){
+ document.getElementById('off-st').value='pending';
+ document.getElementById('off-s').value='';
+ filterOffices();
+ navTo('offices');
+}
+
+async function loadOff(){
+ const version=++officeListVersion;
+ const wrap=document.getElementById('off-wrap');
+ try{
+  const {data,error}=await db.from('offices')
+    .select('id,name,license_number,emirate,phone,status,created_at,declared_license_issuer,verified_license_issuer,verified_license_at,verified_license_expires')
+    .order('created_at',{ascending:false});
+  if(version!==officeListVersion)return;
+  if(error)throw error;
+  aOff=data||[];
+  officeListLoaded=true;
+  filterOffices();
+ }catch{
+  if(version!==officeListVersion)return;
+  officeListLoaded=false;
+  wrap.textContent='تعذّر تحميل قائمة المكاتب. استخدم «تحديث القائمة» للمحاولة مجددًا.';
+ }
+}
+
+function officeAction(label,className,onclick){
+ const button=document.createElement('button');
+ button.type='button';
+ button.className='btn btn-s '+className;
+ button.textContent=label;
+ button.onclick=onclick;
+ return button;
+}
+
+function renderOff(data){
+ const wrap=document.getElementById('off-wrap');
+ wrap.replaceChildren();
+ if(!data.length){
+  const message=document.createElement('p');
+  message.className='office-list-message';
+  message.textContent=aOff.length?'لا توجد مكاتب تطابق البحث أو الحالة المختارة.':'لا توجد طلبات مكاتب مسجلة.';
+  wrap.append(message);
+  return;
+ }
+ const ordered=[...data].sort((a,b)=>Number(b.status==='pending')-Number(a.status==='pending'));
+ for(const office of ordered){
+  const card=document.createElement('article');
+  card.className='office-card';
+  card.dataset.status=office.status;
+  const heading=document.createElement('div');
+  heading.className='office-card-heading';
+  const name=document.createElement('h2');
+  name.textContent=office.name||'مكتب';
+  const status=document.createElement('span');
+  status.className='bge '+(({approved:'active',pending:'pending'})[office.status]||'expired');
+  status.textContent=officeStatusLabels[office.status]||office.status||'—';
+  heading.append(name,status);
+  const facts=document.createElement('dl');
+  facts.className='office-card-facts';
+  for(const [label,value] of [
+   ['الإمارة',office.emirate],['رقم الرخصة',office.license_number],['هاتف المكتب',office.phone],
+   ['تاريخ التسجيل',fd(office.created_at)],['الجهة المصدرة',office.declared_license_issuer]
+  ]){
+   const entry=document.createElement('div'),term=document.createElement('dt'),detail=document.createElement('dd');
+   term.textContent=label;
+   detail.textContent=value||'—';
+   entry.append(term,detail);
+   facts.append(entry);
+  }
+  const license=document.createElement('div');
+  license.className='office-card-license';
+  const verification=document.createElement('p');
+  verification.textContent=office.verified_license_at
+   ? 'آخر تحقق: '+fd(office.verified_license_at)+' · '+office.verified_license_issuer+' · الانتهاء: '+(office.verified_license_expires||'—')
+   : 'الرخصة بانتظار التحقق الرسمي';
+  const tools=document.createElement('div');
+  tools.className='office-card-actions';
+  const attachment=officeAction('تنزيل نسخة الرخصة','btn-o',()=>downloadOfficeLicense(office.id,attachment));
+  const instructions=document.createElement('a');
+  instructions.href='legal.html#verification';
+  instructions.className='btn btn-o btn-s';
+  instructions.textContent='خطوات المطابقة';
+  tools.append(attachment,officeAction('توثيق الرخصة','btn-o',()=>verifyOffice(office.id)),instructions);
+  license.append(verification,tools);
+
+  const actions=document.createElement('div');
+  actions.className='office-card-actions';
+  for(const [next,label] of [['approved','اعتماد المكتب'],['rejected','رفض الطلب'],['suspended','إيقاف المكتب']]){
+   if(office.status!==next)actions.append(officeAction(label,next==='approved'?'btn-p':'btn-d',()=>togOff(office.id,next,office.name)));
+  }
+  card.append(heading,facts,license,actions);
+  wrap.append(card);
+ }
+}
+
+function filterOffices(){
+ if(!officeListLoaded)return;
+ const q=document.getElementById('off-s').value.trim().toLowerCase();
+ const status=document.getElementById('off-st').value;
+ renderOff(aOff.filter(office=>(!status||office.status===status)&&
+   (!q||[office.name,office.license_number].some(value=>String(value||'').toLowerCase().includes(q)))));
+}
 async function downloadOfficeLicense(id,button){
  button.disabled=true;
  try{
@@ -522,7 +696,7 @@ async function verifyOffice(id){
  if(error){toast('تعذر تسجيل التحقق: '+error.message);return;}
  await loadOff();
 }
-async function togOff(id,status,name){if(!confirm('هل تؤكد '+(status==='approved'?'اعتماد':status==='rejected'?'رفض':'إيقاف')+' المكتب: '+name+'؟ تأكد من الترخيص قبل الاعتماد.'))return;if(status==='approved'&&!aOff.find(item=>item.id===id)?.verified_license_expires){toast('وثّق التحقق من الرخصة أولاً.');return;}const {error}=await db.from('offices').update({status}).eq('id',id);if(error){toast('فشل التحديث: '+error.message);return}toast('تم تحديث حالة المكتب');await loadOff();await loadStats()}
+async function togOff(id,status,name){if(!confirm('هل تؤكد '+(status==='approved'?'اعتماد':status==='rejected'?'رفض':'إيقاف')+' المكتب: '+name+'؟ تأكد من الترخيص قبل الاعتماد.'))return;if(status==='approved'&&!aOff.find(item=>item.id===id)?.verified_license_expires){toast('وثّق التحقق من الرخصة أولاً.');return;}const {error}=await db.from('offices').update({status}).eq('id',id);if(error){toast('فشل التحديث: '+error.message);return}toast('تم تحديث حالة المكتب');await Promise.all([loadOff(),loadStats(),refreshOfficeQueue()]);}
 async function loadSpo(){const {data}=await db.from('sponsor_profiles').select('*').order('created_at',{ascending:false});aSpo=data||[];renderSpo(aSpo);}
 function renderSpo(data){const w=document.getElementById('spo-wrap');if(!data.length){w.innerHTML=eh('لا يوجد كفلاء مسجلون');return;}w.innerHTML=`<div class="tw"><table><thead><tr><th>الكفيل</th><th>الإمارة</th><th>البريد</th><th>تاريخ التسجيل</th><th>إجراء</th></tr></thead><tbody>${data.map(s=>`<tr><td><div class="rf"><div class="av" style="background:${ac(s.full_name)}">${ini(s.full_name)}</div>${s.full_name||'—'}</div></td><td>${s.emirate||'—'}</td><td>${s.email||'—'}</td><td>${fd(s.created_at)}</td><td><button class="btn btn-d btn-s" onclick="delSpo('${s.id}')">حذف</button></td></tr>`).join('')}</tbody></table></div>`;}
 function filterSponsors(){const q=document.getElementById('spo-s').value.toLowerCase();renderSpo(aSpo.filter(s=>!q||(s.full_name||'').toLowerCase().includes(q)));}
