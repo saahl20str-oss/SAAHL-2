@@ -14,9 +14,9 @@ const sdk=`window.supabase={createClient:()=>({
        signOut:async()=>({error:null}),signInWithPassword:async()=>({data:{user:{id:'office-test-user'}},error:null})},
  from:(table)=>{
    const q={
-     select(){return q;},eq(){return q;},in(){return q;},order(){return q;},limit(){return q;},
+     select(){return q;},eq(){return q;},in(){return q;},is(){return q;},order(){return q;},limit(){return q;},
      maybeSingle:async()=>({data:table==='offices'?{id:'office-1',owner_id:'office-test-user',name:'مكتب تجربة',phone:'0500000000',status:'approved'}:null,error:null}),
-     then(ok,bad){return Promise.resolve({data:table==='notifications'?
+     then(ok,bad){return Promise.resolve({data:table==='notifications'&&!window.noticeStopped?
        [{id:'notice-test-1',title:'إشعار اختبار المكتب',body:'مضمون الإشعار',sent_at:'2026-11-19T10:00:00Z'}]:[],error:null}).then(ok,bad)}
    };return q;
  }
@@ -26,6 +26,10 @@ const browser=await chromium.launch({headless:true});
 try{
  await delay(1200);
  const context=await browser.newContext({viewport:{width:390,height:844},locale:'ar-AE'});
+ await context.addInitScript(()=>{
+  const original=window.setInterval.bind(window);
+  window.setInterval=(fn,ms,...args)=>original(fn,ms===30000?150:ms,...args);
+ });
  await context.route('**/*supabase-js@2*',route=>route.fulfill({status:200,contentType:'application/javascript',body:sdk}));
  const page=await context.newPage();
  await page.goto('http://127.0.0.1:8767/office.html',{waitUntil:'load'});
@@ -38,6 +42,11 @@ try{
  await page.reload({waitUntil:'load'});
  await page.waitForTimeout(1200);
  if(await page.locator('.saahl2-office-notice-overlay').count())throw Error('Dismissed notice unexpectedly reopened');
- console.log(JSON.stringify({officeModalShown:true,closeWorked:true,dismissalPersisted:true,externalLinksRemoved:true}));
+ await page.evaluate(()=>localStorage.removeItem('saahl2-office-read-notices:office-test-user'));
+ await page.reload({waitUntil:'load'});
+ await dlg.waitFor({state:'visible',timeout:12000});
+ await page.evaluate(()=>{window.noticeStopped=true});
+ await dlg.waitFor({state:'detached',timeout:3000});
+ console.log(JSON.stringify({officeModalShown:true,closeWorked:true,dismissalPersisted:true,stoppedNoticeRemoved:true,externalLinksRemoved:true}));
  await context.close();
 }finally{await browser.close();server.kill();}

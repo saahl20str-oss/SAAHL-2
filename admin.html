@@ -1081,7 +1081,7 @@ async function delAd(id){
 async function loadNotif(){
  const wrap=document.getElementById('nt-wrap');
  if(!wrap)return;
- const {data,error}=await db.from('notifications').select('id,target,title,body,sent_at').order('sent_at',{ascending:false}).limit(50);
+ const {data,error}=await db.from('notifications').select('id,target,title,body,sent_at,stopped_at').order('sent_at',{ascending:false}).limit(50);
  if(error){wrap.textContent='تعذّر تحميل سجل الإشعارات: '+error.message;return;}
  wrap.replaceChildren();
  if(!data?.length){wrap.textContent='لا توجد إشعارات مرسلة بعد';return;}
@@ -1090,7 +1090,34 @@ async function loadNotif(){
   const title=document.createElement('strong');title.textContent=n.title;
   const body=document.createElement('p');body.textContent=n.body;
   const meta=document.createElement('small');meta.textContent=({all:'الجميع',offices:'المكاتب',sponsors:'الكفلاء'}[n.target]||n.target)+' · '+fd(n.sent_at);
-  card.append(title,body,meta);wrap.append(card);
+  card.append(title,body,meta);
+  const actions=document.createElement('div');actions.className='office-card-actions';
+  if(n.stopped_at){
+   const status=document.createElement('small');
+   status.textContent='موقوف · '+fd(n.stopped_at);
+   actions.append(status);
+  }else{
+   const stop=document.createElement('button');
+   stop.type='button';stop.className='btn btn-d btn-s';stop.textContent='إيقاف الإعلان';
+   stop.onclick=()=>stopNotice(n,stop);
+   actions.append(stop);
+  }
+  card.append(actions);wrap.append(card);
+ }
+}
+async function stopNotice(notice,button){
+ if(button.disabled||!confirm('إيقاف الإعلان «'+notice.title+'»؟ سيختفي عن المستلمين وسيبقى في سجل الإدارة.'))return;
+ button.disabled=true;
+ try{
+  const {data,error}=await db.from('notifications').update({stopped_at:new Date().toISOString()})
+   .eq('id',notice.id).is('stopped_at',null).select('id,stopped_at').maybeSingle();
+  if(error)throw error;
+  toast(data?.stopped_at?'تم إيقاف الإعلان ✓':'لم يتغير الإعلان. راجع حالته في القائمة.');
+  await loadNotif();
+ }catch(error){
+  toast('تعذر إيقاف الإعلان: '+error.message);
+ }finally{
+  button.disabled=false;
  }
 }
 async function sendNotif(){
