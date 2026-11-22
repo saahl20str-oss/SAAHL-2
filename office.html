@@ -119,6 +119,34 @@ main{max-width:760px;margin:0 auto 65px;padding:0 18px}
 .withdrawal-summary-action::after{content:'';flex:none;width:7px;height:7px;border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(45deg);margin-bottom:4px}
 #workerWithdrawal[open] .withdrawal-summary-action::after{transform:rotate(225deg);margin-bottom:0}
 #workerWithdrawal:not([open]) .withdrawal-summary-hide,#workerWithdrawal[open] .withdrawal-summary-show{display:none}
+#dashboard.office-onboarding .office-hero,#dashboard.office-onboarding .toolbar-tabs{display:none}
+#dashboard.office-onboarding .office-toolbar{max-width:660px;margin-inline:auto;justify-content:flex-end}
+#officeForm{max-width:660px;margin-inline:auto;padding:clamp(18px,4vw,34px)}
+#officeForm .office-apply-heading{display:block;padding:0;background:transparent;color:#25221d}
+.office-apply-heading h2{margin:0;font-size:clamp(23px,5vw,29px)}
+.office-apply-heading p{margin:5px 0 0}
+.office-apply-steps{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;list-style:none;margin:18px 0;padding:0}
+.office-apply-steps li{border-radius:9px;background:#f5f2e9;padding:8px 10px;color:#5f543f;font-size:13px;font-weight:700}
+.office-apply-steps [aria-current=step]{background:#efe2bc;color:#4d3713;box-shadow:inset 0 -2px #99732c}
+.office-apply-fields,.office-apply-summary{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px 15px}
+.office-apply-fields label{margin:0 0 5px;font-weight:700}
+.office-apply-fields :is(input,select){min-width:0;min-height:44px;padding:10px 11px}
+.office-apply-wide{grid-column:1/-1}
+.office-apply-fields .muted{margin:5px 0 0}
+.office-license-attachment{padding:12px;background:#faf7ef;border:1px dashed #d9c99f;border-radius:10px}
+.office-license-attachment input{background:#fff}
+.office-apply-summary{padding:12px;margin:0 0 17px;background:#f8f5ed;border-radius:10px}
+.office-apply-summary dt{font-size:12px;color:#65583e}
+.office-apply-summary dd{margin:1px 0 0;overflow-wrap:anywhere;font-weight:700}
+.office-apply-agreement{min-width:0;border:1px solid #e7ddc8}
+.office-apply-agreement legend{font-weight:800;padding-inline:5px}
+.office-apply-agreement p{margin:0}
+#officeForm .office-apply-agreement label{cursor:pointer}
+.office-apply-feedback{margin:12px 0 0;padding:9px 12px;border-radius:8px;background:#fff1e9;color:#8a3021}
+#officeForm [aria-invalid=true]{border-color:#a23c2d;outline-color:#a23c2d}
+.office-apply-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+.office-apply-actions button{min-height:44px;margin:0}
+@media(max-width:420px){.office-apply-fields{grid-template-columns:1fr}.office-apply-actions button{flex:1 1 140px}}
 </style><script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <!-- Mobile-first enhancement; isolated from existing application logic -->
 <link rel="stylesheet" href="./mobile-first.css?v=20261119d">
@@ -133,19 +161,56 @@ main{max-width:760px;margin:0 auto 65px;padding:0 18px}
       <label><input id="officeTerms" type="checkbox"> أوافق على <a href="legal.html#terms">شروط الاستخدام</a>.</label>
       <label><input id="officePrivacyRead" type="checkbox"> قرأت <a href="legal.html#privacy">سياسة الخصوصية</a>.</label>
       <label><input id="officePrivacyConsent" type="checkbox"> أوافق على معالجة بيانات فتح الحساب وإدارته.</label>
-    </div><button class="secondary hidden" id="signup">إنشاء حساب المكتب</button><p id="signupFeedback" class="office-signup-feedback" role="status" aria-live="polite" hidden></p></div><p class="muted">قد يُطلب منك تأكيد البريد قبل الدخول. لا تُدخل كلمة المرور في أي صفحة أخرى.</p></section><section id="dashboard" class="hidden"><div id="newOfficeWelcome" class="new-office-welcome hidden" role="status"></div><div class="office-hero office-hero-clean"><div class="office-hero-copy"><span class="hero-kicker">لوحة إدارة المكتب</span><h1 id="officeTitle">إدارة أسهل، وعاملاتك في مكان واحد</h1><p>أضف العاملات، حدّث حالة التوفر، واستعرض طلبات الترويج من لوحة منظمة.</p><div id="officeStatus" class="office-status"></div></div></div><div class="office-toolbar"><div class="toolbar-tabs"><button id="tabHome" class="tab-active">العاملات</button><button id="tabSettings">إعدادات المكتب</button></div><button id="logout" class="secondary">تبديل المكتب / تسجيل الخروج</button></div><div id="officeSettings" class="panel hidden"><div class="dash-header"><div><h2>إعدادات المكتب</h2><p>تحديث بيانات التواصل والمعلومات الأساسية.</p></div><button id="closeSettings" class="secondary">إغلاق</button></div><div class="grid"><div><label>اسم المكتب</label><input id="settingsName"></div><div><label>الإمارة</label><select id="settingsEmirate"><option>أبوظبي</option><option>دبي</option><option>الشارقة</option><option>عجمان</option><option>أم القيوين</option><option>رأس الخيمة</option><option>الفجيرة</option></select></div><div><label>رقم الهاتف</label><input id="settingsPhone"></div><div><label>رقم الترخيص</label><input id="settingsLicense" readonly title="لتغيير رقم الترخيص تواصل مع الإدارة"></div><div><label>رقم واتساب المكتب</label><input id="settingsWhatsapp" inputmode="tel" placeholder="9715xxxxxxxx"></div><div class="logo-upload-field"><label for="officeLogoFile">شعار المكتب (PNG / JPG / WebP)</label><div id="officeLogoPreview" class="office-logo-preview"><span>لم يُرفع شعار المكتب بعد</span></div><input type="file" id="officeLogoFile" accept="image/png,image/jpeg,image/webp"><p class="muted">اختر شعار المكتب، ثم اضغط «حفظ التغييرات» ليظهر في صفحة المكتب ونتائج البحث.</p></div><div><label>البريد الإلكتروني للحساب</label><input type="email" id="settingsEmail" dir="ltr"></div><div><label>كلمة مرور جديدة (8 أحرف على الأقل)</label><input type="password" id="settingsPassword" autocomplete="new-password"><label class="show-password"><input type="checkbox" id="showSettingsPassword"> إظهار كلمة المرور</label></div></div><label>نبذة عن المكتب</label><textarea id="settingsDescription" rows="3" maxlength="1500"></textarea><div class="settings-account-actions"><button id="saveEmail" class="secondary">تغيير البريد الإلكتروني</button><button id="savePassword" class="secondary">تغيير كلمة المرور</button></div><button id="saveSettings">حفظ التغييرات</button><p class="muted">تغيير الترخيص أو حالة الاعتماد يتطلب مراجعة الإدارة.</p></div><section class="panel" id="officeForm"><h2>استكمال بيانات المكتب</h2><p>أدخل بيانات الترخيص والتواصل لإرسال طلب الاعتماد إلى إدارة ساهل 2.</p><div class="grid"><div><label>اسم المكتب</label><input id="name" required></div><div><label>رقم الترخيص</label><input id="license" required></div><div><label>الإمارة</label><select id="emirate"><option>أبوظبي</option><option>دبي</option><option>الشارقة</option><option>عجمان</option><option>أم القيوين</option><option>رأس الخيمة</option><option>الفجيرة</option></select></div><div><label>هاتف المكتب مع رمز الدولة</label><input id="phone" placeholder="9715xxxxxxxx" required></div></div><div class="legal-checks">
-      <label for="licenseIssuer">الجهة المصدرة للرخصة</label><input id="licenseIssuer" maxlength="120">
-      <label for="officeLicenseFile">إرفاق نسخة الرخصة (اختياري)</label>
-      <input type="file" id="officeLicenseFile" accept="application/pdf,image/jpeg,image/png" aria-describedby="officeLicenseHelp">
-      <p id="officeLicenseHelp" class="muted">PDF أو JPG أو PNG، حتى 5 ميغابايت. يطّلع عليها مسؤول الاعتماد في ساهل‑2 للمطابقة.</p>
-      <p>اقرأ <a href="legal.html#offices">اتفاقية المكتب</a> و<a href="legal.html#verification">خطوات التحقق</a>.</p>
-      <label><input id="officeLegalLicense" type="checkbox"> بيانات الترخيص صحيحة وسارية، وأنا مفوض بالتسجيل.</label>
-      <label><input id="officeLegalUpdates" type="checkbox"> أتعهد بإبلاغ الإدارة عند تغير بيانات المكتب أو الترخيص أو التواصل.</label>
-      <label><input id="officeLegalConsent" type="checkbox"> أتعهد بتوثيق موافقة العامل المنفصلة قبل نشر بياناته أو صورته.</label>
-      <label><input id="officeLegalVerification" type="checkbox"> أوافق على مطابقة بيانات المكتب مع المصادر الرسمية وإعادة التحقق.</label>
-      <label><input id="officeLegalResponsibility" type="checkbox"> أتحمل مسؤولية العقود والاستقدام والتزام المكتب بالأنظمة.</label>
-      <label><input id="officeLegalFees" type="checkbox"> أوافق على سياسة <a href="legal.html#ads">الإعلانات</a> و<a href="legal.html#fees">الرسوم</a> الحالية.</label>
-    </div><button id="saveOffice">إرسال طلب الاعتماد</button></section>
+    </div><button class="secondary hidden" id="signup">إنشاء حساب المكتب</button><p id="signupFeedback" class="office-signup-feedback" role="status" aria-live="polite" hidden></p></div><p class="muted">قد يُطلب منك تأكيد البريد قبل الدخول. لا تُدخل كلمة المرور في أي صفحة أخرى.</p></section><section id="dashboard" class="hidden"><div id="newOfficeWelcome" class="new-office-welcome hidden" role="status"></div><div class="office-hero office-hero-clean"><div class="office-hero-copy"><span class="hero-kicker">لوحة إدارة المكتب</span><h1 id="officeTitle">إدارة أسهل، وعاملاتك في مكان واحد</h1><p>أضف العاملات، حدّث حالة التوفر، واستعرض طلبات الترويج من لوحة منظمة.</p><div id="officeStatus" class="office-status"></div></div></div><div class="office-toolbar"><div class="toolbar-tabs"><button id="tabHome" class="tab-active">العاملات</button><button id="tabSettings">إعدادات المكتب</button></div><button id="logout" class="secondary">تبديل المكتب / تسجيل الخروج</button></div><div id="officeSettings" class="panel hidden"><div class="dash-header"><div><h2>إعدادات المكتب</h2><p>تحديث بيانات التواصل والمعلومات الأساسية.</p></div><button id="closeSettings" class="secondary">إغلاق</button></div><div class="grid"><div><label>اسم المكتب</label><input id="settingsName"></div><div><label>الإمارة</label><select id="settingsEmirate"><option>أبوظبي</option><option>دبي</option><option>الشارقة</option><option>عجمان</option><option>أم القيوين</option><option>رأس الخيمة</option><option>الفجيرة</option></select></div><div><label>رقم الهاتف</label><input id="settingsPhone"></div><div><label>رقم الترخيص</label><input id="settingsLicense" readonly title="لتغيير رقم الترخيص تواصل مع الإدارة"></div><div><label>رقم واتساب المكتب</label><input id="settingsWhatsapp" inputmode="tel" placeholder="9715xxxxxxxx"></div><div class="logo-upload-field"><label for="officeLogoFile">شعار المكتب (PNG / JPG / WebP)</label><div id="officeLogoPreview" class="office-logo-preview"><span>لم يُرفع شعار المكتب بعد</span></div><input type="file" id="officeLogoFile" accept="image/png,image/jpeg,image/webp"><p class="muted">اختر شعار المكتب، ثم اضغط «حفظ التغييرات» ليظهر في صفحة المكتب ونتائج البحث.</p></div><div><label>البريد الإلكتروني للحساب</label><input type="email" id="settingsEmail" dir="ltr"></div><div><label>كلمة مرور جديدة (8 أحرف على الأقل)</label><input type="password" id="settingsPassword" autocomplete="new-password"><label class="show-password"><input type="checkbox" id="showSettingsPassword"> إظهار كلمة المرور</label></div></div><label>نبذة عن المكتب</label><textarea id="settingsDescription" rows="3" maxlength="1500"></textarea><div class="settings-account-actions"><button id="saveEmail" class="secondary">تغيير البريد الإلكتروني</button><button id="savePassword" class="secondary">تغيير كلمة المرور</button></div><button id="saveSettings">حفظ التغييرات</button><p class="muted">تغيير الترخيص أو حالة الاعتماد يتطلب مراجعة الإدارة.</p></div><section class="panel" id="officeForm" aria-labelledby="officeFormTitle">
+  <header class="office-apply-heading">
+    <h2 id="officeFormTitle">طلب اعتماد المكتب</h2>
+    <p>أكمل بيانات الرخصة والتواصل، ثم أرسل الطلب للمراجعة.</p>
+  </header>
+  <ol class="office-apply-steps" aria-label="خطوات طلب الاعتماد">
+    <li id="officeStepData" aria-current="step">١. بيانات المكتب</li>
+    <li id="officeStepReview">٢. مراجعة وإرسال</li>
+  </ol>
+  <form id="officeApplication" novalidate>
+    <div id="officeApplicationData">
+      <div class="office-apply-fields">
+        <div><label for="name">اسم المكتب كما يظهر في الرخصة</label><input id="name" required aria-describedby="officeApplicationFeedback"></div>
+        <div><label for="license">رقم الرخصة</label><input id="license" required aria-describedby="officeApplicationFeedback"></div>
+        <div><label for="emirate">الإمارة</label><select id="emirate"><option>أبوظبي</option><option>دبي</option><option>الشارقة</option><option>عجمان</option><option>أم القيوين</option><option>رأس الخيمة</option><option>الفجيرة</option></select></div>
+        <div><label for="phone">هاتف المكتب</label><input id="phone" type="tel" placeholder="0501234567" dir="ltr" required aria-describedby="officeApplicationFeedback"></div>
+        <div class="office-apply-wide">
+          <label for="licenseIssuer">اسم الجهة المصدرة للرخصة</label>
+          <input id="licenseIssuer" placeholder="اكتب الاسم الكامل كما يظهر في الرخصة" minlength="4" maxlength="120" required aria-describedby="officeIssuerHelp officeApplicationFeedback">
+          <p id="officeIssuerHelp" class="muted">اكتب اسم الدائرة أو الهيئة المصدرة كما هو مكتوب في الرخصة. اختر الإمارة في الحقل المخصص لها أعلاه.</p>
+        </div>
+        <div class="office-apply-wide office-license-attachment">
+          <label for="officeLicenseFile">إرفاق نسخة الرخصة (اختياري)</label>
+          <input type="file" id="officeLicenseFile" accept="application/pdf,image/jpeg,image/png" aria-describedby="officeLicenseHelp officeApplicationFeedback">
+          <p id="officeLicenseHelp" class="muted">PDF أو JPG أو PNG حتى 5 ميغابايت. يطّلع عليها مسؤول الاعتماد فقط.</p>
+        </div>
+      </div>
+    </div>
+    <div id="officeApplicationReview" class="hidden">
+      <h3 id="officeReviewHeading" tabindex="-1">راجع بيانات المكتب</h3>
+      <dl id="officeApplicationSummary" class="office-apply-summary"></dl>
+      <fieldset class="legal-checks office-apply-agreement">
+        <legend>إقرارات المكتب</legend>
+        <p>اطّلع على <a href="legal.html#offices" target="_blank" rel="noopener">اتفاقية المكتب</a> و<a href="legal.html#verification" target="_blank" rel="noopener">خطوات التحقق</a>.</p>
+        <label><input id="officeLegalLicense" type="checkbox"> بيانات الترخيص صحيحة وسارية، وأنا مفوض بالتسجيل.</label>
+        <label><input id="officeLegalUpdates" type="checkbox"> أتعهد بإبلاغ الإدارة عند تغير بيانات المكتب أو الترخيص أو التواصل.</label>
+        <label><input id="officeLegalConsent" type="checkbox"> أتعهد بتوثيق موافقة العامل المنفصلة قبل نشر بياناته أو صورته.</label>
+        <label><input id="officeLegalVerification" type="checkbox"> أوافق على مطابقة بيانات المكتب مع المصادر الرسمية وإعادة التحقق.</label>
+        <label><input id="officeLegalResponsibility" type="checkbox"> أتحمل مسؤولية العقود والاستقدام والتزام المكتب بالأنظمة.</label>
+        <label><input id="officeLegalFees" type="checkbox"> أوافق على سياسة <a href="legal.html#ads" target="_blank" rel="noopener">الإعلانات</a> و<a href="legal.html#fees" target="_blank" rel="noopener">الرسوم</a> الحالية.</label>
+      </fieldset>
+    </div>
+    <p id="officeApplicationFeedback" class="office-apply-feedback" role="alert" hidden></p>
+    <div class="office-apply-actions">
+      <button id="nextOfficeApplication" type="submit">متابعة للمراجعة</button>
+      <button id="saveOffice" type="submit" class="hidden">إرسال طلب الاعتماد</button>
+      <button id="backOfficeApplication" type="button" class="secondary hidden">تعديل البيانات</button>
+    </div>
+  </form>
+</section>
 <section class="panel hidden" id="officeHome"><section class="panel hidden" id="pendingLicenseUpload">
   <label for="pendingLicenseFile">إرفاق نسخة الرخصة بطلب الاعتماد (اختياري)</label>
   <input type="file" id="pendingLicenseFile" accept="application/pdf,image/jpeg,image/png" aria-describedby="pendingLicenseHelp">
@@ -217,7 +282,7 @@ const setOfficeBrand = office => {
 };
 const mode=signup=>{$('officeForgotPassword').hidden=signup;$('tabLogin').classList.toggle('active',!signup);$('tabSignup').classList.toggle('active',signup);show('login',!signup);show('signup',signup);show('signupLegal',signup);$('signupFeedback').hidden=true};
 $('tabLogin').onclick=()=>mode(false);$('tabSignup').onclick=()=>mode(true);
-let workerPage=1,allOfficeWorkers=[];function officeView(){show('officeForm',!office);show('officeHome',!!office);show('workerEditor',false);setOfficeBrand(office);show('pendingLicenseUpload',office?.status==='pending');if(office){$('officeTitle').textContent=office.name;show('navSettings',true);show('navLogout',true);$('settingsName').value=office.name;$('settingsPhone').value=office.phone||'';$('settingsEmirate').value=office.emirate||'أبوظبي';$('settingsLicense').value=office.license_number||'';$('settingsWhatsapp').value=office.whatsapp||'';$('settingsDescription').value=office.description||'';$('settingsEmail').value=user?.email||'';updateOfficeLogoPreview();const welcomeBox=$('newOfficeWelcome');const welcomeKey='saahl2-office-welcome-'+office.id;if(office.status==='approved'&&!localStorage.getItem(welcomeKey)){welcomeBox.textContent='أهلاً وسهلاً بمكتب '+office.name+' في ساهل 2! يسعدنا انضمامكم. يمكنكم الآن إضافة العاملات وتحديث صورهن وحالة توفرهن، والتواصل مع العملاء بكل سهولة.';welcomeBox.classList.remove('hidden');localStorage.setItem(welcomeKey,'1')}else welcomeBox.classList.add('hidden');const labels={pending:'بانتظار اعتماد الإدارة',approved:'مكتب معتمد',rejected:'طلب الاعتماد مرفوض',suspended:'المكتب موقوف'};$('officeStatus').textContent='حالة المكتب: '+(labels[office.status]||office.status);$('officeStatus').className=office.status==='approved'?'success':'pending-note';loadWorkers()}else{$('officeTitle').textContent='استكمال تسجيل المكتب';$('officeStatus').textContent='أدخل بيانات المكتب لإرسال طلب الاعتماد'}}
+let workerPage=1,allOfficeWorkers=[];function officeView(){$('dashboard').classList.toggle('office-onboarding',!office);show('officeForm',!office);show('officeHome',!!office);show('workerEditor',false);setOfficeBrand(office);show('pendingLicenseUpload',office?.status==='pending');if(office){$('officeTitle').textContent=office.name;show('navSettings',true);show('navLogout',true);$('settingsName').value=office.name;$('settingsPhone').value=office.phone||'';$('settingsEmirate').value=office.emirate||'أبوظبي';$('settingsLicense').value=office.license_number||'';$('settingsWhatsapp').value=office.whatsapp||'';$('settingsDescription').value=office.description||'';$('settingsEmail').value=user?.email||'';updateOfficeLogoPreview();const welcomeBox=$('newOfficeWelcome');const welcomeKey='saahl2-office-welcome-'+office.id;if(office.status==='approved'&&!localStorage.getItem(welcomeKey)){welcomeBox.textContent='أهلاً وسهلاً بمكتب '+office.name+' في ساهل 2! يسعدنا انضمامكم. يمكنكم الآن إضافة العاملات وتحديث صورهن وحالة توفرهن، والتواصل مع العملاء بكل سهولة.';welcomeBox.classList.remove('hidden');localStorage.setItem(welcomeKey,'1')}else welcomeBox.classList.add('hidden');const labels={pending:'بانتظار اعتماد الإدارة',approved:'مكتب معتمد',rejected:'طلب الاعتماد مرفوض',suspended:'المكتب موقوف'};$('officeStatus').textContent='حالة المكتب: '+(labels[office.status]||office.status);$('officeStatus').className=office.status==='approved'?'success':'pending-note';loadWorkers()}else{$('officeTitle').textContent='استكمال تسجيل المكتب';$('officeStatus').textContent='أدخل بيانات المكتب لإرسال طلب الاعتماد'}}
 
 /* SAAHL-2 announcements appear when the office account opens.
    No top-bar button, no push notifications, no personal message content in localStorage. */
@@ -352,35 +417,127 @@ $('attachPendingLicense').onclick=async()=>{
   }
 };
 
-$('saveOffice').onclick=async()=>{
-  const legal_agreement = {version:'2026-11-21',license:$('officeLegalLicense').checked,updates:$('officeLegalUpdates').checked,
-    consent:$('officeLegalConsent').checked,verification:$('officeLegalVerification').checked,
-    responsibility:$('officeLegalResponsibility').checked,fees:$('officeLegalFees').checked};
-  if(Object.values(legal_agreement).some(value=>value===false))return message('أكمل إقرارات اتفاقية المكتب.',true);
-  if(!v('name')||!v('license')||!v('licenseIssuer')||!v('phone'))return message('أكمل اسم المكتب ورقم الترخيص والجهة المصدرة والهاتف',true);
-  const file=$('officeLicenseFile').files[0], validationError=licenseFileError(file);
-  if(validationError)return message(validationError,true);
+const applicationFields = ['name','license','emirate','phone','licenseIssuer','officeLicenseFile'];
+
+function officeApplicationError(text='',field){
+  const feedback=$('officeApplicationFeedback');
+  feedback.textContent=text;
+  feedback.hidden=!text;
+  if(field){
+    $(field).setAttribute('aria-invalid','true');
+    $(field).focus();
+  }
+}
+
+function setOfficeApplicationStep(review){
+  show('officeApplicationData',!review);
+  show('officeApplicationReview',review);
+  show('nextOfficeApplication',!review);
+  show('saveOffice',review);
+  show('backOfficeApplication',review);
+  for(const [id,active] of [['officeStepData',!review],['officeStepReview',review]]){
+    if(active)$(id).setAttribute('aria-current','step');
+    else $(id).removeAttribute('aria-current');
+  }
+}
+
+function validateOfficeApplication(){
+  const errors=[
+    ['name',!v('name'),'أدخل اسم المكتب كما هو مكتوب في الرخصة.'],
+    ['license',!v('license'),'أدخل رقم الرخصة.'],
+    ['phone',!v('phone'),'أدخل رقم هاتف المكتب.'],
+    ['licenseIssuer',v('licenseIssuer').length<4||v('licenseIssuer').length>120,
+      'أدخل اسم الجهة المصدرة كما يظهر في الرخصة. يجب أن يكون الاسم بين 4 و120 حرفًا.'],
+    ['officeLicenseFile',licenseFileError($('officeLicenseFile').files[0]),
+      'اختر نسخة رخصة بصيغة PDF أو JPG أو PNG وبحجم لا يتجاوز 5 ميغابايت.']
+  ];
+  const invalid=errors.find(([,fails])=>fails);
+  if(!invalid)return true;
+  setOfficeApplicationStep(false);
+  officeApplicationError(invalid[2],invalid[0]);
+  return false;
+}
+
+for(const id of applicationFields){
+  $(id).addEventListener(id==='officeLicenseFile'?'change':'input',()=>{
+    $(id).removeAttribute('aria-invalid');
+    officeApplicationError();
+  });
+}
+
+$('backOfficeApplication').onclick=()=>{
+  setOfficeApplicationStep(false);
+  officeApplicationError();
+  $('name').focus();
+};
+
+$('officeApplication').onsubmit=async(event)=>{
+  event.preventDefault();
   const button=$('saveOffice');
-  button.disabled=true;
+  if(button.disabled||!user)return;
+  officeApplicationError();
+  if(!validateOfficeApplication())return;
+  if($('officeApplicationReview').classList.contains('hidden')){
+    const summary=$('officeApplicationSummary');
+    summary.replaceChildren();
+    for(const [label,value] of [
+      ['اسم المكتب',v('name')],['رقم الرخصة',v('license')],['الإمارة',v('emirate')],
+      ['هاتف المكتب',v('phone')],['الجهة المصدرة',v('licenseIssuer')],
+      ['نسخة الرخصة',$('officeLicenseFile').files[0]?.name||'بدون مرفق']
+    ]){
+      const item=document.createElement('div');
+      const term=document.createElement('dt'), description=document.createElement('dd');
+      term.textContent=label;
+      description.textContent=value;
+      item.append(term,description);
+      summary.append(item);
+    }
+    setOfficeApplicationStep(true);
+    $('officeReviewHeading').focus();
+    return;
+  }
+  const agreementFields={license:'officeLegalLicense',updates:'officeLegalUpdates',consent:'officeLegalConsent',
+    verification:'officeLegalVerification',responsibility:'officeLegalResponsibility',fees:'officeLegalFees'};
+  const unchecked=Object.values(agreementFields).find(id=>!$(id).checked);
+  if(unchecked){officeApplicationError('راجع إقرارات المكتب وأكّد جميع الخانات قبل الإرسال.',unchecked);return;}
+  const legal_agreement={version:'2026-11-21',...Object.fromEntries(Object.keys(agreementFields).map(key=>[key,true]))};
+  const file=$('officeLicenseFile').files[0], back=$('backOfficeApplication');
+  button.disabled=back.disabled=true;
+  button.textContent='جارٍ إرسال الطلب…';
   try{
+    const {data:existing,error:lookupError}=await db.from('offices').select('id').eq('owner_id',user.id).maybeSingle();
+    if(lookupError)throw lookupError;
+    if(existing){
+      await init();
+      message('يوجد طلب مسجل لهذا الحساب. يمكنك متابعة حالته من لوحة المكتب.');
+      return;
+    }
     const {data,error}=await db.from('offices').insert({
       owner_id:user.id,name:v('name'),license_number:v('license'),declared_license_issuer:v('licenseIssuer'),
       emirate:v('emirate'),phone:v('phone'),status:'pending',legal_agreement
     }).select('id').single();
-    if(error)return message('تعذر حفظ المكتب: '+error.message,true);
+    if(error?.code==='22023'&&/issuing authority required/i.test(error.message||'')){
+      setOfficeApplicationStep(false);
+      officeApplicationError('تعذّر قبول اسم الجهة المصدرة. أدخل اسمها الكامل كما يظهر في الرخصة.','licenseIssuer');
+      return;
+    }
+    if(error)throw error;
     let feedback='تم إرسال طلب اعتماد المكتب إلى الإدارة.';
     let failed=false;
     if(file){
       try{feedback+=' '+await uploadOfficeLicense(data.id,file);}
       catch{failed=true;feedback+=' تعذّر رفع نسخة الرخصة. يمكنك إرفاقها من قسم طلب الاعتماد أدناه.';}
     }
-    $('officeLicenseFile').value='';
+    $('officeApplication').reset();
+    setOfficeApplicationStep(false);
     await init();
     message(feedback,failed);
-  }catch{
-    message('تعذّر إكمال طلب الاعتماد. تحقق من الاتصال وأعد فتح الصفحة لتراجع حالة الطلب.',true);
+  }catch(error){
+    console.error('Office application submission failed',error?.code);
+    officeApplicationError('تعذّر إكمال طلب الاعتماد. تحقق من الاتصال وحاول مرة أخرى.');
   }finally{
-    button.disabled=false;
+    button.disabled=back.disabled=false;
+    button.textContent='إرسال طلب الاعتماد';
   }
 };
 function openEditor(){if(!office)return;show('officeSettings',false);show('officeHome',false);show('workerEditor',true);$('workerEditor').scrollIntoView({behavior:'smooth',block:'start'})}
