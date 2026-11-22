@@ -94,8 +94,18 @@ try {
    await queue.click();
    const newOffice=page.locator('.office-card').filter({hasText:'مكتب جديد'});
    await newOffice.waitFor();
-   const officeControls=(await newOffice.getByRole('button',{name:'توثيق الرخصة'}).isVisible())&&
-     (await newOffice.getByRole('button',{name:'تنزيل نسخة الرخصة'}).isVisible());
+   const compact=await newOffice.getByRole('button',{name:'توثيق الرخصة'}).count()===0&&
+     await newOffice.getByText('QA-22',{exact:true}).isVisible();
+   await newOffice.getByRole('button',{name:'التفاصيل'}).click();
+   const officeDialog=page.getByRole('dialog',{name:'تفاصيل طلب المكتب'});
+   await officeDialog.waitFor();
+   const officeControls=(await officeDialog.getByRole('button',{name:'توثيق الرخصة'}).isVisible())&&
+     (await officeDialog.getByRole('button',{name:'تنزيل نسخة الرخصة'}).isVisible())&&
+     (await officeDialog.getByRole('button',{name:'اعتماد المكتب'}).isVisible())&&
+     (await officeDialog.evaluate(el=>el.scrollWidth<=el.clientWidth+2));
+   await officeDialog.getByRole('button',{name:'إغلاق',exact:true}).click();
+   await officeDialog.waitFor({state:'hidden'});
+   const focusRestored=await newOffice.getByRole('button',{name:'التفاصيل'}).evaluate(el=>document.activeElement===el);
    const onlyPending=await page.locator('.office-card').count()===1;
    await page.evaluate(async()=>{
      window.adminOfficeRows[1].status='approved';
@@ -104,10 +114,12 @@ try {
    await page.locator('#office-pending-badge').waitFor({state:'hidden'});
    await page.getByText('لا توجد مكاتب تطابق البحث أو الحالة المختارة.').waitFor();
    await page.getByLabel('حالة المكتب').selectOption('');
+   const tones=await page.locator('.office-card').evaluateAll(cards=>cards.map(card=>getComputedStyle(card).backgroundColor));
+   const distinctTones=tones.length===2&&new Set(tones).size===2;
    await page.getByRole('searchbox',{name:'البحث عن مكتب'}).fill('QA-22');
    await newOffice.getByText('معتمد',{exact:true}).waitFor();
    const officeFits=await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+2);
-   const officePass=firstBadge==='1'&&onlyPending&&officeControls&&officeFits&&await page.locator('.office-card').count()===1;
+   const officePass=firstBadge==='1'&&onlyPending&&compact&&officeControls&&focusRestored&&distinctTones&&officeFits&&await page.locator('.office-card').count()===1;
    checks++;
    if(!officePass)fails++;
    console.log(JSON.stringify({width,officeApprovalCards:officePass}));
