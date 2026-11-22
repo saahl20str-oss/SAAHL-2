@@ -192,6 +192,13 @@ body.admin-menu-open{overflow:hidden}
 #pg-ads .ad-card-actions{margin-top:0;justify-content:flex-start;gap:7px;padding-top:9px}
 #pg-ads .ad-card-actions .btn{min-height:36px}
 @media(max-width:650px){#pg-ads #ads-wrap{grid-template-columns:minmax(0,1fr)}#pg-ads .ad-worker-photo{width:78px;height:96px}}
+/* Keep worker ad summaries short. The existing preview shows the full details. */
+#pg-ads #ads-wrap>.saahl-ad-card.ad-worker-summary{padding:11px;gap:8px}
+#pg-ads .ad-worker-summary .ad-card-header{align-items:center;gap:8px;flex-wrap:wrap}
+#pg-ads .ad-worker-summary .ad-card-heading{min-width:90px;line-height:1.5}
+#pg-ads .ad-worker-summary .ad-card-heading strong{font-size:13px;display:block;line-height:1.45}
+#pg-ads .ad-worker-summary .ad-worker-photo{width:42px;height:52px;border-radius:7px}
+#pg-ads .ad-worker-summary .ad-card-actions{padding-top:7px}
 #pg-notifications .nt-entry{padding:12px 14px;border:1px solid var(--border);border-radius:11px;background:var(--white);margin:0 0 8px}
 #pg-notifications .nt-entry strong{display:block;font-size:13px}
 #pg-notifications .nt-entry p{font-size:12px;line-height:1.7;white-space:pre-wrap;margin:5px 0}
@@ -1014,31 +1021,36 @@ async function loadAds(){
  w.replaceChildren();
  for(const a of aAds){
   const parsed=saahlAdDetails(a.ad_details);
-  const card=document.createElement('article');card.className='ac saahl-ad-card';
+  const workerAd=Boolean(a.worker_id || a.worker_photo_url || parsed.worker || parsed.photo ||
+   /^عاملة\s+متاحة\s*[:：]/.test(a.ad_topic||'') || parsed.parts.some(part=>/^العاملة\s*[:：]/.test(part)));
+  const card=document.createElement('article');card.className=workerAd?'ac saahl-ad-card ad-worker-summary':'ac saahl-ad-card';
   const header=document.createElement('div');header.className='ad-card-header';
   const heading=document.createElement('div');heading.className='ad-card-heading';
   const title=document.createElement('strong');title.textContent=a.ad_topic||'إعلان';
   heading.append(title,saahlAdLine(a.advertiser_name||'معلن غير محدد','ad-office-name'));
   const state=document.createElement('span');state.className='bge '+(a.status==='pending'?'pending':'active');
   state.textContent=a.status==='pending'?'بانتظار المراجعة':(['active','approved'].includes(a.status)?'معتمد':a.status||'—');
-  header.append(heading,state);
-  const content=document.createElement('div');content.className='ad-card-content';
   if(parsed.photo){
    const img=document.createElement('img');
    img.className='ad-worker-photo';img.src=parsed.photo;img.alt='صورة العاملة';
    img.loading='lazy';img.referrerPolicy='no-referrer';
    img.onerror=()=>{img.style.display='none';};
-   content.append(img);
+   header.append(img);
   }
-  const info=document.createElement('div');info.className='ai ad-card-info';
-  const facts=document.createElement('div');facts.className='ad-facts';
-  facts.append(saahlAdLine((a.days||1)+' يوم','ad-fact'),saahlAdLine((a.amount||0)+' AED','ad-fact'));
-  info.append(facts);
-  parsed.parts.forEach(part=>info.append(saahlAdLine(part)));
-  if(a.phone)info.append(saahlAdLine('الهاتف: '+a.phone,'ad-phone'));
-  content.append(info);
+  header.append(heading,state);
+  card.append(header);
+  if(!workerAd){
+   const content=document.createElement('div');content.className='ad-card-content';
+   const info=document.createElement('div');info.className='ai ad-card-info';
+   const facts=document.createElement('div');facts.className='ad-facts';
+   facts.append(saahlAdLine((a.days||1)+' يوم','ad-fact'),saahlAdLine((a.amount||0)+' AED','ad-fact'));
+   info.append(facts);
+   parsed.parts.forEach(part=>info.append(saahlAdLine(part)));
+   if(a.phone)info.append(saahlAdLine('الهاتف: '+a.phone,'ad-phone'));
+   content.append(info);card.append(content);
+  }
   const controls=document.createElement('div');controls.className='ad-card-actions';
-  if(a.worker_id || a.worker_photo_url || parsed.worker || parsed.photo || parsed.parts.length){
+  if(workerAd || parsed.parts.length){
    const view=document.createElement('button');
    view.type='button';view.className='btn btn-s ad-view-link';view.textContent='عرض العاملة';
    view.onclick=()=>showSaahl2WorkerPreview(a,parsed);
@@ -1050,7 +1062,7 @@ async function loadAds(){
   }
   const del=document.createElement('button');del.className='btn btn-d btn-s';del.textContent='حذف';
   del.onclick=()=>delAd(a.id);controls.append(del);
-  card.append(header,content,controls);w.append(card);
+  card.append(controls);w.append(card);
  }
 }
 function updateAdsBadge(n){const b=document.getElementById('ads-badge');if(!b)return;if(n>0){b.textContent=n>99?'99+':n;b.style.display='flex';}else{b.style.display='none';}}
