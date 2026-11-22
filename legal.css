@@ -25,3 +25,13 @@ input,select,textarea,button{font:inherit;border:1px solid #ddd3bf;border-radius
 button{min-height:46px;background:#c5a556;color:#241e12;font-weight:700;cursor:pointer}
 button:disabled{opacity:.55;cursor:wait}
 :focus-visible{outline:2px solid #76571d;outline-offset:3px}
+
+@media screen and (max-width:600px){
+  .bar{padding:8px 12px;gap:8px;flex-wrap:wrap}
+  .bar a{min-height:40px}
+  main{padding:14px 12px 30px}
+  nav{margin-block:12px;gap:5px}
+  nav a{display:inline-flex;align-items:center;min-height:40px;padding:5px 8px;font-size:14px}
+  section{margin-block:12px;padding:13px}
+  form>input,form>select,form>textarea{min-width:0;max-width:100%}
+}
