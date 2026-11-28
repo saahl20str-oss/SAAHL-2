@@ -287,6 +287,7 @@ main{max-width:760px;margin:0 auto 65px;padding:0 18px}
   <p class="muted">اختر ما طلبت العاملة إيقاف عرضه للزوار.</p>
   <button type="button" class="secondary hidden" id="withdrawWorkerPhoto">إيقاف عرض الصورة فقط</button>
   <button type="button" class="secondary" id="withdrawWorkerProfile">إيقاف نشر الملف بالكامل</button>
+  <button type="button" class="secondary hidden" id="retryWorkerMedia">استكمال إيقاف رابط الصورة</button>
 </details>
 <p class="muted">يظهر الملف في البحث عند نشره من المكتب بعد الحصول على موافقة العاملة.</p></section></section></main>
 <dialog id="workerPublication" class="publication-dialog" aria-labelledby="publicationTitle">
@@ -730,6 +731,7 @@ function resetWorkerForm(){
   editingWorker = null;
   $('workerWithdrawal').hidden = true;
   $('workerWithdrawal').open = false;
+  show('retryWorkerMedia',false);
   removeWorkerPhoto = false;
   $('editorTitle').textContent = 'إضافة عاملة جديدة';
   $('saveWorkerDraft').textContent = 'حفظ كمسودة';
@@ -819,13 +821,14 @@ async function saveWorker(continueToPublication){
 
 async function editWorker(id){
   if(!office) return;
-  const {data,error} = await db.from('workers').select('*').eq('office_id',office.id).eq('id',id).single();
+  const {data,error} = await db.from('workers').select('id,display_name,worker_number,religion,nationality,age,salary_aed,experience_years,country_experience,description,status,photo_url,publication_photo_draft,publication_consent_at').eq('office_id',office.id).eq('id',id).single();
   if(error||!data) return message('تعذر فتح بيانات العاملة.',true);
   resetWorkerForm();
   editingWorkerId = id;
   editingWorker = data;
   $('workerWithdrawal').hidden = !data.publication_consent_at;
-  show('withdrawWorkerPhoto',Boolean(data.photo_url));
+  show('withdrawWorkerPhoto',Boolean(data.photo_url&&data.publication_consent_at));
+  show('withdrawWorkerProfile',Boolean(data.publication_consent_at));
   $('editorTitle').textContent = 'تعديل بيانات العاملة';
   $('saveWorkerDraft').textContent = 'حفظ والعودة';
   for(const [field,key] of Object.entries({workerName:'display_name',workerNumber:'worker_number',religion:'religion',
@@ -844,36 +847,46 @@ async function editWorker(id){
   updateExperience();
   openEditor();
   updatePhotoPreview();
+  const {data:receipt}=await db.rpc('saahl2_withdraw_worker_media',{p_worker:id,p_full:null});
+  if(editingWorkerId===id&&receipt?.waiting>0){
+    $('workerWithdrawal').hidden=false;
+    show('retryWorkerMedia',true);
+  }
 }
 
 async function withdrawWorkerPublication(full){
-  if(!office || !editingWorker?.publication_consent_at) return;
+  if(!office || !editingWorker || (full!==null&&!editingWorker.publication_consent_at)) return;
   const id=editingWorker.id, officeId=office.id;
   const question=full
     ? 'هل طلبت العاملة إيقاف نشر ملفها بالكامل من البحث والإعلانات؟'
     : 'هل طلبت العاملة إيقاف عرض صورتها فقط في البحث والإعلانات؟';
-  if(!confirm(question)) return;
-  const buttons=[$('withdrawWorkerPhoto'),$('withdrawWorkerProfile')];
+  if(full!==null&&!confirm(question)) return;
+  const buttons=[$('withdrawWorkerPhoto'),$('withdrawWorkerProfile'),$('retryWorkerMedia')];
   buttons.forEach(button=>button.disabled=true);
   try{
-    const {error}=await db.rpc('saahl2_withdraw_worker_publication',{p_worker:id,p_full:full});
-    if(error) throw error;
+    const {data:receipt,error}=await db.functions.invoke('withdraw-worker-media',{body:{workerId:id,full}});
+    if(error||!Number.isInteger(receipt?.pending)) throw error||Error('Missing withdrawal receipt');
+    const pending=receipt.pending>0;
     if(office?.id!==officeId) return;
     if(editingWorkerId===id){
-      // Clear the saved and in-form photo so a subsequent save cannot restore it.
-      editingWorker.photo_url=null;
-      editingWorker.publication_photo_draft=null;
-      $('photo').value='';
-      $('workerPhotoFile').value='';
-      updatePhotoPreview();
-      show('withdrawWorkerPhoto',false);
-      if(full){
-        editingWorker.publication_consent_at=null;
-        $('workerWithdrawal').hidden=true;
-        closeEditor();
+      if(full!==null){
+        // Clear the saved and in-form photo so a subsequent save cannot restore it.
+        editingWorker.photo_url=null;
+        editingWorker.publication_photo_draft=null;
+        $('photo').value='';
+        $('workerPhotoFile').value='';
+        updatePhotoPreview();
+        show('withdrawWorkerPhoto',false);
       }
+      if(full)editingWorker.publication_consent_at=null;
+      show('withdrawWorkerProfile',Boolean(editingWorker.publication_consent_at));
+      show('retryWorkerMedia',pending);
+      $('workerWithdrawal').hidden=!pending&&!editingWorker.publication_consent_at;
+      if(full&&!pending)closeEditor();
     }
-    message(full?'تم إيقاف نشر الملف وإعلاناته.':'تم إيقاف عرض الصورة.');
+    message(pending
+      ?'حُجبت الصورة من المنصة. إيقاف الرابط القديم قيد الاستكمال. استخدم زر الاستكمال لإعادة المحاولة.'
+      :full===true?'تم إيقاف نشر الملف وإعلاناته.':'تم إيقاف عرض الصورة ورابط النشر.',pending);
     await loadWorkers();
   }catch{
     message('تعذّر إيقاف العرض. تحقق من الاتصال وحاول مرة أخرى.',true);
@@ -883,6 +896,7 @@ async function withdrawWorkerPublication(full){
 }
 $('withdrawWorkerPhoto').onclick=()=>withdrawWorkerPublication(false);
 $('withdrawWorkerProfile').onclick=()=>withdrawWorkerPublication(true);
+$('retryWorkerMedia').onclick=()=>withdrawWorkerPublication(null);
 
 function openPublication(worker){
   if(isWorkerPublished(worker)) return message('الملف منشور في بحث الكفيل.');
@@ -1081,7 +1095,7 @@ function buildOfficeWorkerCard(worker,officeId){
   card.append(photo,body);
   return card;
 }
-async function showCV(id){const {data:w,error}=await db.from('workers').select('*').eq('office_id',office.id).eq('id',id).single();if(error||!w)return message('تعذر تحميل السيرة الذاتية',true);const modal=$('cvModal');const body=$('cvBody');body.replaceChildren();$('cvTitle').textContent='السيرة الذاتية — '+w.display_name;const entries=[['رقم العاملة',w.worker_number||'—'],['الاسم',w.display_name],['الجنسية',w.nationality],['العمر',w.age+' سنة'],['الديانة',w.religion||'غير محدد'],['إجمالي الخبرة',(w.experience_years||0)+' سنوات'],['الراتب',w.salary_aed?w.salary_aed+' درهم':'حسب الاتفاق'],['المهارات والملاحظات',w.description||'—'],['حالة العاملة',w.status==='available'?'متاحة':'غير متاحة']];for(const e of Array.isArray(w.country_experience)?w.country_experience:[])entries.push(['خبرة في '+e.country,e.years+' سنوات']);for(const [label,val] of entries){const row=document.createElement('div');row.className='cv-line';const l=document.createElement('span');l.textContent=label;const v=document.createElement('strong');v.textContent=val;row.append(l,v);body.append(row)}const cvPhoto=$('cvPhoto');cvPhoto.replaceChildren();const preview=w.publication_photo_draft?(await db.storage.from(workerPhotoBucket).createSignedUrl(w.publication_photo_draft,300)).data?.signedUrl:w.photo_url;if(preview){const img=document.createElement('img');img.referrerPolicy='no-referrer';img.src=preview;img.alt='صورة العاملة';cvPhoto.append(img)}else{cvPhoto.textContent='لا توجد صورة مرفوعة'}$('cvNationality').textContent=w.nationality||'';$('cvOffice').textContent=office.name;$('cvWorkerNumber').textContent='رقم العاملة: '+(w.worker_number||'غير محدد');modal.classList.remove('hidden');modal.scrollTop=0}
+async function showCV(id){const {data:w,error}=await db.from('workers').select('id,display_name,worker_number,religion,nationality,age,salary_aed,experience_years,country_experience,description,status,photo_url,publication_photo_draft,publication_consent_at').eq('office_id',office.id).eq('id',id).single();if(error||!w)return message('تعذر تحميل السيرة الذاتية',true);const modal=$('cvModal');const body=$('cvBody');body.replaceChildren();$('cvTitle').textContent='السيرة الذاتية — '+w.display_name;const entries=[['رقم العاملة',w.worker_number||'—'],['الاسم',w.display_name],['الجنسية',w.nationality],['العمر',w.age+' سنة'],['الديانة',w.religion||'غير محدد'],['إجمالي الخبرة',(w.experience_years||0)+' سنوات'],['الراتب',w.salary_aed?w.salary_aed+' درهم':'حسب الاتفاق'],['المهارات والملاحظات',w.description||'—'],['حالة العاملة',w.status==='available'?'متاحة':'غير متاحة']];for(const e of Array.isArray(w.country_experience)?w.country_experience:[])entries.push(['خبرة في '+e.country,e.years+' سنوات']);for(const [label,val] of entries){const row=document.createElement('div');row.className='cv-line';const l=document.createElement('span');l.textContent=label;const v=document.createElement('strong');v.textContent=val;row.append(l,v);body.append(row)}const cvPhoto=$('cvPhoto');cvPhoto.replaceChildren();const preview=w.publication_photo_draft?(await db.storage.from(workerPhotoBucket).createSignedUrl(w.publication_photo_draft,300)).data?.signedUrl:w.photo_url;if(preview){const img=document.createElement('img');img.referrerPolicy='no-referrer';img.src=preview;img.alt='صورة العاملة';cvPhoto.append(img)}else{cvPhoto.textContent='لا توجد صورة مرفوعة'}$('cvNationality').textContent=w.nationality||'';$('cvOffice').textContent=office.name;$('cvWorkerNumber').textContent='رقم العاملة: '+(w.worker_number||'غير محدد');modal.classList.remove('hidden');modal.scrollTop=0}
 $('closeCV').onclick=()=>show('cvModal',false);$('cvModal').onclick=e=>{if(e.target===$('cvModal'))show('cvModal',false)};
 async function updatePhotoPreview(){
   const file = $('workerPhotoFile').files[0], box = $('workerPhotoPreview');
