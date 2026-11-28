@@ -26,6 +26,7 @@ jobs:
       - run: node --check kafala-whatsapp.js
       - run: node --check pwa-install.js
       - run: node --check notifications-inbox.js
+      - run: node tests/admin-review-smoke.mjs
       - run: node tests/mobile-smoke.mjs
       - if: ${{ !cancelled() && steps.chromium.outcome == 'success' }}
         run: node tests/office-announcement-smoke.mjs

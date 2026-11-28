@@ -1082,9 +1082,12 @@ async function appAd(id){
  if(!confirm('اعتماد الإعلان ونشره لمدة '+(a.days||1)+' يوم دون تحصيل مالي أثناء التجربة؟'))return;
  if(a.payment_intent_id){toast('هذا الإعلان مرتبط بدفعة سابقة؛ يلزم مراجعتها قبل الاعتماد');return;}
  const now=new Date(),expiry=new Date(now.getTime()+(Number(a.days)||1)*86400000);
- const {error}=await db.from('strip_ads').update({status:'approved',starts_at:now.toISOString(),expires_at:expiry.toISOString()}).eq('id',id).eq('status','pending');
+ const {data,error}=await db.from('strip_ads').update({status:'approved',starts_at:now.toISOString(),expires_at:expiry.toISOString()}).eq('id',id).eq('status','pending').select('id,status');
  if(error){toast('تعذر اعتماد الإعلان: '+error.message);return;}
- toast('تم اعتماد الإعلان دون تحصيل مالي ✓');await loadAds();
+ toast(data?.some(item=>item.id===id&&item.status==='approved')
+  ?'تم اعتماد الإعلان دون تحصيل مالي ✓'
+  :'لم يُحفظ الاعتماد. راجع حالة الإعلان الحالية.');
+ await loadAds();
 }
 async function delAd(id){
  const a=aAds.find(x=>x.id===id);
