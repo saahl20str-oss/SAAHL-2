@@ -847,12 +847,10 @@ async function editWorker(id){
   updateExperience();
   openEditor();
   updatePhotoPreview();
-  if(!data.photo_url){
-    const {data:receipt}=await db.rpc('saahl2_withdraw_worker_media',{p_worker:id,p_full:null});
-    if(editingWorkerId===id&&receipt?.waiting>0){
-      $('workerWithdrawal').hidden=false;
-      show('retryWorkerMedia',true);
-    }
+  const {data:receipt}=await db.rpc('saahl2_withdraw_worker_media',{p_worker:id,p_full:null});
+  if(editingWorkerId===id&&receipt?.waiting>0){
+    $('workerWithdrawal').hidden=false;
+    show('retryWorkerMedia',true);
   }
 }
 
@@ -871,13 +869,15 @@ async function withdrawWorkerPublication(full){
     const pending=receipt.pending>0;
     if(office?.id!==officeId) return;
     if(editingWorkerId===id){
-      // Clear the saved and in-form photo so a subsequent save cannot restore it.
-      editingWorker.photo_url=null;
-      editingWorker.publication_photo_draft=null;
-      $('photo').value='';
-      $('workerPhotoFile').value='';
-      updatePhotoPreview();
-      show('withdrawWorkerPhoto',false);
+      if(full!==null){
+        // Clear the saved and in-form photo so a subsequent save cannot restore it.
+        editingWorker.photo_url=null;
+        editingWorker.publication_photo_draft=null;
+        $('photo').value='';
+        $('workerPhotoFile').value='';
+        updatePhotoPreview();
+        show('withdrawWorkerPhoto',false);
+      }
       if(full)editingWorker.publication_consent_at=null;
       show('withdrawWorkerProfile',Boolean(editingWorker.publication_consent_at));
       show('retryWorkerMedia',pending);

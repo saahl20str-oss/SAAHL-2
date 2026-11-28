@@ -51,7 +51,7 @@ Deno.serve(async (request) => {
       if (moveError) {
         // Requests can be replayed after Storage succeeds but before the receipt is saved.
         const current = await publicPhotos.exists(path);
-        if (current.error || current.data !== false) continue;
+        if (current.data !== false) continue;
       }
       const { error: markError } = await admin.rpc("saahl2_mark_worker_media_moved", {
         p_worker: input.workerId, p_path: path,
