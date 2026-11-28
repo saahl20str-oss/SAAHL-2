@@ -183,17 +183,17 @@ body.admin-menu-open{overflow:hidden}
 .kf-list{padding:0 14px 14px;display:grid;gap:8px}.kf-line{border:1px solid var(--border);background:var(--white);border-radius:10px;min-width:0;overflow:hidden}.kf-line-main{display:flex;align-items:center;gap:12px;padding:11px 14px;flex-wrap:wrap}.kf-line-name{flex:1;min-width:140px;display:flex;flex-direction:column;gap:3px}.kf-line-name small,.kf-line-date{color:var(--muted);font-size:12px}.kf-line-detail{display:none;border-top:1px solid var(--border);padding:12px 14px}.kf-line.expanded .kf-line-detail{display:block}@media(max-width:600px){.kf-line-main{gap:8px}.kf-line-date{width:100%;order:4}.kf-list{padding:0 8px 10px}}
 
 /* Compact admin advertisements: cards do not stretch across the entire desktop */
-#pg-ads #ads-wrap{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,340px),1fr));gap:12px;align-items:start}
-#pg-ads #ads-wrap>.saahl-ad-card{margin:0!important;width:100%;min-width:0;max-width:100%;height:auto;padding:14px;gap:10px}
+#pg-ads :is(#ads-wrap,#ads-history-wrap){display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,340px),1fr));gap:12px;align-items:start}
+#pg-ads :is(#ads-wrap,#ads-history-wrap)>.saahl-ad-card{margin:0!important;width:100%;min-width:0;max-width:100%;height:auto;padding:14px;gap:10px}
 #pg-ads .ad-card-content{align-items:flex-start;gap:11px}
 #pg-ads .ad-card-info{min-width:0}
 #pg-ads .ad-card-info .ad-detail-line{font-size:12px;line-height:1.65}
 #pg-ads .ad-worker-photo{width:84px;height:105px;object-fit:cover;flex-shrink:0}
 #pg-ads .ad-card-actions{margin-top:0;justify-content:flex-start;gap:7px;padding-top:9px}
 #pg-ads .ad-card-actions .btn{min-height:36px}
-@media(max-width:650px){#pg-ads #ads-wrap{grid-template-columns:minmax(0,1fr)}#pg-ads .ad-worker-photo{width:78px;height:96px}}
+@media(max-width:650px){#pg-ads :is(#ads-wrap,#ads-history-wrap){grid-template-columns:minmax(0,1fr)}#pg-ads .ad-worker-photo{width:78px;height:96px}}
 /* Keep worker ad summaries short. The existing preview shows the full details. */
-#pg-ads #ads-wrap>.saahl-ad-card.ad-worker-summary{padding:11px;gap:8px}
+#pg-ads :is(#ads-wrap,#ads-history-wrap)>.saahl-ad-card.ad-worker-summary{padding:11px;gap:8px}
 #pg-ads .ad-worker-summary .ad-card-header{align-items:center;gap:8px;flex-wrap:wrap}
 #pg-ads .ad-worker-summary .ad-card-heading{min-width:90px;line-height:1.5}
 #pg-ads .ad-worker-summary .ad-card-heading strong{font-size:13px;display:block;line-height:1.45}
@@ -248,6 +248,59 @@ body.dark .office-card{background:color-mix(in srgb,var(--office-accent) 16%,var
 
 <!-- Mobile-first enhancement; isolated from existing application logic -->
 <link rel="stylesheet" href="./mobile-first.css?v=20261119d">
+<style id="saahl-admin-polish">
+/* SAAHL admin presentation */
+body:not(.dark){--bg:#f7f5f0;--border:#e8e0d3;--bl:#f4f0e8;--text:#202735;--muted:#566170;--light:#687383}
+body{--admin-gold:#caa347;--admin-gold-ink:#705016;--admin-gold-wash:#faf0d8;--admin-review:#fff9ea;--admin-review-border:#d7ae5c}
+body.dark{--admin-gold-ink:#ffe0a0;--admin-gold-wash:#3d2d18;--admin-review:#2d2518;--admin-review-border:#a57937;--light:#a5b1c5}
+.tb{box-shadow:0 3px 16px #1c243008}
+.bn{font-weight:800}
+.sb .ns{color:var(--muted);letter-spacing:0}
+.sb .ni{margin:3px 8px;border:1px solid transparent;border-radius:9px;padding-inline:12px}
+.sb .ni.active{background:var(--admin-gold-wash);border-color:var(--admin-review-border);color:var(--admin-gold-ink);font-weight:800}
+.cd,.cb,.sc{border-radius:15px;box-shadow:0 5px 18px #1f293a08}
+.pg:not(#pg-overview)>.pt{font-weight:800;padding-inline-start:12px;border-inline-start:3px solid var(--admin-gold)}
+.admin-overview{
+ display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;
+ margin-block-end:18px;padding:clamp(16px,3vw,31px);border-radius:17px;
+ background:linear-gradient(126deg,#172332,#223349 65%,#554321);color:#fff;box-shadow:0 8px 24px #2330421b
+}
+.admin-overview .pt{font-size:clamp(21px,3vw,31px);font-weight:800;margin:0}
+.admin-overview p{color:#e4ded2;font-size:13px;margin:2px 0 0}
+.admin-review-link{
+ display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:7px 14px;
+ border:1px solid #eed699;border-radius:10px;background:#f4dfaa;color:#34270f;font:800 13px Cairo,sans-serif;cursor:pointer
+}
+.admin-review-link:hover{background:#ffedbc}
+.admin-review-count{display:grid;place-items:center;min-width:22px;height:22px;padding-inline:4px;border-radius:20px;background:#604719;color:#fff}
+#pg-overview .sc{border-block-start:3px solid var(--admin-gold)}
+#pg-overview .sc[role=button]:hover{border-color:var(--admin-gold)}
+#pg-overview .sv{font-weight:800}
+#pg-overview .es{padding-block:28px}
+#pg-overview .es .ei{font-size:30px;margin-bottom:6px}
+.ads-review-header>div,.ads-history>summary{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.ads-review-header .ct2,.ads-history>summary{font-size:16px;font-weight:800}
+.ads-queue-empty{grid-column:1/-1;padding:16px;border:1px dashed var(--border);border-radius:10px;color:var(--muted)}
+#pg-ads .ads-history>summary{cursor:pointer;list-style:none}
+.ads-history>summary::-webkit-details-marker{display:none}
+.ads-history>summary::after{content:'﹀';margin-inline-start:auto;color:var(--muted)}
+.ads-history[open]>summary::after{content:'︿'}
+.ads-history-count{min-width:25px;padding-inline:6px;border-radius:20px;text-align:center;background:var(--bl);color:var(--muted);font-size:12px}
+#ads-history-wrap{margin-block-start:14px}
+#pg-ads #ads-wrap>.ad-awaiting-review{
+ background:var(--admin-review);border-color:var(--admin-review-border);border-inline-start:4px solid var(--admin-gold);
+}
+#pg-ads .ad-awaiting-review .ad-card-header .pending{background:var(--admin-gold-wash);color:var(--admin-gold-ink)}
+#pg-ads .ad-awaiting-review .ad-worker-photo{width:76px;height:90px;object-fit:contain;background:var(--white)}
+#pg-ads .ad-awaiting-review .ad-view-link{color:var(--text)}
+#pg-ads .ads-review-header .btn{min-height:40px}
+.ads-history[hidden],.admin-review-count[hidden],#ads-pending-count[hidden]{display:none}
+@media(max-width:600px){
+ .admin-overview{margin-block-end:12px}
+ .admin-review-link{width:100%}
+ .ads-history>summary{min-height:44px}
+}
+</style>
 <link rel="stylesheet" href="./admin-worker-preview.css?v=1">
 <script defer src="./admin-worker-preview.js?v=1"></script>
 <link rel="manifest" href="./manifest.webmanifest">
@@ -319,7 +372,12 @@ body.dark .office-card{background:color-mix(in srgb,var(--office-accent) 16%,var
 
   <div class="ct">
     <div id="pg-overview" class="pg active">
-      <div class="pt">نظرة عامة</div>
+      <header class="admin-overview">
+        <div><h1 class="pt">نظرة عامة</h1><p>تابع طلبات المراجعة وإدارة المنصة.</p></div>
+        <button type="button" class="admin-review-link" onclick="navTo('ads')">
+          <span>مراجعة إعلانات الشريط</span><span id="overview-ads-pending" class="admin-review-count" hidden></span>
+        </button>
+      </header>
       <div id="office-queue-alert" class="office-queue" hidden>
         <div role="status"><strong id="office-queue-count"></strong><p>طلبات اعتماد المكاتب التي تحتاج إلى مراجعتك.</p></div>
         <button type="button" class="btn btn-p btn-s" onclick="openPendingOffices()">مراجعة طلبات المكاتب</button>
@@ -389,10 +447,17 @@ body.dark .office-card{background:color-mix(in srgb,var(--office-accent) 16%,var
 
     <div id="pg-ads" class="pg">
       <div class="pt">إعلانات الشريط العلوي</div>
-      <div class="cd">
-        <div class="ch"><span class="ct2">الإعلانات</span><span id="ads-cnt" class="bge pending">0 إعلان</span></div>
-        <div id="ads-wrap"><div class="ld"><div class="sp"></div>جارٍ التحميل...</div></div>
-      </div>
+      <section class="cd ads-review" aria-labelledby="ads-review-title">
+        <div class="ch ads-review-header">
+          <div><h2 class="ct2" id="ads-review-title">طلبات بانتظار المراجعة</h2><span id="ads-pending-count" class="bge pending" role="status" hidden></span></div>
+          <button type="button" class="btn btn-o btn-s" onclick="loadAds()">تحديث القائمة</button>
+        </div>
+        <div id="ads-wrap" aria-busy="true"><div class="ld"><div class="sp"></div>جارٍ التحميل...</div></div>
+      </section>
+      <details class="cd ads-history" id="ads-history" hidden>
+        <summary><span>سجل الإعلانات السابقة</span><span id="ads-history-count" class="ads-history-count"></span><span id="ads-cnt" class="bge active"></span></summary>
+        <div id="ads-history-wrap"></div>
+      </details>
       <div class="cd"><div class="ch"><span class="ct2">إجمالي إيرادات الإعلانات</span></div><div style="font-size:28px;font-weight:700;color:var(--teal)" id="ads-rev">0 AED</div><div style="font-size:12px;color:var(--muted);margin-top:6px">10 AED × إجمالي الأيام المباعة</div></div>
     </div>
 
@@ -465,7 +530,7 @@ const fd=d=>{if(!d)return'—';return new Date(d).toLocaleDateString('ar-AE',{ye
 const eh=m=>`<div class="es"><div class="ei">📭</div><p>${m}<br><small>ستظهر هنا عند أول تسجيل</small></p></div>`;
 function toast(m,d=2500){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),d);}
 function toggleAdminMenu(force){const open=typeof force==='boolean'?force:!document.body.classList.contains('admin-menu-open');document.body.classList.toggle('admin-menu-open',open);const btn=document.querySelector('.mobile-admin-menu');if(btn)btn.setAttribute('aria-expanded',String(open));}
-function navTo(id){toggleAdminMenu(false);document.querySelectorAll('.pg').forEach(p=>p.classList.remove('active'));document.querySelectorAll('.ni').forEach(n=>n.classList.remove('active'));document.getElementById('pg-'+id).classList.add('active');document.querySelector('[data-p='+id+']')?.classList.add('active');if(id==='notifications')loadNotif();if(id==='offices'){loadOff();refreshOfficeQueue();}}
+function navTo(id){toggleAdminMenu(false);document.querySelectorAll('.pg').forEach(p=>p.classList.remove('active'));document.querySelectorAll('.ni').forEach(n=>n.classList.remove('active'));document.getElementById('pg-'+id).classList.add('active');document.querySelector('[data-p='+id+']')?.classList.add('active');if(id==='notifications')loadNotif();if(id==='ads')loadAds();if(id==='offices'){loadOff();refreshOfficeQueue();}}
 function toggleDark(){isDark=!isDark;document.body.classList.toggle('dark',isDark);localStorage.setItem('saahl_dark',isDark?'1':'0');const cb=document.getElementById('dk-cb');if(cb)cb.checked=isDark;document.getElementById('dkb').textContent=isDark?'☀️':'🌙';}
 function toggleAdminPassword(){const el=document.getElementById('le-pass'),eye=document.getElementById('le-eye');const visible=el.type==='password';el.type=visible?'text':'password';eye.setAttribute('aria-label',visible?'إخفاء كلمة المرور':'إظهار كلمة المرور');eye.title=eye.getAttribute('aria-label');eye.style.color=visible?'var(--teal)':'var(--muted)';}
 let adminAuthBusy=false;
@@ -1018,32 +1083,61 @@ function saahlAdLine(text,className){
 function showSaahl2WorkerPreview(ad,parsed){
  return window.SaahlWorkerCard.open(ad,parsed,db,SU);
 }
+let adsLoadRequest=0;
 async function loadAds(){
- const w=document.getElementById('ads-wrap');
+ const request=++adsLoadRequest;
+ const queue=document.getElementById('ads-wrap');
+ const history=document.getElementById('ads-history');
+ const archive=document.getElementById('ads-history-wrap');
+ queue.setAttribute('aria-busy','true');
  const {data,error}=await db.from('strip_ads').select('*').order('created_at',{ascending:false});
- if(error){w.textContent='تعذر تحميل طلبات الإعلانات: '+error.message;updateAdsBadge(0);return;}
+ if(request!==adsLoadRequest)return;
+ queue.setAttribute('aria-busy','false');
+ if(error){
+  queue.textContent='تعذر تحميل طلبات الإعلانات. اضغط تحديث القائمة للمحاولة مرة أخرى.';
+  return;
+ }
  aAds=data||[];
  const pending=aAds.filter(a=>a.status==='pending');
  const active=aAds.filter(a=>['active','approved'].includes(a.status)&&Date.parse(a.expires_at||0)>Date.now());
  document.getElementById('ads-cnt').textContent=active.length+' إعلان نشط';
  document.getElementById('ads-rev').textContent='0 AED';
  updateAdsBadge(pending.length);
- if(!aAds.length){w.textContent='لا توجد طلبات إعلانات مسجلة';return;}
- w.replaceChildren();
+ const previous=aAds.filter(a=>a.status!=='pending');
+ const count=document.getElementById('ads-pending-count');
+ count.hidden=!pending.length;
+ count.textContent=pending.length;
+ const overviewCount=document.getElementById('overview-ads-pending');
+ overviewCount.hidden=!pending.length;
+ overviewCount.textContent=pending.length;
+ document.getElementById('ads-history-count').textContent=previous.length;
+ history.hidden=!previous.length;
+ queue.replaceChildren();
+ archive.replaceChildren();
+ if(!pending.length){
+  const empty=saahlAdLine('لا توجد طلبات إعلانات بانتظار المراجعة.','ads-queue-empty');
+  empty.setAttribute('role','status');
+  queue.append(empty);
+ }
+ const newCards=document.createDocumentFragment();
+ const oldCards=document.createDocumentFragment();
  for(const a of aAds){
   const parsed=saahlAdDetails(a.ad_details);
   const workerAd=Boolean(a.worker_id || a.worker_photo_url || parsed.worker || parsed.photo ||
    /^عاملة\s+متاحة\s*[:：]/.test(a.ad_topic||'') || parsed.parts.some(part=>/^العاملة\s*[:：]/.test(part)));
   const card=document.createElement('article');card.className=workerAd?'ac saahl-ad-card ad-worker-summary':'ac saahl-ad-card';
+  const awaitingReview=a.status==='pending';
+  if(awaitingReview)card.classList.add('ad-awaiting-review');
   const header=document.createElement('div');header.className='ad-card-header';
   const heading=document.createElement('div');heading.className='ad-card-heading';
   const title=document.createElement('strong');title.textContent=a.ad_topic||'إعلان';
   heading.append(title,saahlAdLine(a.advertiser_name||'معلن غير محدد','ad-office-name'));
   const state=document.createElement('span');state.className='bge '+(a.status==='pending'?'pending':'active');
   state.textContent=a.status==='pending'?'بانتظار المراجعة':(['active','approved'].includes(a.status)?'معتمد':a.status||'—');
-  if(parsed.photo){
+  const photo=saahlAdDetails(a.worker_photo_url).photo||parsed.photo;
+  if(photo){
    const img=document.createElement('img');
-   img.className='ad-worker-photo';img.src=parsed.photo;img.alt='صورة العاملة';
+   img.className='ad-worker-photo';img.src=photo;img.alt='صورة العاملة';
    img.loading='lazy';img.referrerPolicy='no-referrer';
    img.onerror=()=>{img.style.display='none';};
    header.append(img);
@@ -1073,8 +1167,11 @@ async function loadAds(){
   }
   const del=document.createElement('button');del.className='btn btn-d btn-s';del.textContent='حذف';
   del.onclick=()=>delAd(a.id);controls.append(del);
-  card.append(controls);w.append(card);
+  card.append(controls);
+  (awaitingReview?newCards:oldCards).append(card);
  }
+ queue.append(newCards);
+ archive.append(oldCards);
 }
 function updateAdsBadge(n){const b=document.getElementById('ads-badge');if(!b)return;if(n>0){b.textContent=n>99?'99+':n;b.style.display='flex';}else{b.style.display='none';}}
 async function appAd(id){

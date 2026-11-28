@@ -135,6 +135,10 @@ try {
        {id:'office-1',name:'مكتب معتمد',license_number:'QA-11',status:'approved'},
        {id:'office-2',name:'مكتب جديد',license_number:'QA-22',status:'pending'}
      ];
+     window.adminAdRows=[
+       {id:'archived-ad',ad_topic:'إعلان سابق',status:'approved',advertiser_name:'مكتب معتمد',ad_details:'تفاصيل سابقة'},
+       {id:'pending-ad',ad_topic:'عاملة متاحة: طلب جديد',status:'pending',advertiser_name:'مكتب جديد',ad_details:'خبرة: 3 سنوات',worker_photo_url:'https://hkfxikmpfgixrbrboxeb.supabase.co/storage/v1/object/public/mock/worker.png'}
+     ];
      window.supabase={createClient:()=>({
        auth:{getSession:async()=>({data:{session:null}})},
        rpc:async name=>({data:name==='saahl2_office_license_review'
@@ -147,7 +151,8 @@ try {
            eq(key,value){if(key==='status')status=value;return query;},
            gte(){return query;}, order(){return query;}, limit(){return query;},
            then(resolve,reject){
-             const rows=table==='offices'?window.adminOfficeRows.filter(o=>!status||o.status===status):[];
+             const rows=table==='offices'?window.adminOfficeRows.filter(o=>!status||o.status===status):
+               table==='strip_ads'?window.adminAdRows:[];
              return Promise.resolve({data:head?null:rows,count:rows.length,error:null}).then(resolve,reject);
            }
          };
@@ -155,6 +160,7 @@ try {
        }
      })};`
    }));
+   await ctx.route('**/storage/v1/object/public/mock/worker.png',route=>route.fulfill({path:'saahl-logo.png'}));
    const page=await ctx.newPage();
    await page.goto('http://127.0.0.1:8765/admin.html',{waitUntil:'domcontentloaded'});
    await page.evaluate(()=>showApp());
@@ -219,6 +225,33 @@ try {
    checks++;
    if(!Object.values(good).every(Boolean)||!closed)fails++;
    console.log(JSON.stringify({width,workerPreview:{...good,closed}}));
+   await page.evaluate(()=>navTo('overview'));
+   const review=page.getByRole('button',{name:/مراجعة إعلانات الشريط/});
+   await review.getByText('1',{exact:true}).waitFor();
+   await review.click();
+   const pending=page.locator('#ads-wrap .ad-awaiting-review');
+   await pending.waitFor();
+   const previous=page.locator('#ads-history');
+   const old=previous.getByText('إعلان سابق',{exact:true});
+   const initiallyCollapsed=await old.isHidden();
+   const pendingColor=await pending.evaluate(el=>getComputedStyle(el).backgroundColor);
+   const imageReady=await pending.locator('img').evaluate(img=>img.decode().then(
+     ()=>getComputedStyle(img).objectFit==='contain'&&img.offsetHeight>=76,()=>false));
+   const approvalVisible=await pending.getByRole('button',{name:'موافقة ونشر'}).isVisible();
+   await pending.getByRole('button',{name:'عرض العاملة'}).click();
+   const adPreview=page.getByRole('dialog',{name:'عاملة متاحة: طلب جديد'});
+   await adPreview.getByRole('button',{name:'إغلاق'}).click();
+   await previous.locator('summary').click();
+   await old.waitFor();
+   const archiveColor=await old.evaluate(el=>getComputedStyle(el.closest('article')).backgroundColor);
+   await page.evaluate(()=>{window.adminAdRows[1].status='approved'});
+   await page.getByRole('button',{name:'تحديث القائمة',exact:true}).click();
+   await page.getByText('لا توجد طلبات إعلانات بانتظار المراجعة.').waitFor();
+   const restored=await previous.getByText('عاملة متاحة: طلب جديد',{exact:true}).isVisible();
+   const adsFit=await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+2);
+   const adsPass=initiallyCollapsed&&pendingColor!==archiveColor&&imageReady&&approvalVisible&&restored&&adsFit;
+   checks++;if(!adsPass)fails++;
+   console.log(JSON.stringify({width,adminAdsReview:{initiallyCollapsed,imageReady,approvalVisible,restored,adsFit,pass:adsPass}}));
    await ctx.close();
  }
  // Published ads share one marquee; every button opens its own details.
